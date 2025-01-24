@@ -85,6 +85,8 @@ public class Shop : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        peaShooter1.SetActive(true);
+        peaShooter2.SetActive(true);
         // Original idea: panels and outlines change color based on who owns the weapon
         for (int i=0; i<panels.Count; i+=1) {
             // check if have enough money to buy a weapon

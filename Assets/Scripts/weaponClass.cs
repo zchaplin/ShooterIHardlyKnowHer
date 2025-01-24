@@ -9,25 +9,23 @@ public class Weapon : MonoBehaviour
     //public float range = 100f;
     //public float damage = 50f;
 
-    [SerializeField] public int player;
+    [SerializeField] public int player; // This is now unused but kept for consistency with the existing structure.
 
-     //OVERRIDE THIS VARIABLE TO THE PROJECTILE BEING SHOT IN WEAPON SCRIPTS
-     public GameObject baseBullet;
+    // OVERRIDE THIS VARIABLE TO THE PROJECTILE BEING SHOT IN WEAPON SCRIPTS
+    public GameObject baseBullet;
 
     private float nextTimeToFire = 0f;
     protected Quaternion bulletRotation;
-    public virtual void Start() {
+
+    public virtual void Start()
+    {
     }
+
     // Update is called once per frame
     public virtual void Update()
     {
         // Check if it's time to fire
-        if (Input.GetKeyDown(KeyCode.W) && player == 2 && Time.time >= nextTimeToFire)
-        {
-            nextTimeToFire = Time.time + 1f / fireRate;
-            Shoot();
-        }
-        if (Input.GetKeyDown(KeyCode.UpArrow) && player == 1 && Time.time >= nextTimeToFire)
+        if (Input.GetMouseButton(0) && Time.time >= nextTimeToFire) // 0 = Left Mouse Button
         {
             nextTimeToFire = Time.time + 1f / fireRate;
             Shoot();
@@ -36,14 +34,7 @@ public class Weapon : MonoBehaviour
 
     public virtual void Shoot()
     {
-        // if (player == 1) {
-        //     bulletRotation = gameObject.transform.rotation;
-        // }
-        // else {
-        //     bulletRotation = gameObject.transform.rotation * Quaternion.Euler(0f, 180f, 0f);
-        // }
-
-        //spawn bullet
+        // Spawn bullet
         Instantiate(baseBullet, gameObject.transform.position, gameObject.transform.rotation);
     }
 }
