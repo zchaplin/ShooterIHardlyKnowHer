@@ -5,9 +5,6 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/Chaplin.unity
-    guid: 9ad44f850d08e494dbea1e1e46f28713
   - enabled: 1
     path: Assets/Scenes/Menu.unity
     guid: f9ff272a3896c0b46af1e413ef5668fe

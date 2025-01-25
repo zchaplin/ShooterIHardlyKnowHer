@@ -23,7 +23,12 @@ public class HealthManager : MonoBehaviour
     }
 
     public void playerTakeDamage(int dmg) {
-        remainingHealth -= dmg;
+        if (remainingHealth > 0) {
+            remainingHealth -= dmg;
+        }
+        if (remainingHealth < 0) {
+            remainingHealth = 0;
+        }
     }
 
     public int getRemainingPlayerHealth() {

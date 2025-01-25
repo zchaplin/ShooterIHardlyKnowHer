@@ -38,8 +38,10 @@ public class MovementManager : MonoBehaviour
         // Handle sideways movement (A/D)
         HandleSidewaysMovement();
 
-        // Handle mouse movement for camera
-        RotatePlayerWithMouse();
+        // Handle mouse movement for camera and ensure it won't happen while in shop
+        if (Cursor.lockState != CursorLockMode.Confined) {
+            RotatePlayerWithMouse();
+        }
     }
 
     void HandleSidewaysMovement()
