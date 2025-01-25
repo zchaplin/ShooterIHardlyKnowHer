@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.43956843, g: 0.4879421, b: 0.56817114, a: 1}
+  m_IndirectSpecularColor: {r: 0.43956822, g: 0.48794192, b: 0.56817085, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -11403,7 +11403,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   smallObject: {fileID: 1510788016}
   bigObject: {fileID: 2106340085}
-  specialObject: {fileID: 0}
+  specialObject: {fileID: 316559051}
   initialWaveDuration: 5
   initialSpawnInterval: 1.5
   waveIncreaseFactor: 1.2
@@ -20375,7 +20375,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -377.3, y: 0}
+  m_AnchoredPosition: {x: -244, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &995672615
@@ -37203,8 +37203,6 @@ GameObject:
   - component: {fileID: 1766852595}
   - component: {fileID: 1766852594}
   - component: {fileID: 1766852593}
-  - component: {fileID: 1766852592}
-  - component: {fileID: 1766852591}
   m_Layer: 0
   m_Name: Zag
   m_TagString: Untagged
@@ -37212,35 +37210,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1766852591
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1766852590}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b35ac9670705ba4d95202db27425377, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pushForce: 5
-  interval: 1
---- !u!114 &1766852592
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1766852590}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9939c2ec0d13d894184050a04fe22565, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  active: 0
-  speed: 0.5
-  health: 10
 --- !u!114 &1766852593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41532,7 +41501,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   smallObject: {fileID: 694228104}
   bigObject: {fileID: 1304603204}
-  specialObject: {fileID: 0}
+  specialObject: {fileID: 1766852590}
   initialWaveDuration: 5
   initialSpawnInterval: 1.5
   waveIncreaseFactor: 1.2
