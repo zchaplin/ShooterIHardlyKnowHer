@@ -24,19 +24,22 @@ public class Proj_Move : MonoBehaviour
     private bool hit = false;
 
     // Start is called before the first frame update
-    public virtual void Start() {
+    public virtual void Start() 
+    {
         GameObject healthManagerObject = GameObject.Find("healthManager");
         health = healthManagerObject.GetComponent<HealthManager>();
+
         if (rb != null) {
             // setup the velocity
             //rb.velocity = vel_start;
-            rb.velocity = Vector3.zero;
-            rb.AddRelativeForce(vel_start, ForceMode.VelocityChange);
+            rb.velocity = transform.forward * vel_start.magnitude;
+
             //rb.AddForce(vel_start, ForceMode.VelocityChange);
             if (accel == Vector3.zero) {
                 canAccel = false;
             }
-        } else {
+        } 
+        else {
             Debug.LogError("Projectile: " + name + " has no rigidbody");
         }
         // set the projectile to die after [lifespan] seconds
@@ -44,10 +47,11 @@ public class Proj_Move : MonoBehaviour
 
     }
 
-    private void FixedUpdate() {
+    private void FixedUpdate() 
+    {
         if (rb != null && canAccel) {
             // update velocity to add custom acceleration
-            rb.AddRelativeForce(accel,ForceMode.VelocityChange);
+            rb.AddForce(accel,ForceMode.Acceleration);
         }
     }
 
@@ -59,20 +63,28 @@ public class Proj_Move : MonoBehaviour
     }
 
     // collision detection for projectile
-    private void OnCollisionEnter(Collision other) {
+    private void OnCollisionEnter(Collision other) 
+    {
         damageEntity(other.gameObject);
     }
 
-    public virtual void damageEntity(GameObject other) {
+    public virtual void damageEntity(GameObject other) 
+    {
         Debug.Log("damage gameobject: " + other.name);
+
         MoveForward component = other.GetComponent<MoveForward>();
-        if (component) {
+
+        if (component) 
+        {
             component.TakeDamage(damage);
             GameObject.FindWithTag("Score").GetComponent<ScoreTracker>().addScore(1);
             if (++pierced > piercing_limit) Destroy(gameObject);
-        } else if (other.gameObject.tag == "Player") {
+        } 
+        else if (other.gameObject.tag == "Player") 
+        {
             Debug.Log("PLAYER DAMAGED");
-            if (!hit) {
+            if (!hit) 
+            {
                 health.playerTakeDamage(1);
             }
             hit = true; 

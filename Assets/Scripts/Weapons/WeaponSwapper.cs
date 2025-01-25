@@ -4,34 +4,26 @@ using UnityEngine;
 
 public class WeaponSwapper : MonoBehaviour
 {
-    [SerializeField] public GameObject peaShooter1;
-    [SerializeField] public GameObject peaShooter2;
-    [SerializeField] public GameObject launcher1;
-    [SerializeField] public GameObject launcher2;
+    [SerializeField] public GameObject peaShooter;
+    [SerializeField] public GameObject launcher;
     // Start is called before the first frame update
     void Start()
     {
-        launcher1.SetActive(true);
-        launcher2.SetActive(false);
-        peaShooter1.SetActive(false);
-        peaShooter2.SetActive(true);
+        launcher.SetActive(true);
+        peaShooter.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space)) {
-            if (launcher1.activeInHierarchy) {
-                peaShooter1.SetActive(true);
-                peaShooter2.SetActive(false);
-                launcher1.SetActive(false);
-                launcher2.SetActive(true);
+            if (launcher.activeInHierarchy) {
+                peaShooter.SetActive(true);
+                launcher.SetActive(false);
             }
             else {
-                peaShooter1.SetActive(false);
-                peaShooter2.SetActive(true);
-                launcher1.SetActive(true);
-                launcher2.SetActive(false);
+                peaShooter.SetActive(false);
+                launcher.SetActive(true);
             }
         }
         
