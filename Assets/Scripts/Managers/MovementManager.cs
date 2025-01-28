@@ -27,12 +27,16 @@ public class MovementManager : NetworkBehaviour
         Cursor.visible = false;
     }
 
-    public override void OnNetworkSpawn(){
-        if(!IsOwner) Destroy(this);
+    public override void OnNetworkSpawn()
+    {
+        if(IsLocalPlayer){
+            playerCamera.gameObject.SetActive(true);
+        }
     }
 
     void Update()
     {
+        if(!IsOwner) return;
         // Handle sideways movement (A/D)
         HandleSidewaysMovement();
 
