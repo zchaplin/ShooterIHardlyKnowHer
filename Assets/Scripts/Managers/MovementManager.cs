@@ -1,8 +1,9 @@
+using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class MovementManager : MonoBehaviour
+public class MovementManager : NetworkBehaviour
 {
-    [SerializeField] private GameObject player1; // The player GameObject
     [SerializeField] private Camera playerCamera; // Player's camera
     [SerializeField] private float speed = 10f; // Movement speed
     [SerializeField] private float acceleration = 20f; // Movement acceleration
@@ -14,14 +15,7 @@ public class MovementManager : MonoBehaviour
 
     void Start()
     {
-        // Ensure the player GameObject and CharacterController are assigned
-        if (player1 == null)
-        {
-            Debug.LogError("Player1 is not assigned in the MovementManager script.");
-            return;
-        }
-
-        characterControllerP1 = player1.GetComponent<CharacterController>();
+        characterControllerP1 = GetComponent<CharacterController>();
         if (characterControllerP1 == null)
         {
             Debug.LogError("Player1 does not have a CharacterController component.");
@@ -31,6 +25,10 @@ public class MovementManager : MonoBehaviour
         // Lock the cursor to the center of the screen and make it invisible
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    public override void OnNetworkSpawn(){
+        if(!IsOwner) Destroy(this);
     }
 
     void Update()
@@ -56,12 +54,12 @@ public class MovementManager : MonoBehaviour
         currentVelocityP1 = Vector3.Lerp(currentVelocityP1, moveDirection * speed, acceleration * Time.deltaTime);
 
         // Lock the player's Y and Z positions to enforce movement along the X-axis only
-        Vector3 newPosition = player1.transform.position + currentVelocityP1 * Time.deltaTime;
-        newPosition.y = player1.transform.position.y; // Lock Y position
-        newPosition.z = player1.transform.position.z; // Lock Z position
+        Vector3 newPosition = transform.position + currentVelocityP1 * Time.deltaTime;
+        newPosition.y = transform.position.y; // Lock Y position
+        newPosition.z = transform.position.z; // Lock Z position
 
         // Move the player using the CharacterController
-        characterControllerP1.Move(newPosition - player1.transform.position);
+        characterControllerP1.Move(newPosition - transform.position);
     }
 
     void RotatePlayerWithMouse()
@@ -71,7 +69,7 @@ public class MovementManager : MonoBehaviour
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
         // Rotate the player around the Y-axis (left/right movement)
-        player1.transform.Rotate(Vector3.up * mouseX);
+        transform.Rotate(Vector3.up * mouseX);
 
         // Rotate the camera up/down, clamping to prevent over-rotation
         verticalLookRotation -= mouseY;
