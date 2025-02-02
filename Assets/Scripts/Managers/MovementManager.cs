@@ -11,6 +11,8 @@ public class MovementManager : MonoBehaviour
     private CharacterController characterControllerP1;
     private Vector3 currentVelocityP1 = Vector3.zero;
     private float verticalLookRotation = 0f; // Tracks up/down camera rotation
+    private float horizontalLookRotation = 0f; // Tracks left/right camera rotation
+    private Vector3 startingForwardDirection; // Tracks the player's initial forward direction
 
     void Start()
     {
@@ -70,8 +72,12 @@ public class MovementManager : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        // Rotate the player around the Y-axis (left/right movement)
-        player1.transform.Rotate(Vector3.up * mouseX);
+        // Rotate the player horizontally (left/right)
+        horizontalLookRotation += mouseX;
+        horizontalLookRotation = Mathf.Clamp(horizontalLookRotation, -90f, 90f); // Limit to 90 degrees left/right
+
+        // Apply the clamped horizontal rotation to the player
+        player1.transform.rotation = Quaternion.Euler(0f, horizontalLookRotation, 0f) * Quaternion.LookRotation(startingForwardDirection);
 
         // Rotate the camera up/down, clamping to prevent over-rotation
         verticalLookRotation -= mouseY;
