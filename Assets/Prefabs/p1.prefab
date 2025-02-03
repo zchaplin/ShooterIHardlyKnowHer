@@ -236,6 +236,7 @@ GameObject:
   - component: {fileID: 7851318638961055507}
   - component: {fileID: 6107928483338227633}
   - component: {fileID: 2458831180728407551}
+  - component: {fileID: 3066880144147088103}
   m_Layer: 0
   m_Name: p1
   m_TagString: Player
@@ -419,6 +420,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f67df16387e24896b422f1375082ceb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  player1: {fileID: 0}
   playerCamera: {fileID: 1629880104306304855}
   speed: 10
   acceleration: 20
@@ -436,6 +438,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weapons: {fileID: 7674037595774685501}
+--- !u!114 &3066880144147088103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4400328585649254945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3ea3a66023867e42825c333f8aafdc6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &366558390858064643
 PrefabInstance:
   m_ObjectHideFlags: 0
