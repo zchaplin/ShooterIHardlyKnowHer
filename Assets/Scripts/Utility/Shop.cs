@@ -5,11 +5,14 @@ using UnityEngine.UI;
 
 public class Shop : MonoBehaviour
 {
+<<<<<<< Updated upstream
     [SerializeField] public GameObject peaShooter1;
     [SerializeField] public GameObject launcher1;
     [SerializeField] public GameObject boomarang1;
     [SerializeField] public GameObject weapon41;
 
+=======
+>>>>>>> Stashed changes
     [SerializeField] public GameObject canvasShop;
     [SerializeField] public GameObject panel1;
     [SerializeField] public GameObject panel2;
@@ -28,6 +31,7 @@ public class Shop : MonoBehaviour
     void Start()
     {
         manageButtonImages();
+        ShowCorrectImage();
        
         canvasShop.SetActive(false);
 
@@ -77,7 +81,7 @@ public class Shop : MonoBehaviour
         }
 
 
-        ShowCorrectImage();
+        
     }
     public void activateWeapons(int weaponNum) {
         // Show canvas and cursor
@@ -105,6 +109,7 @@ public class Shop : MonoBehaviour
                 weapons1Bought[weaponNum] = 1;
             }
         }
+        ShowCorrectImage();
     }
 
 
