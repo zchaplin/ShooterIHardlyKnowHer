@@ -5,14 +5,11 @@ using UnityEngine.UI;
 
 public class Shop : MonoBehaviour
 {
-<<<<<<< Updated upstream
-    [SerializeField] public GameObject peaShooter1;
-    [SerializeField] public GameObject launcher1;
-    [SerializeField] public GameObject boomarang1;
-    [SerializeField] public GameObject weapon41;
+    // [SerializeField] public GameObject peaShooter1;
+    // [SerializeField] public GameObject launcher1;
+    // [SerializeField] public GameObject boomarang1;
+    // [SerializeField] public GameObject weapon41;
 
-=======
->>>>>>> Stashed changes
     [SerializeField] public GameObject canvasShop;
     [SerializeField] public GameObject panel1;
     [SerializeField] public GameObject panel2;
@@ -30,30 +27,32 @@ public class Shop : MonoBehaviour
 
     void Start()
     {
-        manageButtonImages();
-        ShowCorrectImage();
-       
-        canvasShop.SetActive(false);
-
         player1Weapons = new List<GameObject>();
-        player1Weapons.Add(peaShooter1);
-        player1Weapons.Add(launcher1);
-        player1Weapons.Add(boomarang1);
-        player1Weapons.Add(weapon41);
-        peaShooter1.SetActive(true);
-
-        for (int i=1; i<player1Weapons.Count; i+=1) {
-            player1Weapons[i].SetActive(false);
-        }
-
         weaponsPrice = new List<int> {0,5,20,45,100};
         weapons1Bought = new List<int> {1,0,0,0,0};
+
+        manageButtonImages();
+       
+        canvasShop.SetActive(false);
         // Panels colors
         panels = new List<Image>();
         panels.Add(panel1.GetComponent<Image>());
         panels.Add(panel2.GetComponent<Image>());
         panels.Add(panel3.GetComponent<Image>());
         panels.Add(panel4.GetComponent<Image>());
+    }
+
+    public void addWeapons(Transform weapons) {
+        for (int i=0; i<weapons.childCount; i+=1) {
+            player1Weapons.Add(weapons.GetChild(i).gameObject);
+        }
+
+        for (int i=1; i<weapons.childCount; i+=1) {
+            player1Weapons[i].SetActive(false);
+        }
+
+        player1Weapons[0].SetActive(true);
+        Debug.Log(player1Weapons[0]);
     }
 
     void Update()
@@ -81,8 +80,9 @@ public class Shop : MonoBehaviour
         }
 
 
-        
+        ShowCorrectImage();
     }
+
     public void activateWeapons(int weaponNum) {
         // Show canvas and cursor
         Cursor.lockState = CursorLockMode.None;
@@ -109,7 +109,6 @@ public class Shop : MonoBehaviour
                 weapons1Bought[weaponNum] = 1;
             }
         }
-        ShowCorrectImage();
     }
 
 
@@ -158,7 +157,7 @@ public class Shop : MonoBehaviour
             }
 
             // Image for the activated weapon
-            if (player1Weapons[i].activeInHierarchy) {
+            if (player1Weapons.Count > 0 && player1Weapons[i].activeInHierarchy) {
                 if (image.name == "filledRedGun") {
                     image.enabled = true;
                 }
