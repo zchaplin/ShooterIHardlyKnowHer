@@ -30,11 +30,11 @@ public class Proj_Move : MonoBehaviour
         health = healthManagerObject.GetComponent<HealthManager>();
 
         if (rb != null) {
-            // setup the velocity
-            //rb.velocity = vel_start;
-            rb.velocity = transform.forward * vel_start.magnitude;
+            // Use the velocity already set by the Weapon script
+            if (rb.velocity == Vector3.zero) {
+                rb.velocity = transform.forward * vel_start.magnitude;
+            }
 
-            //rb.AddForce(vel_start, ForceMode.VelocityChange);
             if (accel == Vector3.zero) {
                 canAccel = false;
             }
@@ -42,9 +42,9 @@ public class Proj_Move : MonoBehaviour
         else {
             Debug.LogError("Projectile: " + name + " has no rigidbody");
         }
-        // set the projectile to die after [lifespan] seconds
-        StartCoroutine("KillProj", lifespan);
 
+        // Set the projectile to die after [lifespan] seconds
+        StartCoroutine("KillProj", lifespan);
     }
 
     private void FixedUpdate() 
