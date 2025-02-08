@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Killable
   - Score
+  - Enemy
   layers:
   - Default
   - TransparentFX

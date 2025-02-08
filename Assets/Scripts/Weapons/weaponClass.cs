@@ -9,7 +9,7 @@ public class Weapon : MonoBehaviour
     //public float range = 100f;
     //public float damage = 50f;
 
-    [SerializeField] public int player; // This is now unused but kept for consistency with the existing structure.
+    // [SerializeField] public int player; // This is now unused but kept for consistency with the existing structure.
 
     // OVERRIDE THIS VARIABLE TO THE PROJECTILE BEING SHOT IN WEAPON SCRIPTS
     public GameObject baseBullet;
@@ -18,7 +18,7 @@ public class Weapon : MonoBehaviour
     protected Quaternion bulletRotation;
 
     // Reference to player camera (for crosshair)
-    [SerializeField] private Camera playerCamera;
+    public Camera playerCamera;
 
     public virtual void Start()
     {

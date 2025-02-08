@@ -45,6 +45,11 @@ public class MoveForward : MonoBehaviour
         
     }
 
+    public void Deactivate() {
+        speed = 0f;
+        active = false;
+    }
+
     public void TakeDamage(int x){
         health -= x;
         checkAlive();

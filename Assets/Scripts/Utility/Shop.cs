@@ -28,7 +28,7 @@ public class Shop : MonoBehaviour
     void Start()
     {
         player1Weapons = new List<GameObject>();
-        weaponsPrice = new List<int> {0,5,20,45,100};
+        weaponsPrice = new List<int> {0,0,0,0,0};
         weapons1Bought = new List<int> {1,0,0,0,0};
 
         manageButtonImages();
