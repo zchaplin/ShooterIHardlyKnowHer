@@ -87,7 +87,7 @@ public class Weapon : MonoBehaviour
         // If the ray doesn't hit anything, shoot in the camera's forward direction
         else
         {
-            return playerCamera.transform.forward;
+            return transform.forward;
         }
     }
 
