@@ -46,8 +46,6 @@ public class Weapon : MonoBehaviour
         // Calculate the direction from the weapon to the crosshair
         Vector3 shootDirection = GetShootDirection();
 
-        // Debug.Log("Shoot direction: " + shootDirection);
-
         // Spawn bullet with the calculated direction
         GameObject bullet = Instantiate(baseBullet, gameObject.transform.position, Quaternion.identity);
         bullet.transform.forward = shootDirection; // Set the bullet's forward direction
@@ -56,7 +54,22 @@ public class Weapon : MonoBehaviour
         Rigidbody bulletRigidbody = bullet.GetComponent<Rigidbody>();
         if (bulletRigidbody != null)
         {
-            bulletRigidbody.velocity = shootDirection * 75f; // Adjust speed as needed
+            // Check if the crosshair is aiming at something
+            Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)); // Center of the screen
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                // If aiming at something, calculate velocity to hit the target (with gravity)
+                Vector3 targetPosition = hit.point;
+                Vector3 velocity = CalculateVelocityToHitTarget(bullet.transform.position, targetPosition, bulletRigidbody);
+                bulletRigidbody.velocity = velocity;
+            }
+            else
+            {
+                // If not aiming at anything, shoot straight forward (no gravity)
+                bulletRigidbody.velocity = shootDirection * 75f; // Adjust speed as needed
+            }
         }
     }
 
@@ -74,7 +87,28 @@ public class Weapon : MonoBehaviour
         // If the ray doesn't hit anything, shoot in the camera's forward direction
         else
         {
-            return playerCamera.transform.forward;
+            return transform.forward;
         }
+    }
+
+    private Vector3 CalculateVelocityToHitTarget(Vector3 origin, Vector3 target, Rigidbody rb)
+    {
+        // Calculate the direction to the target
+        Vector3 direction = target - origin;
+        float distance = direction.magnitude;
+
+        // Calculate the time of flight based on distance and bullet speed
+        float bulletSpeed = 75f; // Adjust this value to control bullet speed
+        float timeOfFlight = distance / bulletSpeed;
+
+        // Calculate the vertical velocity required to compensate for gravity
+        float gravity = Physics.gravity.magnitude;
+        float verticalVelocity = (target.y - origin.y) / timeOfFlight + 0.5f * gravity * timeOfFlight;
+
+        // Combine horizontal and vertical velocities
+        Vector3 velocity = direction.normalized * bulletSpeed;
+        velocity.y = verticalVelocity;
+
+        return velocity;
     }
 }

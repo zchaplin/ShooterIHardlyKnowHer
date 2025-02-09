@@ -12,6 +12,8 @@ public class MovementManager : NetworkBehaviour
     private CharacterController characterControllerP1;
     private Vector3 currentVelocityP1 = Vector3.zero;
     private float verticalLookRotation = 0f; // Tracks up/down camera rotation
+    private float horizontalLookRotation = 0f; // Tracks left/right camera rotation
+    private Vector3 startingForwardDirection; // Tracks the player's initial forward direction
 
     void Start()
     {
@@ -51,6 +53,12 @@ public class MovementManager : NetworkBehaviour
         // Get input for sideways movement (A/D keys)
         float moveX = Input.GetAxis("Horizontal");
 
+        // Reverse movement for Player 2 
+        if (OwnerClientId == 1) 
+        {
+            moveX *= -1;
+        }
+
         // Calculate movement direction (only along the X-axis, ignoring rotation)
         Vector3 moveDirection = Vector3.right * moveX;
 
@@ -72,8 +80,23 @@ public class MovementManager : NetworkBehaviour
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        // Rotate the player around the Y-axis (left/right movement)
-        transform.Rotate(Vector3.up * mouseX);
+        // Adjust horizontal rotation based on input
+        horizontalLookRotation += mouseX;
+
+        // Apply different rotation clamping based on player ID
+        if (OwnerClientId == 0) // Player 1
+        {
+            horizontalLookRotation = Mathf.Clamp(horizontalLookRotation, -90f, 90f);
+        }
+        else if (OwnerClientId == 1) // Player 2
+        {
+            // Player 2 should rotate between 90° and 270° to match Player 1’s perspective
+            if (horizontalLookRotation < 90f) horizontalLookRotation = 90f;
+            if (horizontalLookRotation > 270f) horizontalLookRotation = 270f;
+        }
+
+    // Apply rotation
+    transform.rotation = Quaternion.Euler(0f, horizontalLookRotation, 0f);
 
         // Rotate the camera up/down, clamping to prevent over-rotation
         verticalLookRotation -= mouseY;
