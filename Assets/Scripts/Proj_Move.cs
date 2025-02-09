@@ -13,7 +13,7 @@ public class Proj_Move : MonoBehaviour
     public Vector3 vel_start = Vector3.forward * 20; // starting projectile velocity
     public Vector3 accel = Vector3.zero; // if not 0, adds to velocity every fixed update
 
-    public bool destroyOnHit = true;
+    public bool destroyOnHit;
     private bool canAccel = true; // sets to false if there is no acceleration to add
     public float lifespan = 5; // number of seconds until projectile disappears
     public float piercing_limit = 0;
