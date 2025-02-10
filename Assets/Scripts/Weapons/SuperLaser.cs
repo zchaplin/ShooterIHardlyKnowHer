@@ -22,6 +22,6 @@ public class SuperLaser : Weapon
        
 
         //spawn bullet
-        Instantiate(baseBullet, gameObject.transform.position + Vector3.forward*22, bulletRotation, transform);
+        Instantiate(baseBullet, gameObject.transform.position + Vector3.forward*2, bulletRotation, transform);
     }
 }

@@ -514,7 +514,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8349394578282742384, guid: 89bb49198dcbc594d9572bdde432a161, type: 3}
       propertyPath: fireRate
-      value: 0.05
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 8349394578282742384, guid: 89bb49198dcbc594d9572bdde432a161, type: 3}
       propertyPath: playerCamera

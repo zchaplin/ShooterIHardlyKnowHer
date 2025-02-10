@@ -28,7 +28,7 @@ public class Proj_Move : MonoBehaviour
     {
         GameObject healthManagerObject = GameObject.Find("healthManager");
         health = healthManagerObject.GetComponent<HealthManager>();
-
+        if (rb == null) { rb = gameObject.GetComponent<Rigidbody>(); }
         if (rb != null) {
             // Use the velocity already set by the Weapon script
             if (rb.velocity == Vector3.zero) {
