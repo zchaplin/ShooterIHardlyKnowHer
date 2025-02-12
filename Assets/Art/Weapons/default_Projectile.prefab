@@ -282,10 +282,10 @@ MonoBehaviour:
   rb: {fileID: 96674918417469273}
   vel_start: {x: 0, y: 3, z: 20}
   accel: {x: 0, y: 0, z: 0}
-  destroyOnHit: 1
+  destroyOnHit: 0
   lifespan: 3.5
   piercing_limit: 0
-  damage: 5
+  damage: 4
 --- !u!54 &96674918417469273
 Rigidbody:
   m_ObjectHideFlags: 0

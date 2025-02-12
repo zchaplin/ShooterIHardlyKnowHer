@@ -5,7 +5,7 @@ using UnityEngine;
 public class Weapon : MonoBehaviour
 {
     // Variables to define weapon behavior
-    public float fireRate = 1f;
+    public float fireRate;// = 1f;
     //public float range = 100f;
     //public float damage = 50f;
 

@@ -16,6 +16,8 @@ public class Shop : MonoBehaviour
     [SerializeField] public GameObject panel3;
     [SerializeField] public GameObject panel4;
     [SerializeField] public GameObject panel5;
+    [SerializeField] public GameObject panel6;
+
     private List<Image> panels;
 
     private List<GameObject> player1Weapons;
@@ -23,13 +25,14 @@ public class Shop : MonoBehaviour
     private List<int> weaponsPrice;
     private List<int> weapons1Bought;
     private Dictionary<Button, RawImage[]> buttonImagesMap;
+    [SerializeField] private ShowWeaponStats showWeaponStats; // used for debugging
 
 
     void Start()
     {
         player1Weapons = new List<GameObject>();
-        weaponsPrice = new List<int> {0,0,0,0,0};
-        weapons1Bought = new List<int> {1,0,0,0,0};
+        weaponsPrice = new List<int> {0,5,15,30,40,40};
+        weapons1Bought = new List<int> {1,0,0,0,0,0};
 
         manageButtonImages();
        
@@ -40,6 +43,8 @@ public class Shop : MonoBehaviour
         panels.Add(panel2.GetComponent<Image>());
         panels.Add(panel3.GetComponent<Image>());
         panels.Add(panel4.GetComponent<Image>());
+
+        Debug.Log("weapons stats: "+showWeaponStats);
     }
 
     public void addWeapons(Transform weapons) {
@@ -109,6 +114,8 @@ public class Shop : MonoBehaviour
                 weapons1Bought[weaponNum] = 1;
             }
         }
+
+        showWeaponStats.updateText(weaponNum);
     }
 
 

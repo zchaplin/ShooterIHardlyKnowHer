@@ -32,9 +32,9 @@ Transform:
   - {fileID: 6566339533292237002}
   - {fileID: 8904315126187721573}
   - {fileID: 93461269253504115}
-  - {fileID: 4952473086262155037}
   - {fileID: 2695204323791905152}
   - {fileID: 4304837177024304585}
+  - {fileID: 4952473086262155037}
   m_Father: {fileID: 7180642123259438290}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2635761614529097251
@@ -551,6 +551,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6179648395382473106, guid: 72b7ffe62e6f61f4b90a993e76b4e80b, type: 3}
+      propertyPath: fireRate
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6179648395382473106, guid: 72b7ffe62e6f61f4b90a993e76b4e80b, type: 3}
       propertyPath: baseBullet
       value: 
       objectReference: {fileID: 4390976419354512532, guid: 9c4792f27e174344980eaa15cf5a7973, type: 3}
@@ -858,7 +862,7 @@ MonoBehaviour:
   fireRate: 1
   baseBullet: {fileID: 4390976419354512532, guid: d4b1b28cf01a2ee4d883e98ece810d61, type: 3}
   playerCamera: {fileID: 1629880104306304855}
-  maxEnemies: 5
+  maxEnemies: 3
   lineMaterial: {fileID: 2100000, guid: aa9f25951a207ca4c9659ce9a2d03d59, type: 2}
   lineColor: {r: 0, g: 0, b: 1, a: 1}
   lineWidth: 0.05
@@ -873,6 +877,10 @@ PrefabInstance:
     - target: {fileID: 1596494700146678190, guid: f2368caac59e6b640a1a006fb413a44e, type: 3}
       propertyPath: player
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1596494700146678190, guid: f2368caac59e6b640a1a006fb413a44e, type: 3}
+      propertyPath: fireRate
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 1596494700146678190, guid: f2368caac59e6b640a1a006fb413a44e, type: 3}
       propertyPath: playerCamera
