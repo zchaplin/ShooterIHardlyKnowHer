@@ -1,43 +1,40 @@
-using Unity.Netcode;
 using UnityEngine;
+using Unity.Netcode;
 using System.Collections.Generic;
 
 public class WeaponBin : NetworkBehaviour
 {
-    public List<GameObject> dummyWeapons; // Assign dummy prefabs in Inspector
-    public List<GameObject> realWeapons;  // Assign real weapon GameObjects
-    private NetworkList<bool> weaponsUnlocked;
+    [SerializeField] private GameObject[] dummyWeaponPrefabs;  // Assign dummy prefabs in inspector
+    [SerializeField] private float pickupRange = 3f;  // How far player can pickup from
+    private List<GameObject> weaponsInBin = new List<GameObject>();
 
-    private void Awake()
+    // Spawn weapon in bin when purchased
+    public void SpawnDummyWeapon(int weaponIndex)
     {
-        weaponsUnlocked = new NetworkList<bool>(
-            new List<bool> { false, false, false, false, false }, 
-            NetworkVariableReadPermission.Everyone, 
-            NetworkVariableWritePermission.Server
+        if (weaponIndex >= dummyWeaponPrefabs.Length) return;
+        
+        // Spawn weapon at a random position within the bin
+        Vector3 randomOffset = new Vector3(
+            Random.Range(-0.5f, 0.5f),
+            0.5f,  // Slightly above bin floor
+            Random.Range(-0.5f, 0.5f)
         );
+        
+        Vector3 spawnPos = transform.position + randomOffset;
+        GameObject dummyWeapon = Instantiate(dummyWeaponPrefabs[weaponIndex], spawnPos, Quaternion.identity);
+        dummyWeapon.GetComponent<NetworkObject>().Spawn();
+        
+        DummyWeapon dummyComponent = dummyWeapon.GetComponent<DummyWeapon>();
+        if (dummyComponent == null)
+            dummyComponent = dummyWeapon.AddComponent<DummyWeapon>();
+            
+        dummyComponent.WeaponIndex = weaponIndex;
+        weaponsInBin.Add(dummyWeapon);
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    public void UnlockWeaponServerRpc(int weaponIndex)
+    // Called when weapon is dropped back in bin
+    public void ReturnWeapon(int weaponIndex, Vector3 dropPosition)
     {
-        if (weaponIndex < weaponsUnlocked.Count)
-        {
-            weaponsUnlocked[weaponIndex] = true;
-            UpdateDummyWeaponClientRpc(weaponIndex, true);
-        }
-    }
-
-    [ClientRpc]
-    private void UpdateDummyWeaponClientRpc(int weaponIndex, bool state)
-    {
-        dummyWeapons[weaponIndex].SetActive(state);
-    }
-
-    public GameObject GetRealWeapon(int weaponIndex)
-    {
-        if (weaponIndex < realWeapons.Count && weaponsUnlocked[weaponIndex])
-            return realWeapons[weaponIndex];
-        else
-            return null;
+        SpawnDummyWeapon(weaponIndex);
     }
 }

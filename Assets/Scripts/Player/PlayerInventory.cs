@@ -1,70 +1,112 @@
+using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class PlayerInventory : NetworkBehaviour
 {
-    public List<GameObject> realWeapons; // Assign real weapon GameObjects
-    private GameObject currentWeapon;
+    public Transform weapons;
+    private Shop shop;
+    [SerializeField] private float pickupRange = 3f;
+    [SerializeField] private Transform playerCamera;  // Assign the player's camera in inspector
+    [SerializeField] private LayerMask weaponLayer;  // Set this to the layer your dummy weapons are on
     private int currentWeaponIndex = 0;
+    private List<int> ownedWeapons = new List<int>();
+    private WeaponBin weaponBin;
 
     public override void OnNetworkSpawn()
     {
-        if (IsOwner)
-        {
-            realWeapons[0].SetActive(true); // Enable default weapon (pea shooter)
-            currentWeapon = realWeapons[0];
+        if (!IsOwner) return;
+
+        shop = FindObjectOfType<Shop>();
+        weaponBin = FindObjectOfType<WeaponBin>();
+        if (shop) {
+            shop.addWeapons(weapons);
         }
-    }
-
-    [ServerRpc]
-    public void PickupWeaponServerRpc(int weaponIndex)
-    {
-        if (!realWeapons[weaponIndex].activeSelf)
-        {
-            // Disable current weapon
-            currentWeapon.SetActive(false);
-
-            // Enable new weapon
-            realWeapons[weaponIndex].SetActive(true);
-            currentWeapon = realWeapons[weaponIndex];
-            currentWeaponIndex = weaponIndex;
-
-            // Sync state
-            UpdateWeaponClientRpc(weaponIndex);
-        }
-    }
-
-    [ClientRpc]
-    private void UpdateWeaponClientRpc(int weaponIndex)
-    {
-        if (IsOwner) return; // Owner already handled
-        realWeapons[weaponIndex].SetActive(true);
-        currentWeapon = realWeapons[weaponIndex];
-        currentWeaponIndex = weaponIndex;
+        
+        // Start with default weapon
+        ownedWeapons.Add(0);
     }
 
     void Update()
     {
         if (!IsOwner) return;
 
-        if (Input.GetKeyDown(KeyCode.Q))
+        // Pickup weapon when looking at it and pressing E
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            ReturnWeapon();
+            TryPickupWeapon();
+        }
+
+        // Drop weapon when pressing T
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            TryDropWeapon();
+        }
+
+        // Switch weapons with number keys
+        for (int i = 0; i < 9; i++)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1 + i))
+            {
+                SwitchWeapon(i);
+            }
+        }
+
+        // Debug raycast to see what we're looking at
+        Debug.DrawRay(playerCamera.position, playerCamera.forward * pickupRange, Color.red);
+    }
+
+    private void TryPickupWeapon()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, pickupRange, weaponLayer))
+        {
+            Debug.Log("Hit something with raycast");
+            DummyWeapon dummyWeapon = hit.collider.GetComponent<DummyWeapon>();
+            if (dummyWeapon != null)
+            {
+                Debug.Log($"Found dummy weapon with index {dummyWeapon.WeaponIndex}");
+                PickupWeapon(dummyWeapon.WeaponIndex);
+                Destroy(dummyWeapon.gameObject);  // Remove the dummy weapon
+            }
         }
     }
 
-    private void ReturnWeapon()
+    private void TryDropWeapon()
     {
-        if (currentWeaponIndex == 0) return; // Can't return default weapon
+        if (currentWeaponIndex == 0) return;  // Can't drop default weapon
 
-        // Re-enable dummy weapon in bin
-        FindObjectOfType<WeaponBin>().UnlockWeaponServerRpc(currentWeaponIndex);
+        if (weaponBin != null)
+        {
+            // Spawn the dummy weapon in the bin
+            weaponBin.SpawnDummyWeapon(currentWeaponIndex);
+            
+            // Remove from inventory
+            ownedWeapons.Remove(currentWeaponIndex);
+            shop.DeactivateWeapon(currentWeaponIndex);
+            
+            // Switch back to default weapon
+            currentWeaponIndex = 0;
+            shop.activateWeapons(0);
+        }
+    }
 
-        // Switch back to default weapon
-        currentWeapon.SetActive(false);
-        currentWeapon = realWeapons[0];
-        currentWeapon.SetActive(true);
-        currentWeaponIndex = 0;
+    private void PickupWeapon(int weaponIndex)
+    {
+        if (!ownedWeapons.Contains(weaponIndex))
+        {
+            ownedWeapons.Add(weaponIndex);
+        }
+        currentWeaponIndex = weaponIndex;
+        shop.activateWeapons(weaponIndex);
+    }
+
+    private void SwitchWeapon(int index)
+    {
+        if (ownedWeapons.Contains(index))
+        {
+            currentWeaponIndex = index;
+            shop.activateWeapons(index);
+        }
     }
 }

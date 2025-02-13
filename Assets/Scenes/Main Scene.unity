@@ -2918,7 +2918,6 @@ MonoBehaviour:
   panel4: {fileID: 26894586}
   panel5: {fileID: 1175521891}
   panel6: {fileID: 476089168}
-  weaponBin: {fileID: 1065925132}
   showWeaponStats: {fileID: 625935869}
 --- !u!1 &134680193
 GameObject:
@@ -3629,6 +3628,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1065925129}
     m_Modifications:
+    - target: {fileID: -3174929121210331205, guid: a58295b61d2977641ba999032a15b44d, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3718823416
+      objectReference: {fileID: 0}
+    - target: {fileID: -3174929121210331205, guid: a58295b61d2977641ba999032a15b44d, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 3285548777
+      objectReference: {fileID: 0}
     - target: {fileID: 601129064418692900, guid: a58295b61d2977641ba999032a15b44d, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 4151493870
@@ -11759,6 +11766,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1065925129}
     m_Modifications:
+    - target: {fileID: -7794906906674296422, guid: 13f2e0d13b5cfd24e9da6e75b0e9a969, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1931060531
+      objectReference: {fileID: 0}
+    - target: {fileID: -7794906906674296422, guid: 13f2e0d13b5cfd24e9da6e75b0e9a969, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 871060000
+      objectReference: {fileID: 0}
     - target: {fileID: 1039770527560777114, guid: 13f2e0d13b5cfd24e9da6e75b0e9a969, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 1115264398
@@ -16342,6 +16357,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1065925129}
     m_Modifications:
+    - target: {fileID: -7636313982780031277, guid: fda7918069f496d48aa469a8578670db, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1754582548
+      objectReference: {fileID: 0}
+    - target: {fileID: -7636313982780031277, guid: fda7918069f496d48aa469a8578670db, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 258846597
+      objectReference: {fileID: 0}
     - target: {fileID: 1841607100372705157, guid: fda7918069f496d48aa469a8578670db, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.099
@@ -16390,15 +16413,9 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5242664765237150080, guid: fda7918069f496d48aa469a8578670db, type: 3}
-      propertyPath: GlobalObjectIdHash
-      value: 2878244565
-      objectReference: {fileID: 0}
-    - target: {fileID: 5242664765237150080, guid: fda7918069f496d48aa469a8578670db, type: 3}
-      propertyPath: InScenePlacedSourceGlobalObjectIdHash
-      value: 2147902462
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 0}
+    - {fileID: -7767832076057235068, guid: fda7918069f496d48aa469a8578670db, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -22820,11 +22837,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1065925129}
   - component: {fileID: 1065925130}
-  - component: {fileID: 1065925131}
   - component: {fileID: 1065925132}
+  - component: {fileID: 1065925131}
   m_Layer: 0
   m_Name: WeaponBox
-  m_TagString: Untagged
+  m_TagString: WeaponBin
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -22904,13 +22921,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c468a5f94a97c164696d33c4f3b67338, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dummyWeapons:
-  - {fileID: 6353242943574501118, guid: 13f2e0d13b5cfd24e9da6e75b0e9a969, type: 3}
-  - {fileID: 6438064843822109264, guid: ca1d802c4b5a00b49b314e2edc2af41a, type: 3}
-  - {fileID: 2668413666563361826, guid: a58295b61d2977641ba999032a15b44d, type: 3}
-  - {fileID: 6894707718038605511, guid: 92d74b1a2248113489d043238bb24006, type: 3}
-  - {fileID: 2171690989592873872, guid: fda7918069f496d48aa469a8578670db, type: 3}
-  realWeapons: []
+  dummyWeaponPrefabs: []
 --- !u!1 &1068329411
 GameObject:
   m_ObjectHideFlags: 0
@@ -40951,6 +40962,14 @@ PrefabInstance:
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 1059807913
       objectReference: {fileID: 0}
+    - target: {fileID: 3272890869235164628, guid: 92d74b1a2248113489d043238bb24006, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3964923226
+      objectReference: {fileID: 0}
+    - target: {fileID: 3272890869235164628, guid: 92d74b1a2248113489d043238bb24006, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 2202327708
+      objectReference: {fileID: 0}
     - target: {fileID: 6894707718038605511, guid: 92d74b1a2248113489d043238bb24006, type: 3}
       propertyPath: m_Name
       value: GrenadeLauncherDummy
@@ -48825,6 +48844,14 @@ PrefabInstance:
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 2047122287
       objectReference: {fileID: 0}
+    - target: {fileID: -4352569433652955573, guid: ca1d802c4b5a00b49b314e2edc2af41a, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 160751588
+      objectReference: {fileID: 0}
+    - target: {fileID: -4352569433652955573, guid: ca1d802c4b5a00b49b314e2edc2af41a, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 2264217931
+      objectReference: {fileID: 0}
     - target: {fileID: 2712924177266294074, guid: ca1d802c4b5a00b49b314e2edc2af41a, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.374
@@ -48891,5 +48918,5 @@ SceneRoots:
   - {fileID: 567327831}
   - {fileID: 219691709}
   - {fileID: 219140660}
-  - {fileID: 386058344}
   - {fileID: 1065925129}
+  - {fileID: 386058344}

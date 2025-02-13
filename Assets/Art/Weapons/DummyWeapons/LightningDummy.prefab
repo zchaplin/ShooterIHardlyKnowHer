@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5351357616855241650}
   - component: {fileID: 3433970231620150972}
   - component: {fileID: 346833393374019913}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Part1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -118,7 +118,7 @@ GameObject:
   - component: {fileID: 6510866524952912081}
   - component: {fileID: 4375280746098579122}
   - component: {fileID: 4963977472962014483}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Part2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -223,9 +223,9 @@ GameObject:
   - component: {fileID: 2712924177266294074}
   - component: {fileID: 9046982360268094325}
   - component: {fileID: 3754413235549843391}
-  - component: {fileID: -5723709851359499071}
-  - component: {fileID: 3156809481619411951}
-  m_Layer: 0
+  - component: {fileID: -4352569433652955573}
+  - component: {fileID: -756671573565015568}
+  m_Layer: 6
   m_Name: LightningDummy
   m_TagString: DummyWeapon
   m_Icon: {fileID: 0}
@@ -298,7 +298,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.610256, y: 0.3788035, z: 0.29043913}
   m_Center: {x: 0.21045776, y: 0.6298831, z: -0.063643314}
---- !u!114 &-5723709851359499071
+--- !u!114 &-4352569433652955573
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -310,7 +310,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2047122287
+  GlobalObjectIdHash: 2264217931
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -319,7 +319,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &3156809481619411951
+--- !u!114 &-756671573565015568
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -328,10 +328,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 6438064843822109264}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0615a8d299f037469ab98c223788f77, type: 3}
+  m_Script: {fileID: 11500000, guid: 45ad03633de3b504a98a1076161afa5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponIndex: 1
+  outlineWidth: 0.05
 --- !u!1 &6935611028281695623
 GameObject:
   m_ObjectHideFlags: 0
@@ -344,7 +344,7 @@ GameObject:
   - component: {fileID: 8486764322329579317}
   - component: {fileID: 4521419228719692405}
   - component: {fileID: 983718931381103041}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Part3
   m_TagString: Untagged
   m_Icon: {fileID: 0}

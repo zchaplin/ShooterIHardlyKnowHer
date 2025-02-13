@@ -8,6 +8,7 @@ TagManager:
   - Score
   - Enemy
   - DummyWeapon
+  - WeaponBin
   layers:
   - Default
   - TransparentFX
