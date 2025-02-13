@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
@@ -10,6 +12,10 @@ using UnityEngine;
 
 public class RelayManager : MonoBehaviour
 {
+    [SerializeField] private GameObject buttons;
+    [SerializeField] private string joinInput;
+    [SerializeField] private TMP_Text joinCodeText;
+    [SerializeField] private TMP_Text joinCodeTextDisplay;
     public static RelayManager Instance;
     private string joinCode;
     private void Awake()
@@ -23,16 +29,22 @@ public class RelayManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        if(buttons){
+            buttons.SetActive(true);
+        }
     }
     private async void Start()
     {
         await UnityServices.InitializeAsync();
+        await SignInAnonymouslyAsync();
     }
-
-    // Update is called once per frame
-    void Update()
+    private async Task SignInAnonymouslyAsync()
     {
-        
+        if (!AuthenticationService.Instance.IsSignedIn)
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            Debug.Log("Signed in anonymously.");
+        }
     }
     public async void CreateGame()
     {
@@ -50,14 +62,16 @@ public class RelayManager : MonoBehaviour
                 allocation.ConnectionData);
             
             NetworkManager.Singleton.StartHost();
+            joinCodeTextDisplay.SetText(joinCode);
         }
         catch (RelayServiceException e)
         {
             Debug.LogError($"Relay creation failed: {e.Message}");
         }
+        
     }
 
-    public async void JoinGame(string joinCode)
+    public async void JoinGame(string _joinInput)
     {
         try
         {
