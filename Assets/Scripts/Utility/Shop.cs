@@ -17,6 +17,7 @@ public class Shop : MonoBehaviour
     [SerializeField] public GameObject panel4;
     [SerializeField] public GameObject panel5;
     [SerializeField] public GameObject panel6;
+    [SerializeField] public WeaponBin weaponBin;
 
     private List<Image> panels;
 
@@ -45,6 +46,12 @@ public class Shop : MonoBehaviour
         panels.Add(panel4.GetComponent<Image>());
 
         Debug.Log("weapons stats: "+showWeaponStats);
+    }
+
+    public void UnlockWeapon(int weaponIndex) {
+        if (!weaponBin) {
+            weaponBin.UnlockWeaponServerRpc(weaponIndex);
+        }
     }
 
     public void addWeapons(Transform weapons) {

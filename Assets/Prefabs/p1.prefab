@@ -402,7 +402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3823312306
+  GlobalObjectIdHash: 2722499459
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -439,7 +439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b403dd9b83d5a94197052fb84674f5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapons: {fileID: 7674037595774685501}
+  realWeapons: []
 --- !u!114 &3066880144147088103
 MonoBehaviour:
   m_ObjectHideFlags: 0
