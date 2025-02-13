@@ -2918,6 +2918,7 @@ MonoBehaviour:
   panel4: {fileID: 26894586}
   panel5: {fileID: 1175521891}
   panel6: {fileID: 476089168}
+  weaponBin: {fileID: 1065925132}
   showWeaponStats: {fileID: 625935869}
 --- !u!1 &134680193
 GameObject:
@@ -3631,6 +3632,10 @@ PrefabInstance:
     - target: {fileID: 601129064418692900, guid: a58295b61d2977641ba999032a15b44d, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 4151493870
+      objectReference: {fileID: 0}
+    - target: {fileID: 601129064418692900, guid: a58295b61d2977641ba999032a15b44d, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 1370428005
       objectReference: {fileID: 0}
     - target: {fileID: 2668413666563361826, guid: a58295b61d2977641ba999032a15b44d, type: 3}
       propertyPath: m_Name
@@ -22905,6 +22910,7 @@ MonoBehaviour:
   - {fileID: 2668413666563361826, guid: a58295b61d2977641ba999032a15b44d, type: 3}
   - {fileID: 6894707718038605511, guid: 92d74b1a2248113489d043238bb24006, type: 3}
   - {fileID: 2171690989592873872, guid: fda7918069f496d48aa469a8578670db, type: 3}
+  realWeapons: []
 --- !u!1 &1068329411
 GameObject:
   m_ObjectHideFlags: 0
