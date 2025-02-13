@@ -94,7 +94,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5188306157323960629, guid: 89bb49198dcbc594d9572bdde432a161, type: 3}
       propertyPath: m_TagString
-      value: DummyWeapon
+      value: Untagged
       objectReference: {fileID: 0}
     - target: {fileID: 5420084496725619747, guid: 89bb49198dcbc594d9572bdde432a161, type: 3}
       propertyPath: m_Enabled
@@ -212,4 +212,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45ad03633de3b504a98a1076161afa5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outlineWidth: 0.05

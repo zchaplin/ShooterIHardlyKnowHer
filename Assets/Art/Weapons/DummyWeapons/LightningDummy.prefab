@@ -227,7 +227,7 @@ GameObject:
   - component: {fileID: -756671573565015568}
   m_Layer: 6
   m_Name: LightningDummy
-  m_TagString: DummyWeapon
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -331,7 +331,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45ad03633de3b504a98a1076161afa5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  outlineWidth: 0.05
 --- !u!1 &6935611028281695623
 GameObject:
   m_ObjectHideFlags: 0
