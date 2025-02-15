@@ -8,6 +8,7 @@ public class ShowWeaponStats : MonoBehaviour
 {
     // Start is called before the first frame update
     [SerializeField] private GameObject weaponCanvas;
+    [SerializeField] private GameObject hostCanvas;
     [SerializeField] private TMP_Text weaponText;
 
 
@@ -35,6 +36,11 @@ public class ShowWeaponStats : MonoBehaviour
                 updateText(0);
                 firstUpdate = false;
             }
+        }
+        // Will also display the host/join code when pressing tab, for now just putting the code here
+
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            hostCanvas.SetActive(!hostCanvas.activeSelf);
         }
     }
 
