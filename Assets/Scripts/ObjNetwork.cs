@@ -1,3 +1,4 @@
+//this script is meant for a parent class
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,20 +21,18 @@ public class ObjNetwork : NetworkBehaviour
     void Update()
     {
         if(IsOwner){
-            netObjpos.Value = gameObject.transform.position;
-            netObjrot.Value = gameObject.transform.rotation;
-            
-            for(int i = 0; i < transform.childCount; i++){
+            for(int i = 0; i < transform.childCount; i++){ //checks if all the children are active
                 if(transform.GetChild(i).gameObject.activeSelf){
                     if(i != indexNum){
                         Destroy(model);
                         indexNum = i;
                         model = Instantiate(models[indexNum], netObjpos.Value, netObjrot.Value);
                     }
-                    
                     break;
                 }
             }
+            netObjpos.Value = transform.GetChild(indexNum).position;
+            netObjrot.Value = transform.GetChild(indexNum).rotation;
             Debug.Log("obj position: " + model.transform.position);
         }else{
             model.transform.position = netObjpos.Value;
