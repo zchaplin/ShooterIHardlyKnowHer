@@ -5,18 +5,13 @@ using UnityEngine.UI;
 
 public class Shop : MonoBehaviour
 {
-    // [SerializeField] public GameObject peaShooter1;
-    // [SerializeField] public GameObject launcher1;
-    // [SerializeField] public GameObject boomarang1;
-    // [SerializeField] public GameObject weapon41;
-
-    [SerializeField] public GameObject canvasShop;
-    [SerializeField] public GameObject panel1;
-    [SerializeField] public GameObject panel2;
-    [SerializeField] public GameObject panel3;
-    [SerializeField] public GameObject panel4;
-    [SerializeField] public GameObject panel5;
-    [SerializeField] public GameObject panel6;
+    [SerializeField] private GameObject canvasShop;
+    [SerializeField] private GameObject panel1;
+    [SerializeField] private GameObject panel2;
+    [SerializeField] private GameObject panel3;
+    [SerializeField] private GameObject panel4;
+    [SerializeField] private GameObject panel5;
+    [SerializeField] private GameObject panel6;
 
     private List<Image> panels;
 
@@ -101,6 +96,10 @@ public class Shop : MonoBehaviour
                 player1Weapons[i].SetActive(false);
             }
             player1Weapons[weaponNum].SetActive(true);
+            if (ScoreTracker.score >= weaponsPrice[weaponNum]) {
+                player1Weapons[weaponNum].GetComponent<Weapon>().RefillBullets();
+                GameObject.FindWithTag("Score").GetComponent<ScoreTracker>().addScore(-weaponsPrice[weaponNum]/2);
+            }
         }
         // if not, that means we didn't buy the weapon
         else {
@@ -110,7 +109,7 @@ public class Shop : MonoBehaviour
                     player1Weapons[i].SetActive(false);
                 }
                 player1Weapons[weaponNum].SetActive(true);
-                ScoreTracker.score -= weaponsPrice[weaponNum];
+                GameObject.FindWithTag("Score").GetComponent<ScoreTracker>().addScore(-weaponsPrice[weaponNum]);
                 weapons1Bought[weaponNum] = 1;
             }
         }

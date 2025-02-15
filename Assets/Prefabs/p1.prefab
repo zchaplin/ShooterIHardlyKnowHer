@@ -514,12 +514,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8349394578282742384, guid: 89bb49198dcbc594d9572bdde432a161, type: 3}
       propertyPath: fireRate
-      value: 0.3
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 8349394578282742384, guid: 89bb49198dcbc594d9572bdde432a161, type: 3}
       propertyPath: playerCamera
       value: 
       objectReference: {fileID: 1629880104306304855}
+    - target: {fileID: 8349394578282742384, guid: 89bb49198dcbc594d9572bdde432a161, type: 3}
+      propertyPath: initialBullets
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -552,7 +556,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6179648395382473106, guid: 72b7ffe62e6f61f4b90a993e76b4e80b, type: 3}
       propertyPath: fireRate
-      value: 2.5
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 6179648395382473106, guid: 72b7ffe62e6f61f4b90a993e76b4e80b, type: 3}
       propertyPath: baseBullet
@@ -562,6 +566,10 @@ PrefabInstance:
       propertyPath: playerCamera
       value: 
       objectReference: {fileID: 1629880104306304855}
+    - target: {fileID: 6179648395382473106, guid: 72b7ffe62e6f61f4b90a993e76b4e80b, type: 3}
+      propertyPath: initialBullets
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 7052483521828782715, guid: 72b7ffe62e6f61f4b90a993e76b4e80b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -673,9 +681,17 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6837901703155720656, guid: 0506610fb7d42c849afcd5cef4a9b6c0, type: 3}
+      propertyPath: fireRate
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6837901703155720656, guid: 0506610fb7d42c849afcd5cef4a9b6c0, type: 3}
       propertyPath: playerCamera
       value: 
       objectReference: {fileID: 1629880104306304855}
+    - target: {fileID: 6837901703155720656, guid: 0506610fb7d42c849afcd5cef4a9b6c0, type: 3}
+      propertyPath: initialBullets
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -707,9 +723,17 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6179648395382473106, guid: 72b7ffe62e6f61f4b90a993e76b4e80b, type: 3}
+      propertyPath: fireRate
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6179648395382473106, guid: 72b7ffe62e6f61f4b90a993e76b4e80b, type: 3}
       propertyPath: playerCamera
       value: 
       objectReference: {fileID: 1629880104306304855}
+    - target: {fileID: 6179648395382473106, guid: 72b7ffe62e6f61f4b90a993e76b4e80b, type: 3}
+      propertyPath: initialBullets
+      value: 12
+      objectReference: {fileID: 0}
     - target: {fileID: 7052483521828782715, guid: 72b7ffe62e6f61f4b90a993e76b4e80b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -859,8 +883,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a4d9bc17ef215444bacf881e2255f26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireRate: 1
+  fireRate: 0.65
   baseBullet: {fileID: 4390976419354512532, guid: d4b1b28cf01a2ee4d883e98ece810d61, type: 3}
+  initialBullets: 8
+  rechargeText: {fileID: 0}
   playerCamera: {fileID: 1629880104306304855}
   maxEnemies: 3
   lineMaterial: {fileID: 2100000, guid: aa9f25951a207ca4c9659ce9a2d03d59, type: 2}
@@ -880,12 +906,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1596494700146678190, guid: f2368caac59e6b640a1a006fb413a44e, type: 3}
       propertyPath: fireRate
-      value: 1.5
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 1596494700146678190, guid: f2368caac59e6b640a1a006fb413a44e, type: 3}
       propertyPath: playerCamera
       value: 
       objectReference: {fileID: 1629880104306304855}
+    - target: {fileID: 1596494700146678190, guid: f2368caac59e6b640a1a006fb413a44e, type: 3}
+      propertyPath: initialBullets
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 2884124821690980948, guid: f2368caac59e6b640a1a006fb413a44e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
