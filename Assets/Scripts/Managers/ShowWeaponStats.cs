@@ -16,7 +16,7 @@ public class ShowWeaponStats : MonoBehaviour
     private List<string> weaponsNames;
     private List<string> weaponsAbilities;
     private List<string> weaponsDmg;
-    private List<string> weaponsFireRate;
+    // private List<string> weaponsFireRate;
     private bool firstUpdate = true;
 
     void Start()
@@ -24,7 +24,7 @@ public class ShowWeaponStats : MonoBehaviour
         weaponCanvas.SetActive(false);
         weaponsNames = new List<string> {"PeaShooter", "Bouncy", "Lightning", "Laser", "Granade", "Boomarang"};
         weaponsAbilities = new List<string> {"Regular shooting", "Reflects from objects (7 bounces)", "Hits close 3 enemies", "More damage over time", "Explosion", "Comes back"};
-        weaponsFireRate = new List<string> {"2", "2.5", "1", "0.3", "1.5"};
+        // weaponsFireRate = new List<string> {"2", "2.5", "1", "0.3", "1.5"};
         weaponsDmg = new List<string> {"4", "5", "4", "1 + 5 every sec", "7"};
     }
 
@@ -45,7 +45,6 @@ public class ShowWeaponStats : MonoBehaviour
     }
 
     public void updateText(int weaponNum) {
-        Debug.Log("updating text!"+ weaponNum);
-        weaponText.text = $"Name: {weaponsNames[weaponNum]}\nAbility: {weaponsAbilities[weaponNum]}\nFire rate: {weaponsFireRate[weaponNum]}\nDamage: {weaponsDmg[weaponNum]}";
+        weaponText.text = $"Name: {weaponsNames[weaponNum]}\nAbility: {weaponsAbilities[weaponNum]}\nDamage: {weaponsDmg[weaponNum]}";
     }
 }

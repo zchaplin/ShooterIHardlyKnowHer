@@ -20,7 +20,7 @@ public class LighthingChain : Weapon
     }
 
     public override void Shoot()
-    {
+    {        
         // Calculate the direction from the weapon to the crosshair
         Vector3 shootDirection = GetShootDirection();
 
@@ -86,8 +86,9 @@ public class LighthingChain : Weapon
 
         // Filter only enemies, then sort by distance
         GameObject[] closestEnemies = colliders
-            .Where(c => c.CompareTag("Enemy")) // Filter by tag
-            .Select(c => c.gameObject) // Convert to GameObject
+            .Select(c => c.gameObject)
+            .Where(c => c.CompareTag("Enemy")) 
+            .Concat(GameObject.FindGameObjectsWithTag("Player")) 
             .OrderBy(enemy => Vector3.Distance(hitPoint, enemy.transform.position)) // Sort by distance
             .Take(maxEnemies-1)
             .Where(enemy => IsEnemyInFieldOfView(enemy))

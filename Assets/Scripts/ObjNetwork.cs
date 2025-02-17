@@ -9,10 +9,12 @@ public class ObjNetwork : NetworkBehaviour
 {
     private readonly NetworkVariable<Vector3> netObjpos = new (writePerm: NetworkVariableWritePermission.Owner);
     private readonly NetworkVariable<Quaternion> netObjrot = new (writePerm: NetworkVariableWritePermission.Owner);
+    //private readonly NetworkVariable<bool> weaponSwaped = new (writePerm: NetworkVariableWritePermission.Server);
+    //private bool Swaped = false;
+    private readonly NetworkVariable<int> i = new (writePerm: NetworkVariableWritePermission.Owner);
     int indexNum = 0;
     public List<GameObject> models; //This is assigned in the unity engine. MAKE SURE TO DRAG THE PREFAB MODEL. AVOID USING THE DROPDOWN LIST.  
     private GameObject model;
-    private bool weaponSwaped = false;
     void Start()
     {
         // Instantiate the visual model at the specified position and rotation for other players to see
@@ -21,28 +23,25 @@ public class ObjNetwork : NetworkBehaviour
     void Update()
     {
         if(IsOwner){
-            for(int i = 0; i < transform.childCount; i++){ //checks if all the children are active
-                if(transform.GetChild(i).gameObject.activeSelf){
-                    if(i != indexNum){ //If the player changes weapon
-                        Destroy(model); 
-                        indexNum = i;
-                        weaponSwaped = true;
+            for(i.Value = 0; i.Value < transform.childCount; i.Value++){ //checks active children (weapons that are being held)
+                if(transform.GetChild(i.Value).gameObject.activeSelf){
+                    if(i.Value != indexNum){ //If the player changes weapon
+                        Destroy(model); //remove model from client side
                     }
                     break;
                 }
             }
             netObjpos.Value = transform.GetChild(indexNum).position;
             netObjrot.Value = transform.GetChild(indexNum).rotation;
-            Debug.Log("obj position: " + model.transform.position);
         }else{
-            if(weaponSwaped){ 
-                model = Instantiate(models[indexNum], netObjpos.Value, netObjrot.Value); 
+            if(indexNum != i.Value){ //if the weapon is swapped
+                Destroy(model); //removes model for server side
+                model = Instantiate(models[i.Value], netObjpos.Value, netObjrot.Value); 
+                Debug.Log("new weapon: " + model);
+                indexNum = i.Value;
             }
             model.transform.position = netObjpos.Value;
             model.transform.rotation = netObjrot.Value;
-            
-            Debug.Log("model position: " + netObjpos.Value);
         }
-        
     }
 }

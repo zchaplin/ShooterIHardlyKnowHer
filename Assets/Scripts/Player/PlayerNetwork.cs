@@ -44,7 +44,7 @@ public class PlayerNetwork : NetworkBehaviour
             spawnPosition.y = GetGroundHeight(spawnPosition);
             
             transform.position = spawnPosition;
-            Debug.Log("position: " + spawnPosition);
+            //Debug.Log("position: " + spawnPosition);
         }
     }
 
