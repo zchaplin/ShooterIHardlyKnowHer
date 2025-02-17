@@ -96,10 +96,10 @@ public class Shop : MonoBehaviour
             player1Weapons.Add(weapons.GetChild(i).gameObject);
         }
 
-        for (int i=1; i<weapons.childCount; i+=1) 
-        {
-            player1Weapons[i].SetActive(false);
-        }
+        // for (int i=1; i<weapons.childCount; i+=1) 
+        // {
+        //     player1Weapons[i].SetActive(false);
+        // }
 
         player1Weapons[0].SetActive(true);
         Debug.Log(player1Weapons[0]);

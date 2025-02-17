@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class WeaponBin : NetworkBehaviour
 {
     [SerializeField] private GameObject[] dummyWeaponPrefabs;  // Assign dummy prefabs in inspector
-    [SerializeField] private float pickupRange = 3f;  // How far player can pickup from
     private List<GameObject> weaponsInBin = new List<GameObject>();
 
     // Spawn weapon in bin when purchased

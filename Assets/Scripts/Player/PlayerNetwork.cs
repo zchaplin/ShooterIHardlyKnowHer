@@ -14,7 +14,7 @@ public class PlayerNetwork : NetworkBehaviour
         if(IsOwner){
             netpos.Value = transform.position;
             netrot.Value = transform.rotation;
-            Debug.Log("current position: " + transform.position);
+            // Debug.Log("current position: " + transform.position);
         }else{
             transform.position = netpos.Value;
             transform.rotation = netrot.Value;
@@ -44,7 +44,7 @@ public class PlayerNetwork : NetworkBehaviour
             spawnPosition.y = GetGroundHeight(spawnPosition);
             
             transform.position = spawnPosition;
-            Debug.Log("position: " + spawnPosition);
+            // Debug.Log("position: " + spawnPosition);
         }
     }
 

@@ -6,7 +6,6 @@ public class PlayerInventory : NetworkBehaviour
 {
     public Transform weapons;
     private Shop shop;
-    [SerializeField] private float pickupRange = 3f;
     [SerializeField] private Transform playerCamera;  // Assign the player's camera in inspector
     [SerializeField] private LayerMask weaponLayer;  // Set this to the layer your dummy weapons are on
     private int currentWeaponIndex = 0;
@@ -53,17 +52,16 @@ public class PlayerInventory : NetworkBehaviour
         }
 
         // Debug raycast to see what we're looking at
-        Debug.DrawRay(playerCamera.position, playerCamera.forward * pickupRange, Color.red);
+        Debug.DrawRay(playerCamera.position, playerCamera.forward, Color.red);
     }
 
     private void TryPickupWeapon()
     {
         RaycastHit hit;
-        if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, pickupRange, weaponLayer))
+        if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, 10f,weaponLayer))
         {
             Debug.Log("Hit something with raycast");
-            DummyWeapon dummyWeapon = hit.collider.GetComponent<DummyWeapon>();
-            if (dummyWeapon != null)
+            DummyWeapon dummyWeapon = hit.collider.GetComponentInParent<DummyWeapon>();            if (dummyWeapon != null)
             {
                 Debug.Log($"Found dummy weapon with index {dummyWeapon.WeaponIndex}");
                 PickupWeapon(dummyWeapon.WeaponIndex);
@@ -83,7 +81,7 @@ public class PlayerInventory : NetworkBehaviour
             
             // Remove from inventory
             ownedWeapons.Remove(currentWeaponIndex);
-            shop.DeactivateWeapon(currentWeaponIndex);
+            // shop.DeactivateWeapon(currentWeaponIndex);
             
             // Switch back to default weapon
             currentWeaponIndex = 0;
