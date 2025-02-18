@@ -5,7 +5,7 @@ using UnityEngine;
 using Unity.Mathematics;
 using Unity.Netcode;
 
-public class ObjNetwork : NetworkBehaviour
+public class WeaponNetwork : NetworkBehaviour
 {
     private readonly NetworkVariable<Vector3> netObjpos = new (writePerm: NetworkVariableWritePermission.Owner);
     private readonly NetworkVariable<Quaternion> netObjrot = new (writePerm: NetworkVariableWritePermission.Owner);
@@ -43,5 +43,13 @@ public class ObjNetwork : NetworkBehaviour
             model.transform.position = netObjpos.Value;
             model.transform.rotation = netObjrot.Value;
         }
+    }
+    void OnDisable()
+    {
+        Destroy(model);
+    }
+    void Oestroy()
+    {
+        Destroy(model);
     }
 }
