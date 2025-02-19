@@ -14,7 +14,7 @@ public class PlayerNetwork : NetworkBehaviour
         if(IsOwner){
             netpos.Value = transform.position;
             netrot.Value = transform.rotation;
-            Debug.Log("current position: " + transform.position);
+            //Debug.Log("current position: " + transform.position);
         }else{
             transform.position = netpos.Value;
             transform.rotation = netrot.Value;
@@ -31,12 +31,12 @@ public class PlayerNetwork : NetworkBehaviour
             //modified to be inclusive of more than 2 players. 
             if (OwnerClientId % 2 == 0) // any even number clientID
             {
-                Debug.Log(" == 0");
+                //Debug.Log(" == 0");
                 spawnPosition = new Vector3(1f, 1f, -3f + OwnerClientId);
             }
             else // any odd number clientID
             {
-                Debug.Log(" != 0");
+                //Debug.Log(" != 0");
                 spawnPosition = new Vector3(-1f, 1f, 3f + OwnerClientId);
             }
 
@@ -44,7 +44,7 @@ public class PlayerNetwork : NetworkBehaviour
             spawnPosition.y = GetGroundHeight(spawnPosition);
             
             transform.position = spawnPosition;
-            Debug.Log("position: " + spawnPosition);
+            //Debug.Log("position: " + spawnPosition);
         }
     }
 

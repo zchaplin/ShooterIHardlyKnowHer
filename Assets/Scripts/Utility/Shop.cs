@@ -54,7 +54,7 @@ public class Shop : MonoBehaviour
         }
 
         player1Weapons[0].SetActive(true);
-        Debug.Log(player1Weapons[0]);
+        //Debug.Log(player1Weapons[0]);
     }
 
     void Update()

@@ -15,8 +15,8 @@ TagManager:
   - Water
   - UI
   - 
-  - 
-  - 
+  - SpawnerHost
+  - SpawnerGuest
   - 
   - p1 cam
   - p2 cam
