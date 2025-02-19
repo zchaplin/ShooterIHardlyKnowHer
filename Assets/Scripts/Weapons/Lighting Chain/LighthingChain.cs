@@ -38,12 +38,12 @@ public class LighthingChain : Weapon
 
             if (Physics.Raycast(ray, out hit))
             {
-                if (hit.collider.CompareTag("Enemy")) { // w/o it hitting walls will aslo hit enemeis
-                // If aiming at something, calculate velocity to hit the target (with gravity)
-                Vector3 targetPosition = hit.point;
-                FindClosetEnemies(hit.point);
-                Vector3 velocity = CalculateVelocityToHitTarget(bullet.transform.position, targetPosition, bulletRigidbody);
-                bulletRigidbody.velocity = velocity;
+                if (hit.collider.CompareTag("Enemy")||hit.collider.CompareTag("Player")) { // w/o it hitting walls will aslo hit enemeis
+                    // If aiming at something, calculate velocity to hit the target (with gravity)
+                    Vector3 targetPosition = hit.point;
+                    FindClosetEnemies(hit.point);
+                    Vector3 velocity = CalculateVelocityToHitTarget(bullet.transform.position, targetPosition, bulletRigidbody);
+                    bulletRigidbody.velocity = velocity;
                 }
             }
             else

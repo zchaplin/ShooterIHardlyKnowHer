@@ -38,8 +38,10 @@ public class Shop : MonoBehaviour
         panels.Add(panel2.GetComponent<Image>());
         panels.Add(panel3.GetComponent<Image>());
         panels.Add(panel4.GetComponent<Image>());
+        panels.Add(panel5.GetComponent<Image>());
+        panels.Add(panel6.GetComponent<Image>());
 
-        Debug.Log("weapons stats: "+showWeaponStats);
+        //Debug.Log("weapons stats: "+showWeaponStats);
     }
 
     public void addWeapons(Transform weapons) {
@@ -67,19 +69,17 @@ public class Shop : MonoBehaviour
         }
         
         // check for player's turn
-        if (Input.GetKeyDown(KeyCode.S)) {
-            canvasShop.SetActive(true);
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.Confined;
+        if (Input.GetKeyDown(KeyCode.B)) {
+            canvasShop.SetActive(!canvasShop.activeSelf);
+            if (canvasShop.activeSelf) {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.Confined;
+            } else {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = false;
+            }
+            
         }
-        // Close shop when the player starts shotting again
-        if (Input.GetKeyDown(KeyCode.W)) {
-            canvasShop.SetActive(false);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = false;
-        }
-
-
         ShowCorrectImage();
     }
 

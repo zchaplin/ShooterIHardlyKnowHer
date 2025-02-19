@@ -6,9 +6,11 @@ using UnityEngine.UI;
 
 public class ShowWeaponStats : MonoBehaviour
 {
+    public static bool isPaused = false;
     // Start is called before the first frame update
     [SerializeField] private GameObject weaponCanvas;
     [SerializeField] private GameObject hostCanvas;
+    [SerializeField] private GameObject PauseCanvas;
     [SerializeField] private TMP_Text weaponText;
 
 
@@ -21,7 +23,7 @@ public class ShowWeaponStats : MonoBehaviour
 
     void Start()
     {
-        weaponCanvas.SetActive(false);
+        weaponCanvas.SetActive(true);
         weaponsNames = new List<string> {"PeaShooter", "Bouncy", "Lightning", "Laser", "Granade", "Boomarang"};
         weaponsAbilities = new List<string> {"Regular shooting", "Reflects from objects (7 bounces)", "Hits close 3 enemies", "More damage over time", "Explosion", "Comes back"};
         // weaponsFireRate = new List<string> {"2", "2.5", "1", "0.3", "1.5"};
@@ -42,9 +44,27 @@ public class ShowWeaponStats : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
             hostCanvas.SetActive(!hostCanvas.activeSelf);
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            PauseCanvas.SetActive(!PauseCanvas.activeSelf);
+            if (PauseCanvas.activeSelf) {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.Confined;
+                isPaused = true;
+            } else {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = false;
+                isPaused = false;
+            }
+            
+        }
     }
 
     public void updateText(int weaponNum) {
         weaponText.text = $"Name: {weaponsNames[weaponNum]}\nAbility: {weaponsAbilities[weaponNum]}\nDamage: {weaponsDmg[weaponNum]}";
+    }
+
+    public void Quit() {
+        Application.Quit();
     }
 }

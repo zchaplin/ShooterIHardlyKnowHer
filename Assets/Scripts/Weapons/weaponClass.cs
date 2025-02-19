@@ -40,7 +40,7 @@ public class Weapon : MonoBehaviour
     public virtual void Update()
     {
         // Check if it's time to fire
-        if (Input.GetMouseButton(0) && Time.time >= nextTimeToFire && bullets > 0) // 0 = Left Mouse Button
+        if (Input.GetMouseButton(0) && Time.time >= nextTimeToFire && bullets > 0 && !ShowWeaponStats.isPaused) // 0 = Left Mouse Button
         {
             nextTimeToFire = Time.time + 1f / fireRate;
             bullets -= 1;
