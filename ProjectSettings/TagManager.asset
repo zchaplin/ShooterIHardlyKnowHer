@@ -9,6 +9,7 @@ TagManager:
   - Enemy
   - DummyWeapon
   - WeaponBin
+  - SpawnPoint
   layers:
   - Default
   - TransparentFX
