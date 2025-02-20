@@ -7,8 +7,14 @@ public class laser_Proj : Proj_Move
     public override void Start()
     {
         base.Start();
+        damage = 1;
+        StartCoroutine(increaseDamage());
     }
-    private void OnTriggerEnter(Collider other) {
-        damageEntity(other.gameObject);
+
+    IEnumerator increaseDamage() {
+        while (true) {
+            damage += 5;
+            yield return new WaitForSeconds(0.5f);
+        }  
     }
 }

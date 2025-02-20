@@ -330,8 +330,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fireRate: 2
-  player: 0
   baseBullet: {fileID: 4390976419354512532, guid: d4b1b28cf01a2ee4d883e98ece810d61, type: 3}
+  playerCamera: {fileID: 0}
 --- !u!1 &7134954826825175237
 GameObject:
   m_ObjectHideFlags: 0

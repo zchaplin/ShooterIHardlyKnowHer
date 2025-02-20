@@ -14,7 +14,6 @@ public class MovementManager : NetworkBehaviour
     private float verticalLookRotation = 0f; // Tracks up/down camera rotation
     private float horizontalLookRotation = 0f; // Tracks left/right camera rotation
     private Vector3 startingForwardDirection; // Tracks the player's initial forward direction
-
     void Start()
     {
         characterControllerP1 = GetComponent<CharacterController>();

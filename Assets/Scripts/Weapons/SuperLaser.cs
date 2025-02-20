@@ -18,14 +18,10 @@ public class SuperLaser : Weapon
 
     public override void Shoot()
     {
-        if (player == 1) {
-            bulletRotation = gameObject.transform.rotation;
-        }
-        else {
-            bulletRotation = gameObject.transform.rotation * Quaternion.Euler(0f, 180f, 0f);
-        }
+        bulletRotation = gameObject.transform.rotation;
+       
 
         //spawn bullet
-        Instantiate(baseBullet, gameObject.transform.position + ((player==1)? Vector3.forward*22 : Vector3.back*22), bulletRotation, transform);
+        Instantiate(baseBullet, gameObject.transform.position + Vector3.forward*2, bulletRotation, transform);
     }
 }

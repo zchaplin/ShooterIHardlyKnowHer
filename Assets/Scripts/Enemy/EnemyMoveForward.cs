@@ -45,12 +45,17 @@ public class MoveForward : MonoBehaviour
         
     }
 
+    public void Deactivate() {
+        speed = 0f;
+        active = false;
+    }
+
     public void TakeDamage(int x){
         health -= x;
         checkAlive();
     }
 
-    void checkAlive(){
+    private void checkAlive(){
         if (health <= 0){
             MusicManager.AudioManager.goopMusic();
             Destroy(gameObject);
