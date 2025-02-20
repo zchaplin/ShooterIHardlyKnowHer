@@ -28,7 +28,7 @@ public class PlayerInventory : NetworkBehaviour
 
     void Update()
     {
-        if (!IsOwner) return;
+        // if (!IsOwner) return;
 
         // Pickup weapon when looking at it and pressing E
         if (Input.GetKeyDown(KeyCode.E))

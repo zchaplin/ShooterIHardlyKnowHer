@@ -19438,6 +19438,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: ground
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 02eac3eff1bc1974dac7e435c96d5067, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 8134837689134937748, guid: 02eac3eff1bc1974dac7e435c96d5067, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -22688,7 +22696,6 @@ MonoBehaviour:
   - {fileID: 2668413666563361826, guid: a58295b61d2977641ba999032a15b44d, type: 3}
   - {fileID: 6894707718038605511, guid: 92d74b1a2248113489d043238bb24006, type: 3}
   - {fileID: 2171690989592873872, guid: fda7918069f496d48aa469a8578670db, type: 3}
-  pickupRange: 3
 --- !u!1 &1068329411
 GameObject:
   m_ObjectHideFlags: 0
