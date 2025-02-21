@@ -2,7 +2,6 @@ using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-
 public class PlayerNetwork : NetworkBehaviour
 {
     [SerializeField] private GameObject player1Spawn;
@@ -14,13 +13,16 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void Awake()
     {
-        // Pretty bad way to do this but it works for now, maybe someone can redo this with tags or something
-        // Just checking that spawns exist and if not sets to one in scene
-        if(!player1Spawn){
+        // Check for spawn points and log their positions
+        if (!player1Spawn)
+        {
             player1Spawn = GameObject.Find("spawn1");
+            Debug.Log($"Player 1 Spawn Position: {player1Spawn?.transform.position}");
         }
-        if(!player2Spawn){
+        if (!player2Spawn)
+        {
             player2Spawn = GameObject.Find("spawn2");
+            Debug.Log($"Player 2 Spawn Position: {player2Spawn?.transform.position}");
         }
     }
 
@@ -44,39 +46,32 @@ public class PlayerNetwork : NetworkBehaviour
 
         if (IsOwner && !hasSpawned) // Check for ownership and if not spawned
         {
-            // Request the server to set the spawn position
-            RequestSpawnPositionServerRpc(OwnerClientId);
+            RequestSpawnPositionServerRpc();
         }
     }
 
     [ServerRpc]
-    private void RequestSpawnPositionServerRpc(ulong clientId)
+    private void RequestSpawnPositionServerRpc()
     {
-        Debug.Log($"Server received spawn request from client {clientId}");
+        Debug.Log($"Server received spawn request from client {OwnerClientId}");
 
-        Vector3 spawnPosition = GetSpawnPosition(clientId);
+        Vector3 spawnPosition = GetSpawnPosition(OwnerClientId);
 
-
-        SetSpawnPositionClientRpc(spawnPosition, new ClientRpcParams
-        {
-            Send = new ClientRpcSendParams
-            {
-                TargetClientIds = new ulong[] { clientId }
-            }
-        });
+        // Set spawn position for the owner
+        SetSpawnPositionClientRpc(spawnPosition);
     }
 
     private Vector3 GetSpawnPosition(ulong clientId)
     {
+        Debug.Log(clientId);
         // Check the OwnerClientId to decide the spawn position
-        if (clientId == 0){ // Assuming the host has an ID of 0
+        if (clientId == 0) // Assuming the host has an ID of 0
+        {
             return player1Spawn.transform.position;
         }
-        else if (clientId == 1){ // Assuming the client has an ID of 1
+        else // Assuming the client is not ID 0
+        {
             return player2Spawn.transform.position;
-        }
-        else { // For any extras
-            return new Vector3(-1f, 1f, 3f);
         }
     }
 
@@ -88,9 +83,10 @@ public class PlayerNetwork : NetworkBehaviour
             transform.position = spawnPosition;
             netpos.Value = transform.position; // Update player spawn position
             hasSpawned = true; // Mark the player as spawned
-            Debug.Log($"Player {OwnerClientId} spawned at: {spawnPosition}");
+            Debug.Log($"Player {OwnerClientId} spawned at: {transform.position}");
         }
     }
+
     private float GetGroundHeight(Vector3 position)
     {
         RaycastHit hit;
@@ -102,4 +98,3 @@ public class PlayerNetwork : NetworkBehaviour
         return position.y; // Return the original y if no ground is detected
     }
 }
-
