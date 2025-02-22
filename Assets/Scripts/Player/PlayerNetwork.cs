@@ -22,40 +22,40 @@ public class PlayerNetwork : NetworkBehaviour
         
     }
 
-    public override void OnNetworkSpawn()
-    {
-        if (IsOwner)
-        {
-            Vector3 spawnPosition;
+    // public override void OnNetworkSpawn()
+    // {
+    //     if (IsOwner)
+    //     {
+    //         Vector3 spawnPosition;
 
-            //modified to be inclusive of more than 2 players. 
-            if (OwnerClientId % 2 == 0) // any even number clientID
-            {
-                Debug.Log(" == 0");
-                spawnPosition = new Vector3(1f, 1f, -3f + OwnerClientId);
-            }
-            else // any odd number clientID
-            {
-                Debug.Log(" != 0");
-                spawnPosition = new Vector3(-1f, 1f, 3f + OwnerClientId);
-            }
+    //         //modified to be inclusive of more than 2 players. 
+    //         if (OwnerClientId % 2 == 0) // any even number clientID
+    //         {
+    //             Debug.Log(" == 0");
+    //             spawnPosition = new Vector3(1f, 1f, -3f + OwnerClientId);
+    //         }
+    //         else // any odd number clientID
+    //         {
+    //             Debug.Log(" != 0");
+    //             spawnPosition = new Vector3(-1f, 1f, 3f + OwnerClientId);
+    //         }
 
-            // Adjust Y position to match the ground level
-            spawnPosition.y = GetGroundHeight(spawnPosition);
+    //         // Adjust Y position to match the ground level
+    //         spawnPosition.y = GetGroundHeight(spawnPosition);
             
-            transform.position = spawnPosition;
-            Debug.Log("position: " + spawnPosition);
-        }
-    }
+    //         transform.position = spawnPosition;
+    //         Debug.Log("position: " + spawnPosition);
+    //     }
+    // }
 
-    private float GetGroundHeight(Vector3 position)
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(new Vector3(position.x, 10f, position.z), Vector3.down, out hit, Mathf.Infinity))
-        {
-            return hit.point.y + 0.1f; // Add slight offset to prevent clipping
-        }
-        return position.y; // Default if no ground detected
-    }
+    // private float GetGroundHeight(Vector3 position)
+    // {
+    //     RaycastHit hit;
+    //     if (Physics.Raycast(new Vector3(position.x, 10f, position.z), Vector3.down, out hit, Mathf.Infinity))
+    //     {
+    //         return hit.point.y + 0.1f; // Add slight offset to prevent clipping
+    //     }
+    //     return position.y; // Default if no ground detected
+    // }
 
 }

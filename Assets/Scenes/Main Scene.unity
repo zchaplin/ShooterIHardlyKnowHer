@@ -18223,6 +18223,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   joinCodeText: {fileID: 432433355}
   joinCodeInputField: {fileID: 500543039}
+  playerPrefab: {fileID: 4400328585649254945, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
 --- !u!4 &803698357
 Transform:
   m_ObjectHideFlags: 0
