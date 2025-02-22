@@ -87,6 +87,25 @@ public class Shop : MonoBehaviour
                 }
             }
         }
+        else if (weapons1Bought[weaponNum] == 1 && player1Weapons[weaponNum].activeInHierarchy)
+        {
+            // Weapon is already bought and equipped: refill bullets
+            Weapon weaponScript = player1Weapons[weaponNum].GetComponent<Weapon>();
+            if (weaponScript != null)
+            {
+                Debug.Log($"Refilling bullets for weapon {weaponNum}");
+                weaponScript.RefillBullets();
+                showWeaponStats.updateText(weaponNum); // Update UI to reflect new ammo count
+            }
+            else
+            {
+                Debug.LogError($"Weapon script not found on weapon {weaponNum}");
+            }
+        }
+        else if (weapons1Bought[weaponNum] == 1 && !player1Weapons[weaponNum].activeInHierarchy)
+        {
+            Debug.Log($"Weapon {weaponNum} is already bought but not equipped. Cannot buy again.");
+        }
     }
 
     public void addWeapons(Transform weapons) 
@@ -115,18 +134,20 @@ public class Shop : MonoBehaviour
             }
         }
         
-        if (Input.GetKeyDown(KeyCode.S)) 
+        if (Input.GetKeyDown(KeyCode.B))
         {
-            canvasShop.SetActive(true);
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.Confined;
-        }
-
-        if (Input.GetKeyDown(KeyCode.W)) 
-        {
-            canvasShop.SetActive(false);
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = false;
+            if (!canvasShop.activeInHierarchy)
+            {
+                canvasShop.SetActive(true);
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.Confined;
+            }
+            else
+            {
+                canvasShop.SetActive(false);
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = false;
+            }
         }
 
         ShowCorrectImage();
