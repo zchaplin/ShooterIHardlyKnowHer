@@ -7,6 +7,8 @@ TagManager:
   - Killable
   - Score
   - Enemy
+  - DummyWeapon
+  - WeaponBin
   layers:
   - Default
   - TransparentFX
@@ -14,10 +16,10 @@ TagManager:
   - 
   - Water
   - UI
+  - Weapon
   - 
   - 
-  - 
-  - 
+  - Ground
   - p1 cam
   - p2 cam
   - 
