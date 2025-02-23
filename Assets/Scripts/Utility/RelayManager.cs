@@ -30,19 +30,50 @@ public class RelayManager : MonoBehaviour
         await StartClientWithRelay(joinCodeInputField.text);
     }
     
-    private async Task<string> StartHostWithRelay(int maxConnections = 3) {
-        Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData( new RelayServerData(allocation, "dtls"));
-        string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-        return NetworkManager.Singleton.StartHost() ? joinCode : null;
+private async Task<string> StartHostWithRelay(int maxConnections = 3) {
+    Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxConnections);
+    NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(allocation, "dtls"));
+    string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
+    if (NetworkManager.Singleton.StartHost()) {
+        SetHostTransform(); 
+        return joinCode;
     }
 
-    private async Task<bool> StartClientWithRelay(string joinCode) {
-        JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
-        NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
-        return !string.IsNullOrEmpty(joinCode) && NetworkManager.Singleton.StartClient();
+    return null;
+}
+
+private void SetHostTransform() {
+    NetworkObject hostObject = NetworkManager.Singleton.LocalClient.PlayerObject;
+    if (hostObject != null) {
+        hostObject.transform.position = new Vector3(0, 1, -5); 
     }
+}
+
+
+private async Task<bool> StartClientWithRelay(string joinCode) {
+    JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+    NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
+
+    bool isClientStarted = !string.IsNullOrEmpty(joinCode) && NetworkManager.Singleton.StartClient();
+
+    if (isClientStarted) {
+        NetworkManager.Singleton.OnClientConnectedCallback += (clientId) => {
+            if (clientId == NetworkManager.Singleton.LocalClientId) {
+                SetClientTransform();
+            }
+        };
+    }
+
+    return isClientStarted;
+}
+
+private void SetClientTransform() {
+    NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
+    if (playerObject != null) {
+        playerObject.transform.position = new Vector3(0,1,5); 
+    }
+}
 
     // Update is called once per frame
     void Update()
