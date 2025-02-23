@@ -72,8 +72,7 @@ public class Proj_Move : MonoBehaviour
     {
         Debug.Log("damage gameobject: " + other.name);
 
-        MoveForward component = other.GetComponent<MoveForward>();
-
+        NetworkMoveEnemy component = other.GetComponent<NetworkMoveEnemy>();
         if (component) 
         {
             component.TakeDamage(damage);
