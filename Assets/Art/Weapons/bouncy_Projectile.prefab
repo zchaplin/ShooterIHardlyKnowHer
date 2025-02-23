@@ -310,6 +310,9 @@ MonoBehaviour:
   bulletRB: {fileID: 96674918417469273}
   numOfBounces: 7
   damage: 5
+  gunLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &5445780849391351001
 GameObject:
   m_ObjectHideFlags: 0

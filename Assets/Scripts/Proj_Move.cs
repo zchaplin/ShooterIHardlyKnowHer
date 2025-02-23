@@ -22,6 +22,8 @@ public class Proj_Move : MonoBehaviour
     public int damage = 5;
     private HealthManager health;
     private bool hit = false;
+    [SerializeField] private LayerMask gunLayer; // so bullets won't hit the gun
+
 
     // Start is called before the first frame update
     public virtual void Start() 
@@ -65,6 +67,7 @@ public class Proj_Move : MonoBehaviour
     // collision detection for projectile
     private void OnCollisionEnter(Collision other) 
     {
+        if (other.gameObject.layer == gunLayer) return;
         damageEntity(other.gameObject);
     }
 

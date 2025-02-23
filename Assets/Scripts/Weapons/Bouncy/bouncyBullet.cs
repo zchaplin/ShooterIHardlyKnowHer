@@ -9,6 +9,7 @@ public class bouncyBullet : MonoBehaviour
     [SerializeField] private Rigidbody bulletRB;
     [SerializeField] private int numOfBounces = 7;
     [SerializeField] private int damage = 5;
+    [SerializeField] private LayerMask gunLayer;  // so bullets won't hit the gun
 
 
     private Vector3 lastVelocity;
@@ -29,6 +30,7 @@ public class bouncyBullet : MonoBehaviour
     }
 
     private void OnCollisionEnter(Collision collision) {
+        if (collision.gameObject.layer == gunLayer) return;
         if (curBounces >= numOfBounces) Destroy(gameObject);
         curSpeed = lastVelocity.magnitude;
         direction = Vector3.Reflect(lastVelocity.normalized, collision.contacts[0].normal);

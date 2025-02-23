@@ -21,6 +21,7 @@ public class LighthingChain : Weapon
 
     public override void Shoot()
     {        
+        DestroyLineRenderers();
         // Calculate the direction from the weapon to the crosshair
         Vector3 shootDirection = GetShootDirection();
 
@@ -38,7 +39,7 @@ public class LighthingChain : Weapon
 
             if (Physics.Raycast(ray, out hit))
             {
-                if (hit.collider.CompareTag("Enemy")||hit.collider.CompareTag("Player")) { // w/o it hitting walls will aslo hit enemeis
+                if (hit.collider.CompareTag("Enemy") || hit.collider.CompareTag("Player")) { // w/o it hitting walls will aslo hit enemeis
                     // If aiming at something, calculate velocity to hit the target (with gravity)
                     Vector3 targetPosition = hit.point;
                     FindClosetEnemies(hit.point);
@@ -49,6 +50,7 @@ public class LighthingChain : Weapon
             else
             {
                 // If not aiming at anything, shoot straight forward (no gravity)
+                StartCoroutine(SetUpLineRenderer(new GameObject[0], hit.point));
                 bulletRigidbody.velocity = shootDirection * 75f; // Adjust speed as needed
             }
         }
@@ -120,19 +122,22 @@ public class LighthingChain : Weapon
         lineRenderer.endColor = lineColor;
         lineRenderer.startWidth = lineWidth;
         lineRenderer.endWidth = lineWidth;
-        lineRenderer.positionCount = closestEnemies.Length + 1;
+        lineRenderer.positionCount = closestEnemies.Length + 2;
 
         // Connect line reneder between all enemies
         lineRenderer.SetPosition(0, gameObject.transform.position);
+        lineRenderer.SetPosition(1, hitPoint);
+        
         for (int i = 0; i < closestEnemies.Length; i++)
         {
             MoveForward enemy = closestEnemies[i].GetComponent<MoveForward>();
             enemy.Deactivate();
-            lineRenderer.SetPosition(i + 1, closestEnemies[i].transform.position);
+            lineRenderer.SetPosition(i + 2, closestEnemies[i].transform.position);
         }
 
         yield return new WaitForSeconds(1f);
         Destroy(lineRenderer);
+        DestroyLineRenderers();
         for (int i = 0; i < closestEnemies.Length; i++) {
             Destroy(closestEnemies[i]);
         }
@@ -159,4 +164,17 @@ public class LighthingChain : Weapon
 
         return velocity;
     }
+
+    void DestroyLineRenderers()
+    {
+        GameObject[] objects = GameObject.FindObjectsOfType<GameObject>(); 
+        foreach (GameObject obj in objects)
+        {
+            if (obj.name == "EnemyLineRenderer")
+            {
+                Destroy(obj);
+            }
+        }
+    }
+
 }
