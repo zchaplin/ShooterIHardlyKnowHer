@@ -11122,7 +11122,6 @@ MonoBehaviour:
   waveNum: 0
   enemiesInWave: 
   maxWave: 3
-  parentFolder: {fileID: 487004610}
   minX: -5
   maxX: 5
 --- !u!1 &487759922
@@ -14319,7 +14318,6 @@ MonoBehaviour:
   waveNum: 0
   enemiesInWave: 
   maxWave: 3
-  parentFolder: {fileID: 654047851}
   minX: -5
   maxX: 5
 --- !u!114 &654047853
@@ -37791,7 +37789,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 625935869}
         m_TargetAssemblyTypeName: ShowWeaponStats, Assembly-CSharp
         m_MethodName: Quit
         m_Mode: 1

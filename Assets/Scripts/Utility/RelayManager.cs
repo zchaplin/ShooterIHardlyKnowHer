@@ -45,8 +45,11 @@ private async Task<string> StartHostWithRelay(int maxConnections = 3) {
 
 private void SetHostTransform() {
     NetworkObject hostObject = NetworkManager.Singleton.LocalClient.PlayerObject;
-    if (hostObject != null) {
-        hostObject.transform.position = new Vector3(0, 1, -5); 
+    Debug.Log("Host: " + NetworkManager.Singleton.IsHost);
+    if (hostObject != null && NetworkManager.Singleton.IsHost) {
+        hostObject.transform.localPosition = new Vector3(0, 1, -5); 
+        Debug.Log("Host position: " + hostObject.transform.localPosition);
+
     }
 }
 
@@ -70,8 +73,11 @@ private async Task<bool> StartClientWithRelay(string joinCode) {
 
 private void SetClientTransform() {
     NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
-    if (playerObject != null) {
-        playerObject.transform.position = new Vector3(0,1,5); 
+    Debug.Log("Client: " + NetworkManager.Singleton.IsHost);
+
+    if (playerObject != null && !NetworkManager.Singleton.IsHost) {
+        playerObject.transform.localPosition = new Vector3(0,1,5); 
+        Debug.Log("client position: " + playerObject.transform.localPosition);
     }
 }
 

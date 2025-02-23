@@ -141,6 +141,7 @@ public class Shop : MonoBehaviour
                 canvasShop.SetActive(true);
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.Confined;
+                ShowWeaponStats.isPaused = true;
             }
             else
             {
