@@ -88,6 +88,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Untagged
       objectReference: {fileID: 0}
+    - target: {fileID: 8974781205374132788, guid: 67e031de2e88ef343aec08542f2c7756, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1595972170914395145, guid: 67e031de2e88ef343aec08542f2c7756, type: 3}
     m_RemovedGameObjects: []
@@ -117,7 +121,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 258846597
+  GlobalObjectIdHash: 262107002
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -138,3 +142,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45ad03633de3b504a98a1076161afa5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WeaponIndex:
+    m_InternalValue: 0
+  highlightMaterial: {fileID: 2100000, guid: 2a04bac6c3487134bbb134cbfc9a2d4b, type: 2}

@@ -18,17 +18,20 @@ public class PlayerInventory : NetworkBehaviour
 
         shop = FindObjectOfType<Shop>();
         weaponBin = FindObjectOfType<WeaponBin>();
-        if (shop) {
+        if (shop != null)
+        {
             shop.addWeapons(weapons);
         }
-        
+
         // Start with default weapon
         ownedWeapons.Add(0);
     }
 
     void Update()
     {
-        // if (!IsOwner) return;
+        if (!IsOwner) return;
+
+        CheckWeaponHighlight();
 
         // Pickup weapon when looking at it and pressing E
         if (Input.GetKeyDown(KeyCode.E))
@@ -55,17 +58,48 @@ public class PlayerInventory : NetworkBehaviour
         Debug.DrawRay(playerCamera.position, playerCamera.forward, Color.red);
     }
 
+    private void CheckWeaponHighlight()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, 10f, weaponLayer))
+        {
+            Debug.Log($"Raycast hit: {hit.collider.name}"); // Log the name of the object hit
+            DummyWeapon dummyWeapon = hit.collider.GetComponentInParent<DummyWeapon>();
+            if (dummyWeapon != null)
+            {
+                Debug.Log("Highlighting weapon"); // Log when a weapon is highlighted
+                dummyWeapon.Highlight();
+            }
+        }
+        else
+        {
+            Debug.Log("Raycast did not hit anything"); // Log when nothing is hit
+            RemoveAllHighlights();
+        }
+    }
+
+    private void RemoveAllHighlights()
+    {
+        // Find all dummy weapons in the scene and remove their highlights
+        DummyWeapon[] allWeapons = FindObjectsOfType<DummyWeapon>();
+        foreach (DummyWeapon weapon in allWeapons)
+        {
+            weapon.RemoveHighlight();
+        }
+    }
+
     private void TryPickupWeapon()
     {
         RaycastHit hit;
-        if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, 10f,weaponLayer))
+        if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, 10f, weaponLayer))
         {
             Debug.Log("Hit something with raycast");
-            DummyWeapon dummyWeapon = hit.collider.GetComponentInParent<DummyWeapon>();            if (dummyWeapon != null)
+            DummyWeapon dummyWeapon = hit.collider.GetComponentInParent<DummyWeapon>();
+            if (dummyWeapon != null)
             {
-                Debug.Log($"Found dummy weapon with index {dummyWeapon.WeaponIndex}");
-                PickupWeapon(dummyWeapon.WeaponIndex);
-                Destroy(dummyWeapon.gameObject);  // Remove the dummy weapon
+                Debug.Log($"Found dummy weapon with index {dummyWeapon.WeaponIndex.Value}");
+                PickupWeapon(dummyWeapon.WeaponIndex.Value);
+                weaponBin.PickupWeapon(dummyWeapon.gameObject);  // Remove the dummy weapon from the bin
             }
         }
     }
@@ -77,12 +111,11 @@ public class PlayerInventory : NetworkBehaviour
         if (weaponBin != null)
         {
             // Spawn the dummy weapon in the bin
-            weaponBin.SpawnDummyWeapon(currentWeaponIndex);
-            
+            weaponBin.ReturnWeapon(currentWeaponIndex, transform.position);
+
             // Remove from inventory
             ownedWeapons.Remove(currentWeaponIndex);
-            // shop.DeactivateWeapon(currentWeaponIndex);
-            
+
             // Switch back to default weapon
             currentWeaponIndex = 0;
             shop.activateWeapons(0);
