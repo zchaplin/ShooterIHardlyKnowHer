@@ -64,8 +64,8 @@ Transform:
   - {fileID: 8904315126187721573}
   - {fileID: 93461269253504115}
   - {fileID: 2695204323791905152}
-  - {fileID: 4304837177024304585}
   - {fileID: 4952473086262155037}
+  - {fileID: 4304837177024304585}
   m_Father: {fileID: 7180642123259438290}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2635761614529097251
@@ -472,11 +472,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weapons: {fileID: 7674037595774685501}
-  interactRange: 3
+  playerCamera: {fileID: 6290640501990745057}
   weaponLayer:
     serializedVersion: 2
     m_Bits: 64
-  playerCamera: {fileID: 6290640501990745057}
 --- !u!114 &3066880144147088103
 MonoBehaviour:
   m_ObjectHideFlags: 0

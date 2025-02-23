@@ -82,7 +82,7 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    private Vector3 GetShootDirection()
+    protected Vector3 GetShootDirection()
     {
         // Create a ray from the camera through the center of the screen (crosshair)
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)); // Center of the screen
@@ -100,7 +100,7 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    private Vector3 CalculateVelocityToHitTarget(Vector3 origin, Vector3 target, Rigidbody rb)
+    protected Vector3 CalculateVelocityToHitTarget(Vector3 origin, Vector3 target, Rigidbody rb)
     {
         // Calculate the direction to the target
         Vector3 direction = target - origin;

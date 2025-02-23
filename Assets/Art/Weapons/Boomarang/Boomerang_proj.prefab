@@ -389,8 +389,8 @@ MonoBehaviour:
   vel_start: {x: 10, y: 0, z: 50}
   accel: {x: -1, y: 0, z: -2}
   destroyOnHit: 0
-  lifespan: 3.5
-  piercing_limit: 5
+  lifespan: 100000
+  piercing_limit: 10
   damage: 7
 --- !u!54 &96674918417469273
 Rigidbody:

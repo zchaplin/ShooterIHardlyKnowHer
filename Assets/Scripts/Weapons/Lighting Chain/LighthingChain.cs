@@ -159,5 +159,4 @@ public class LighthingChain : Weapon
 
         return velocity;
     }
-    // Idea: if projectile hits enemy, check the numebr of gameobjects with the enwmy tag and imapct x of them 
 }
