@@ -19,11 +19,11 @@ MonoBehaviour:
     SourcePrefabToOverride: {fileID: 0}
     SourceHashToOverride: 0
     OverridingTargetPrefab: {fileID: 0}
-  - Override: 0
+  - Override: 2
     Prefab: {fileID: 2262247272392185019, guid: ba6ac3e2bcf5bed49a54ea12e831091c, type: 3}
     SourcePrefabToOverride: {fileID: 0}
-    SourceHashToOverride: 0
-    OverridingTargetPrefab: {fileID: 0}
+    SourceHashToOverride: 1143500917
+    OverridingTargetPrefab: {fileID: 2262247272392185019, guid: ba6ac3e2bcf5bed49a54ea12e831091c, type: 3}
   - Override: 0
     Prefab: {fileID: 5412275338724608756, guid: 3aedb63653d993f4c89bf9655ddec5b8, type: 3}
     SourcePrefabToOverride: {fileID: 0}
@@ -46,6 +46,31 @@ MonoBehaviour:
     OverridingTargetPrefab: {fileID: 0}
   - Override: 0
     Prefab: {fileID: 3697161746342541262, guid: fd299e2111e99f341951faeaab866ab8, type: 3}
+    SourcePrefabToOverride: {fileID: 0}
+    SourceHashToOverride: 0
+    OverridingTargetPrefab: {fileID: 0}
+  - Override: 0
+    Prefab: {fileID: 6438064843822109264, guid: ca1d802c4b5a00b49b314e2edc2af41a, type: 3}
+    SourcePrefabToOverride: {fileID: 0}
+    SourceHashToOverride: 0
+    OverridingTargetPrefab: {fileID: 0}
+  - Override: 0
+    Prefab: {fileID: 2171690989592873872, guid: fda7918069f496d48aa469a8578670db, type: 3}
+    SourcePrefabToOverride: {fileID: 0}
+    SourceHashToOverride: 0
+    OverridingTargetPrefab: {fileID: 0}
+  - Override: 0
+    Prefab: {fileID: 2668413666563361826, guid: a58295b61d2977641ba999032a15b44d, type: 3}
+    SourcePrefabToOverride: {fileID: 0}
+    SourceHashToOverride: 0
+    OverridingTargetPrefab: {fileID: 0}
+  - Override: 0
+    Prefab: {fileID: 6353242943574501118, guid: 13f2e0d13b5cfd24e9da6e75b0e9a969, type: 3}
+    SourcePrefabToOverride: {fileID: 0}
+    SourceHashToOverride: 0
+    OverridingTargetPrefab: {fileID: 0}
+  - Override: 0
+    Prefab: {fileID: 6894707718038605511, guid: 92d74b1a2248113489d043238bb24006, type: 3}
     SourcePrefabToOverride: {fileID: 0}
     SourceHashToOverride: 0
     OverridingTargetPrefab: {fileID: 0}
