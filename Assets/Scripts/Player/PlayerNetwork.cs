@@ -1,61 +1,58 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
 
 public class PlayerNetwork : NetworkBehaviour
 {
-    private readonly NetworkVariable<Vector3> netpos = new (writePerm: NetworkVariableWritePermission.Owner);
-    private readonly NetworkVariable<Quaternion> netrot = new (writePerm: NetworkVariableWritePermission.Owner);
-
-    void Update()
+    // Hardcoded spawn points
+    private readonly Vector3[] spawnPoints = new Vector3[]
     {
-        if(IsOwner){
-            netpos.Value = transform.position;
-            netrot.Value = transform.rotation;
-            // Debug.Log("current position: " + transform.position);
-        }else{
-            transform.position = netpos.Value;
-            transform.rotation = netrot.Value;
+        new Vector3(1, 1, -3), // Spawn point for player 1
+        new Vector3(1, 1, 3)   // Spawn point for player 2
+    };
+
+    private CharacterController characterController;
+
+    private void Awake()
+    {
+        characterController = GetComponent<CharacterController>();
+        if (characterController != null)
+        {
+            // Start with CharacterController disabled
+            characterController.enabled = false;
         }
-        
     }
 
-    // public override void OnNetworkSpawn()
-    // {
-    //     if (IsOwner)
-    //     {
-    //         Vector3 spawnPosition;
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer)
+        {
+            // Assign spawn point based on player ID
+            int playerId = (int)OwnerClientId;
+            if (playerId < spawnPoints.Length)
+            {
+                transform.position = spawnPoints[playerId];
 
-    //         //modified to be inclusive of more than 2 players. 
-    //         if (OwnerClientId % 2 == 0) // any even number clientID
-    //         {
-    //             Debug.Log(" == 0");
-    //             spawnPosition = new Vector3(1f, 1f, -3f + OwnerClientId);
-    //         }
-    //         else // any odd number clientID
-    //         {
-    //             Debug.Log(" != 0");
-    //             spawnPosition = new Vector3(-1f, 1f, 3f + OwnerClientId);
-    //         }
+                if (playerId == 0) // Player 1
+                {
+                    transform.rotation = Quaternion.LookRotation(Vector3.forward); 
+                }
+                else if (playerId == 1) // Player 2
+                {
+                    transform.rotation = Quaternion.LookRotation(Vector3.back); 
+                }
+            }
+        }
 
-    //         // Adjust Y position to match the ground level
-    //         spawnPosition.y = GetGroundHeight(spawnPosition);
-            
-    //         transform.position = spawnPosition;
-    //         Debug.Log("position: " + spawnPosition);
-    //     }
-    // }
+        // Owner enables CharacterController when spawned
+        if (IsOwner && characterController != null)
+        {
+            characterController.enabled = true;
+        }
 
-    // private float GetGroundHeight(Vector3 position)
-    // {
-    //     RaycastHit hit;
-    //     if (Physics.Raycast(new Vector3(position.x, 10f, position.z), Vector3.down, out hit, Mathf.Infinity))
-    //     {
-    //         return hit.point.y + 0.1f; // Add slight offset to prevent clipping
-    //     }
-    //     return position.y; // Default if no ground detected
-    // }
-
+        base.OnNetworkSpawn();
+    }
 }
+
+

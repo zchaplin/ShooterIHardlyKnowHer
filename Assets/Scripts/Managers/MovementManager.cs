@@ -13,7 +13,7 @@ public class MovementManager : NetworkBehaviour
     private Vector3 currentVelocityP1 = Vector3.zero;
     private float verticalLookRotation = 0f; // Tracks up/down camera rotation
     private float horizontalLookRotation = 0f; // Tracks left/right camera rotation
-    private Vector3 startingForwardDirection; // Tracks the player's initial forward direction
+    private float initialYRotation;
     void Start()
     {
         characterControllerP1 = GetComponent<CharacterController>();
@@ -26,6 +26,8 @@ public class MovementManager : NetworkBehaviour
         // Lock the cursor to the center of the screen and make it invisible
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        initialYRotation = transform.eulerAngles.y;
     }
 
     public override void OnNetworkSpawn()
@@ -82,20 +84,11 @@ public class MovementManager : NetworkBehaviour
         // Adjust horizontal rotation based on input
         horizontalLookRotation += mouseX;
 
-        // Apply different rotation clamping based on player ID
-        if (OwnerClientId == 0) // Player 1
-        {
-            horizontalLookRotation = Mathf.Clamp(horizontalLookRotation, -90f, 90f);
-        }
-        else if (OwnerClientId == 1) // Player 2
-        {
-            // Player 2 should rotate between 90° and 270° to match Player 1’s perspective
-            if (horizontalLookRotation < 90f) horizontalLookRotation = 90f;
-            if (horizontalLookRotation > 270f) horizontalLookRotation = 270f;
-        }
+        // Clamp horizontal rotation to ±90 degrees from the initial Y rotation
+        horizontalLookRotation = Mathf.Clamp(horizontalLookRotation, -90f, 90f);
 
-    // Apply rotation
-    transform.rotation = Quaternion.Euler(0f, horizontalLookRotation, 0f);
+        // Apply rotation
+        transform.rotation = Quaternion.Euler(0f, initialYRotation + horizontalLookRotation, 0f);
 
         // Rotate the camera up/down, clamping to prevent over-rotation
         verticalLookRotation -= mouseY;
