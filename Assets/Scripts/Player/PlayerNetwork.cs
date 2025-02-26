@@ -13,7 +13,6 @@ public class PlayerNetwork : NetworkBehaviour
 
     private void Awake()
     {
-        // Check for spawn points and log their positions
         if (!player1Spawn)
         {
             player1Spawn = GameObject.Find("spawn1");
@@ -44,57 +43,47 @@ public class PlayerNetwork : NetworkBehaviour
     {
         Debug.Log($"Player spawned with OwnerClientId: {OwnerClientId}, IsServer: {IsServer}, IsClient: {IsClient}");
 
-        if (IsOwner && !hasSpawned) // Check for ownership and if not spawned
+        if (IsOwner && !hasSpawned)
         {
-            RequestSpawnPositionServerRpc();
+            RequestSpawnPositionServerRpc(OwnerClientId);
         }
     }
 
     [ServerRpc]
-    private void RequestSpawnPositionServerRpc()
+    private void RequestSpawnPositionServerRpc(ulong clientId)
     {
-        Debug.Log($"Server received spawn request from client {OwnerClientId}");
+        Debug.Log($"Server received spawn request from client {clientId}");
 
-        Vector3 spawnPosition = GetSpawnPosition(OwnerClientId);
+        Vector3 spawnPosition = GetSpawnPosition(clientId);
 
-        // Set spawn position for the owner
+        // Apply position on the server-side instance as well
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var networkClient))
+        {
+            networkClient.PlayerObject.transform.position = spawnPosition;
+        }
+
         SetSpawnPositionClientRpc(spawnPosition);
     }
 
     private Vector3 GetSpawnPosition(ulong clientId)
     {
-        Debug.Log(clientId);
-        // Check the OwnerClientId to decide the spawn position
-        if (clientId == 0) // Assuming the host has an ID of 0
+        // Assign spawn based on connected clients' order
+        if (NetworkManager.Singleton.ConnectedClientsList[0].ClientId == clientId)
         {
             return player1Spawn.transform.position;
         }
-        else // Assuming the client is not ID 0
+        else
         {
             return player2Spawn.transform.position;
         }
     }
 
     [ClientRpc]
-    private void SetSpawnPositionClientRpc(Vector3 spawnPosition, ClientRpcParams rpcParams = default)
+    private void SetSpawnPositionClientRpc(Vector3 spawnPosition)
     {
-        if (IsOwner)
-        {
-            transform.position = spawnPosition;
-            netpos.Value = transform.position; // Update player spawn position
-            hasSpawned = true; // Mark the player as spawned
-            Debug.Log($"Player {OwnerClientId} spawned at: {transform.position}");
-        }
-    }
-
-    private float GetGroundHeight(Vector3 position)
-    {
-        RaycastHit hit;
-        // Cast a ray downwards from a height (10f) at the x/z location to find the ground
-        if (Physics.Raycast(new Vector3(position.x, 10f, position.z), Vector3.down, out hit, Mathf.Infinity))
-        {
-            return hit.point.y + 0.1f; // Add a slight offset to prevent clipping
-        }
-        return position.y; // Return the original y if no ground is detected
+        transform.position = spawnPosition;
+        netpos.Value = spawnPosition;
+        hasSpawned = true;
+        Debug.Log($"Player {OwnerClientId} spawned at: {spawnPosition}");
     }
 }
