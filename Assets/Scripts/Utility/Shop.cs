@@ -121,7 +121,7 @@ public class Shop : MonoBehaviour
         // }
 
         player1Weapons[0].SetActive(true);
-        //Debug.Log(player1Weapons[0]);
+        Debug.Log(player1Weapons[0]);
     }
 
     void Update()
@@ -141,7 +141,6 @@ public class Shop : MonoBehaviour
                 canvasShop.SetActive(true);
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.Confined;
-                ShowWeaponStats.isPaused = true;
             }
             else
             {
