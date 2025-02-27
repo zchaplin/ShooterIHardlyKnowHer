@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.Netcode;
 
-public class Weapon : MonoBehaviour
+public class Weapon : NetworkBehaviour
 {
     // Variables to define weapon behavior
     public float fireRate;// = 1f;
@@ -16,6 +17,7 @@ public class Weapon : MonoBehaviour
     public GameObject baseBullet;
     public int initialBullets;
     private int bullets;
+    private NetworkObject netBullet;
 
     private float nextTimeToFire = 0f;
     protected Quaternion bulletRotation;
@@ -58,6 +60,12 @@ public class Weapon : MonoBehaviour
         // Spawn bullet with the calculated direction
         GameObject bullet = Instantiate(baseBullet, gameObject.transform.position, Quaternion.identity);
         bullet.transform.forward = shootDirection; // Set the bullet's forward direction
+
+        netBullet = bullet.GetComponent<NetworkObject>();
+        netBullet.Spawn(true);
+
+        Debug.Log("netBullet: ", netBullet);
+        Debug.Log(netBullet.transform);
 
         // If the bullet has a rigidbody, set its velocity
         Rigidbody bulletRigidbody = bullet.GetComponent<Rigidbody>();
