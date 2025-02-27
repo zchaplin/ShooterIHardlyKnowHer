@@ -13,6 +13,42 @@ public class WeaponBin : NetworkBehaviour
         Debug.Log($"WeaponBin spawned. IsServer: {IsServer}, IsHost: {IsHost}, IsClient: {IsClient}");
     }
 
+    // New ServerRpc for weapon purchase
+    [ServerRpc(RequireOwnership = false)]
+    public void PurchaseWeaponServerRpc(int weaponIndex, ulong clientId)
+    {
+        Debug.Log($"Server received purchase request for weapon {weaponIndex} from client {clientId}");
+        
+        if (!IsServer)
+        {
+            Debug.LogError("PurchaseWeaponServerRpc execution on client - this should never happen!");
+            return;
+        }
+        
+        // Spawn the weapon in the bin for all clients to see
+        SpawnDummyWeapon(weaponIndex);
+        
+        // Notify clients that this weapon was purchased successfully
+        NotifyWeaponPurchasedClientRpc(weaponIndex, clientId);
+    }
+    
+    // ClientRpc to notify all clients about a purchase
+    [ClientRpc]
+    private void NotifyWeaponPurchasedClientRpc(int weaponIndex, ulong clientId)
+    {
+        Debug.Log($"Client notified that weapon {weaponIndex} was purchased by client {clientId}");
+        
+        // Find all clients' Shop instances
+        Shop[] shops = FindObjectsOfType<Shop>();
+        foreach (Shop shop in shops)
+        {
+            if (shop != null)
+            {
+                shop.MarkWeaponAsPurchased(weaponIndex);
+            }
+        }
+    }
+
     // Spawn weapon in bin when purchased - only called on server
     public void SpawnDummyWeapon(int weaponIndex)
     {

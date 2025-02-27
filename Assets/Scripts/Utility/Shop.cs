@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
 
 public class Shop : MonoBehaviour
 {
@@ -19,6 +20,11 @@ public class Shop : MonoBehaviour
     private List<int> weapons1Bought;
     private Dictionary<Button, RawImage[]> buttonImagesMap;
     [SerializeField] private ShowWeaponStats showWeaponStats;
+    
+    // Reference to network manager for server RPCs
+    private NetworkManager networkManager;
+    // Reference to weapon bin for spawning weapons
+    private WeaponBin weaponBin;
 
     void Start()
     {
@@ -26,8 +32,18 @@ public class Shop : MonoBehaviour
         weaponsPrice = new List<int> {0,5,15,30,40,40};
         weapons1Bought = new List<int> {1,0,0,0,0,0};
 
+        // Get network manager reference
+        networkManager = NetworkManager.Singleton;
+        // Get weapon bin reference
+        weaponBin = FindObjectOfType<WeaponBin>();
+        
+        if (weaponBin == null)
+        {
+            Debug.LogError("WeaponBin not found in scene! Shop functionality will be limited.");
+        }
+
         manageButtonImages();
-        SetupButtonListeners(); // Add this line to setup button clicks
+        SetupButtonListeners();
        
         canvasShop.SetActive(false);
         panels = new List<Image>();
@@ -39,7 +55,6 @@ public class Shop : MonoBehaviour
         Debug.Log("weapons stats: "+showWeaponStats);
     }
 
-    // Add this new method to setup button listeners
     private void SetupButtonListeners()
     {
         Button[] buttons = GetComponentsInChildren<Button>();
@@ -53,41 +68,44 @@ public class Shop : MonoBehaviour
         }
     }
 
-    // New method to handle weapon purchase
     private void PurchaseWeapon(int weaponNum)
     {
         Debug.Log($"Attempting to purchase weapon {weaponNum}");
         
+        if (player1Weapons.Count == 0)
+        {
+            Debug.LogWarning("No weapons available to purchase!");
+            return;
+        }
+        
+        // Check if client can afford it and doesn't already own it
         if (weapons1Bought[weaponNum] == 0 && ScoreTracker.score >= weaponsPrice[weaponNum])
         {
             Debug.Log($"Purchasing weapon {weaponNum} for {weaponsPrice[weaponNum]} points");
+            
+            // Deduct score locally
             ScoreTracker.score -= weaponsPrice[weaponNum];
             weapons1Bought[weaponNum] = 1;
 
-            // Spawn weapon in bin
-            if (weaponNum > 0)
+            // Request server to spawn the weapon (handle both host and client case)
+            if (networkManager != null && networkManager.IsClient)
             {
-                GameObject bin = GameObject.FindGameObjectWithTag("WeaponBin");
-                if (bin)
+                // Find local player to get client ID
+                ulong localClientId = networkManager.LocalClientId;
+                Debug.Log($"Local client ID: {localClientId}, requesting purchase from server");
+                
+                if (weaponBin != null)
                 {
-                    Debug.Log($"Found bin, spawning weapon {weaponNum}");
-                    WeaponBin binScript = bin.GetComponent<WeaponBin>();
-                    if (binScript != null)
-                    {
-                        binScript.SpawnDummyWeapon(weaponNum);
-                    }
-                    else
-                    {
-                        Debug.LogError("WeaponBin script not found on bin object");
-                    }
-                }
-                else
-                {
-                    Debug.LogError("Could not find object with WeaponBin tag");
+                    // Call server RPC to purchase the weapon
+                    weaponBin.PurchaseWeaponServerRpc(weaponNum, localClientId);
                 }
             }
+            else
+            {
+                Debug.LogError("NetworkManager not found or not connected as client!");
+            }
         }
-        else if (weapons1Bought[weaponNum] == 1 && player1Weapons[weaponNum].activeInHierarchy)
+        else if (weapons1Bought[weaponNum] == 1 && weaponNum < player1Weapons.Count && player1Weapons[weaponNum].activeInHierarchy)
         {
             // Weapon is already bought and equipped: refill bullets
             Weapon weaponScript = player1Weapons[weaponNum].GetComponent<Weapon>();
@@ -95,14 +113,17 @@ public class Shop : MonoBehaviour
             {
                 Debug.Log($"Refilling bullets for weapon {weaponNum}");
                 weaponScript.RefillBullets();
-                showWeaponStats.updateText(weaponNum); // Update UI to reflect new ammo count
+                if (showWeaponStats != null)
+                {
+                    showWeaponStats.updateText(weaponNum); // Update UI to reflect new ammo count
+                }
             }
             else
             {
                 Debug.LogError($"Weapon script not found on weapon {weaponNum}");
             }
         }
-        else if (weapons1Bought[weaponNum] == 1 && !player1Weapons[weaponNum].activeInHierarchy)
+        else if (weapons1Bought[weaponNum] == 1 && weaponNum < player1Weapons.Count && !player1Weapons[weaponNum].activeInHierarchy)
         {
             Debug.Log($"Weapon {weaponNum} is already bought but not equipped. Cannot buy again.");
         }
@@ -110,18 +131,16 @@ public class Shop : MonoBehaviour
 
     public void addWeapons(Transform weapons) 
     {
+        // Clear previous weapons
+        player1Weapons.Clear();
+        
         for (int i=0; i<weapons.childCount; i+=1) 
         {
             player1Weapons.Add(weapons.GetChild(i).gameObject);
         }
 
-        // for (int i=1; i<weapons.childCount; i+=1) 
-        // {
-        //     player1Weapons[i].SetActive(false);
-        // }
-
         player1Weapons[0].SetActive(true);
-        Debug.Log(player1Weapons[0]);
+        Debug.Log("First weapon activated: " + player1Weapons[0]);
     }
 
     void Update()
@@ -132,8 +151,13 @@ public class Shop : MonoBehaviour
             {
                 panels[i].color = Color.white;
             }
+            else
+            {
+                panels[i].color = Color.gray;
+            }
         }
         
+        // Toggle shop menu with B key
         if (Input.GetKeyDown(KeyCode.B))
         {
             if (!canvasShop.activeInHierarchy)
@@ -145,25 +169,50 @@ public class Shop : MonoBehaviour
             else
             {
                 canvasShop.SetActive(false);
-                Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
             }
         }
 
         ShowCorrectImage();
     }
 
-    // This is now only used when picking up weapons from the bin
     public void activateWeapons(int weaponNum)
     {
-        if (weapons1Bought[weaponNum] == 1)
+        // Safety checks
+        if (player1Weapons.Count == 0)
         {
+            Debug.LogWarning("No weapons to activate!");
+            return;
+        }
+        
+        if (weaponNum >= player1Weapons.Count)
+        {
+            Debug.LogError($"Weapon index {weaponNum} out of range!");
+            return;
+        }
+        
+        if (weapons1Bought[weaponNum] == 1 || weaponNum == 0)  // Always allow activating the default weapon
+        {
+            Debug.Log($"Activating weapon {weaponNum}");
             for (int i = 0; i < player1Weapons.Count; i++)
             {
-                player1Weapons[i].SetActive(false);
+                if (player1Weapons[i] != null)
+                {
+                    player1Weapons[i].SetActive(false);
+                }
             }
+            
             player1Weapons[weaponNum].SetActive(true);
-            showWeaponStats.updateText(weaponNum);
+            
+            if (showWeaponStats != null)
+            {
+                showWeaponStats.updateText(weaponNum);
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"Tried to activate weapon {weaponNum} but it's not owned!");
         }
     }
 
@@ -172,8 +221,21 @@ public class Shop : MonoBehaviour
         if (weaponNum <= 0 || weaponNum >= weapons1Bought.Count) return;
         
         weapons1Bought[weaponNum] = 0;
-        player1Weapons[weaponNum].SetActive(false);
-        player1Weapons[0].SetActive(true);
+        
+        if (weaponNum < player1Weapons.Count)
+        {
+            player1Weapons[weaponNum].SetActive(false);
+            player1Weapons[0].SetActive(true);
+        }
+    }
+
+    // Mark weapon as purchased (called from server via ClientRpc)
+    public void MarkWeaponAsPurchased(int weaponNum)
+    {
+        if (weaponNum < 0 || weaponNum >= weapons1Bought.Count) return;
+        
+        weapons1Bought[weaponNum] = 1;
+        Debug.Log($"Weapon {weaponNum} marked as purchased");
     }
 
     public void manageButtonImages() 
@@ -198,11 +260,15 @@ public class Shop : MonoBehaviour
 
     public void ShowCorrectImage() 
     {
+        if (player1Weapons.Count == 0) return;
+        
         foreach (var kvp in buttonImagesMap)
         {
             Button button = kvp.Key;
             RawImage[] images = kvp.Value;
-            int i = int.Parse(button.name);
+            
+            if (!int.TryParse(button.name, out int i)) continue;
+            if (i >= weapons1Bought.Count) continue;
             
             foreach (var image in images)
             {
@@ -223,7 +289,7 @@ public class Shop : MonoBehaviour
                 }
 
                 // Image for the activated weapon
-                if (player1Weapons.Count > 0 && player1Weapons[i].activeInHierarchy) 
+                if (i < player1Weapons.Count && player1Weapons[i] != null && player1Weapons[i].activeInHierarchy) 
                 {
                     if (image.name == "filledRedGun") 
                     {
