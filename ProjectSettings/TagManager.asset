@@ -10,6 +10,7 @@ TagManager:
   - DummyWeapon
   - WeaponBin
   - SpawnPoint
+  - HealthManager
   layers:
   - Default
   - TransparentFX

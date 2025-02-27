@@ -28,9 +28,12 @@ public class DamageDisplay : MonoBehaviour
         }
         else
         {
-            GameObject hpObject = GameObject.Find("healthManager");
+            GameObject hpObject = GameObject.FindGameObjectWithTag("HealthManager");
             if(hpObject == null){
                  Debug.LogError("No health manager!");
+            } else{
+                healthManager = hpObject.GetComponent<HealthManager>();
+                healthManager.PlayerDamaged += OnPlayerDamaged;
             }
         }
     }
@@ -55,13 +58,14 @@ public class DamageDisplay : MonoBehaviour
     private IEnumerator DamageEffect()
     {
         vignette.enabled.Override(true);
+        intensity = 0.4f;
         vignette.intensity.Override(intensity);
         
         yield return new WaitForSeconds(0.4f);
 
         while (intensity > 0)
         {
-            intensity -= 0.01f;
+            intensity -= 0.05f;
             vignette.intensity.Override(intensity);
             yield return new WaitForSeconds(0.1f);
         }

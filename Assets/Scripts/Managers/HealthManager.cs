@@ -10,7 +10,7 @@ public class HealthManager : MonoBehaviour
 
     // Event system for player damage
     public delegate void OnPlayerDamaged();
-     public event OnPlayerDamaged PlayerDamaged;
+    public event OnPlayerDamaged PlayerDamaged;
     // Start is called before the first frame update
     void Start()
     {

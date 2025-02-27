@@ -20135,71 +20135,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2118380430}
   m_LocalEulerAnglesHint: {x: 0, y: 34.801, z: 0}
---- !u!1001 &944088685
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 4400328585649254945, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: m_Name
-      value: p1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7180642123259438290, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7180642123259438290, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7180642123259438290, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7180642123259438290, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7180642123259438290, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7180642123259438290, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7180642123259438290, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7180642123259438290, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7180642123259438290, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7180642123259438290, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7851318638961055507, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: GlobalObjectIdHash
-      value: 2986114369
-      objectReference: {fileID: 0}
-    - target: {fileID: 9121134010590273998, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
-      propertyPath: healthManager
-      value: 
-      objectReference: {fileID: 1656206110}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
 --- !u!1 &945530839
 GameObject:
   m_ObjectHideFlags: 0
@@ -35441,17 +35376,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2118380430}
   m_LocalEulerAnglesHint: {x: 0, y: -90.792, z: 0}
---- !u!114 &1656206110 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2943282112334124960, guid: f1904634e3d68d04da06e704fc8cbae6, type: 3}
-  m_PrefabInstance: {fileID: 3365959246192786310}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 218f0b1510f1b5745a6e2bb4629c4f2c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1656767248
 GameObject:
   m_ObjectHideFlags: 0
@@ -49066,10 +48990,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1509894335}
     m_Modifications:
-    - target: {fileID: 2943282112334124960, guid: f1904634e3d68d04da06e704fc8cbae6, type: 3}
-      propertyPath: totalHealth
-      value: 1000
-      objectReference: {fileID: 0}
     - target: {fileID: 6308814727835722986, guid: f1904634e3d68d04da06e704fc8cbae6, type: 3}
       propertyPath: m_Name
       value: healthManager
@@ -49365,4 +49285,3 @@ SceneRoots:
   - {fileID: 8310892341900151950}
   - {fileID: 1003027619}
   - {fileID: 1373566299}
-  - {fileID: 944088685}
