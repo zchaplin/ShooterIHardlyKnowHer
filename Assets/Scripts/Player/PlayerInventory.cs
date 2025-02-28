@@ -53,7 +53,7 @@ public class PlayerInventory : NetworkBehaviour
     
     private void OnWeaponIndexChanged(int oldValue, int newValue)
     {
-        Debug.Log($"Network weapon change: {oldValue} -> {newValue}");
+       //Debug.Log($"Network weapon change: {oldValue} -> {newValue}");
         
         // Make sure we have a weapons transform
         if (weapons == null || weapons.childCount == 0)
@@ -76,12 +76,17 @@ public class PlayerInventory : NetworkBehaviour
                 weapons.GetChild(i).gameObject.SetActive(i == newValue);
             }
         }
+        // reload weapon
+        // Transform weaponTransform = weapons.GetChild(newValue);
+        // Weapon weaponScript = weaponTransform.gameObject.GetComponent<Weapon>();
+        // weaponScript.RefillBullets();
+
         
         // If we're the owner, also update the shop UI
         if (IsOwner && shop != null)
         {
-            shop.activateWeapons(newValue);
-            Debug.Log($"Weapon {newValue} activated via Shop for owner");
+            // shop.activateWeapons(newValue);
+            //.Log($"Weapon {newValue} activated via Shop for owner");
         }
     }
 
@@ -158,13 +163,13 @@ public class PlayerInventory : NetworkBehaviour
         RaycastHit hit;
         if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, 10f, weaponLayer))
         {
-            Debug.Log("Hit something with raycast");
+            //Debug.Log("Hit something with raycast");
             
             DummyWeapon dummyWeapon = hit.collider.GetComponentInParent<DummyWeapon>();
             if (dummyWeapon != null)
             {
                 int weaponIndex = dummyWeapon.WeaponIndex.Value;
-                Debug.Log($"Found dummy weapon with index {weaponIndex}");
+                //Debug.Log($"Found dummy weapon with index {weaponIndex}");
                 
                 NetworkObject networkObj = dummyWeapon.GetComponent<NetworkObject>();
                 if (networkObj != null)
@@ -173,11 +178,14 @@ public class PlayerInventory : NetworkBehaviour
                     
                     // Update our local weapon index first
                     currentWeaponIndex.Value = weaponIndex;
-                    
+                    Transform weaponTransform = weapons.GetChild(weaponIndex);
+                    Weapon weaponScript = weaponTransform.gameObject.GetComponent<Weapon>();
+                    weaponScript.RefillBullets();
+
                     // Then tell the server to remove the dummy weapon
                     weaponBin.PickupWeaponServerRpc(networkId);
                     
-                    Debug.Log($"Requested pickup of weapon {weaponIndex} with networkID {networkId}");
+                    //Debug.Log($"Requested pickup of weapon {weaponIndex} with networkID {networkId}");
                 }
                 else
                 {
@@ -216,6 +224,10 @@ public class PlayerInventory : NetworkBehaviour
         if (ownedWeapons.Contains(index))
         {
             currentWeaponIndex.Value = index;
+            // Transform weaponTransform = weapons.GetChild(index);
+            // Weapon weaponScript = weaponTransform.gameObject.GetComponent<Weapon>();
+            // weaponScript.RefillBullets();
+
         }
     }
 

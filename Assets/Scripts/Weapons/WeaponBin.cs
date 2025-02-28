@@ -10,18 +10,18 @@ public class WeaponBin : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        Debug.Log($"WeaponBin spawned. IsServer: {IsServer}, IsHost: {IsHost}, IsClient: {IsClient}");
+        //Debug.Log($"WeaponBin spawned. IsServer: {IsServer}, IsHost: {IsHost}, IsClient: {IsClient}");
     }
 
     // New ServerRpc for weapon purchase
     [ServerRpc(RequireOwnership = false)]
     public void PurchaseWeaponServerRpc(int weaponIndex, ulong clientId)
     {
-        Debug.Log($"Server received purchase request for weapon {weaponIndex} from client {clientId}");
+        //Debug.Log($"Server received purchase request for weapon {weaponIndex} from client {clientId}");
         
         if (!IsServer)
         {
-            Debug.LogError("PurchaseWeaponServerRpc execution on client - this should never happen!");
+            //Debug.LogError("PurchaseWeaponServerRpc execution on client - this should never happen!");
             return;
         }
         
@@ -36,7 +36,7 @@ public class WeaponBin : NetworkBehaviour
     [ClientRpc]
     private void NotifyWeaponPurchasedClientRpc(int weaponIndex, ulong clientId)
     {
-        Debug.Log($"Client notified that weapon {weaponIndex} was purchased by client {clientId}");
+        //Debug.Log($"Client notified that weapon {weaponIndex} was purchased by client {clientId}");
         
         // Find all clients' Shop instances
         Shop[] shops = FindObjectsOfType<Shop>();
@@ -54,13 +54,13 @@ public class WeaponBin : NetworkBehaviour
     {
         if (!IsServer)
         {
-            Debug.LogWarning("SpawnDummyWeapon called on client - should only be called on server!");
+            //Debug.LogWarning("SpawnDummyWeapon called on client - should only be called on server!");
             return;
         }
 
         if (weaponIndex >= dummyWeaponPrefabs.Length) 
         {
-            Debug.LogError($"Invalid weapon index: {weaponIndex}");
+            //Debug.LogError($"Invalid weapon index: {weaponIndex}");
             return;
         }
 
@@ -92,17 +92,17 @@ public class WeaponBin : NetworkBehaviour
                 // Track the weapon by its network ID
                 weaponsInBin[networkObject.NetworkObjectId] = dummyWeapon;
                 
-                Debug.Log($"Weapon {weaponIndex} spawned successfully with NetworkObjectId: {networkObject.NetworkObjectId}");
+                // Debug.Log($"Weapon {weaponIndex} spawned successfully with NetworkObjectId: {networkObject.NetworkObjectId}");
             }
             else
             {
-                Debug.LogError("NetworkObject component missing on dummy weapon prefab!");
+                //Debug.LogError("NetworkObject component missing on dummy weapon prefab!");
                 Destroy(dummyWeapon);
             }
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Error spawning weapon: {e.Message}\n{e.StackTrace}");
+            //Debug.LogError($"Error spawning weapon: {e.Message}\n{e.StackTrace}");
         }
     }
 
@@ -110,11 +110,11 @@ public class WeaponBin : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void ReturnWeaponServerRpc(int weaponIndex, Vector3 dropPosition)
     {
-        Debug.Log($"Server received request to return weapon {weaponIndex}");
+        //Debug.Log($"Server received request to return weapon {weaponIndex}");
         
         if (!IsServer)
         {
-            Debug.LogError("ReturnWeaponServerRpc execution on client - this should never happen!");
+            //Debug.LogError("ReturnWeaponServerRpc execution on client - this should never happen!");
             return;
         }
         
@@ -126,11 +126,11 @@ public class WeaponBin : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void PickupWeaponServerRpc(ulong weaponNetworkId)
     {
-        Debug.Log($"Server received request to pickup weapon with ID: {weaponNetworkId}");
+        //Debug.Log($"Server received request to pickup weapon with ID: {weaponNetworkId}");
         
         if (!IsServer)
         {
-            Debug.LogError("PickupWeaponServerRpc execution on client - this should never happen!");
+            //Debug.LogError("PickupWeaponServerRpc execution on client - this should never happen!");
             return;
         }
 
@@ -153,21 +153,21 @@ public class WeaponBin : NetworkBehaviour
                     // Despawn from network (this will remove it for all clients)
                     weaponNetObj.Despawn();
                     
-                    Debug.Log($"Weapon with ID {weaponNetworkId} successfully despawned");
+                    //Debug.Log($"Weapon with ID {weaponNetworkId} successfully despawned");
                 }
                 else
                 {
-                    Debug.LogError($"Found NetworkObjectId: {weaponNetworkId} but object reference is null");
+                    //Debug.LogError($"Found NetworkObjectId: {weaponNetworkId} but object reference is null");
                 }
             }
             else
             {
-                Debug.LogError($"Could not find weapon with NetworkObjectId: {weaponNetworkId} in SpawnedObjects dictionary");
+                //Debug.LogError($"Could not find weapon with NetworkObjectId: {weaponNetworkId} in SpawnedObjects dictionary");
             }
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Error during pickup: {e.Message}\n{e.StackTrace}");
+            //Debug.LogError($"Error during pickup: {e.Message}\n{e.StackTrace}");
         }
     }
 }

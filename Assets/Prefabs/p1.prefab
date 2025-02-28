@@ -782,6 +782,10 @@ PrefabInstance:
       propertyPath: initialBullets
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 6179648395382473106, guid: 72b7ffe62e6f61f4b90a993e76b4e80b, type: 3}
+      propertyPath: isLimitedBullet
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7052483521828782715, guid: 72b7ffe62e6f61f4b90a993e76b4e80b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -870,6 +874,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 7674037595774685501}
     m_Modifications:
     - target: {fileID: 5463096494024768567, guid: 41a869ce6f1c2a845bd986274ca71222, type: 3}
+      propertyPath: fireRate
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5463096494024768567, guid: 41a869ce6f1c2a845bd986274ca71222, type: 3}
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
@@ -877,6 +885,10 @@ PrefabInstance:
       propertyPath: playerCamera
       value: 
       objectReference: {fileID: 1629880104306304855}
+    - target: {fileID: 5463096494024768567, guid: 41a869ce6f1c2a845bd986274ca71222, type: 3}
+      propertyPath: isLimitedBullet
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5711333623547471582, guid: 41a869ce6f1c2a845bd986274ca71222, type: 3}
       propertyPath: m_Name
       value: peaShooter
@@ -1172,6 +1184,7 @@ MonoBehaviour:
   fireRate: 0.65
   baseBullet: {fileID: 4390976419354512532, guid: d4b1b28cf01a2ee4d883e98ece810d61, type: 3}
   initialBullets: 8
+  isLimitedBullet: 1
   rechargeText: {fileID: 0}
   playerCamera: {fileID: 1629880104306304855}
   maxEnemies: 3

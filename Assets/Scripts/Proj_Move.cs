@@ -40,7 +40,7 @@ public class Proj_Move : MonoBehaviour
             }
         } 
         else {
-            Debug.LogError("Projectile: " + name + " has no rigidbody");
+            //Debug.LogError("Projectile: " + name + " has no rigidbody");
         }
 
         // Set the projectile to die after [lifespan] seconds
@@ -70,7 +70,7 @@ public class Proj_Move : MonoBehaviour
 
     public virtual void damageEntity(GameObject other) 
     {
-        Debug.Log("damage gameobject: " + other.name);
+        //Debug.Log("damage gameobject: " + other.name);
 
         NetworkMoveEnemy component = other.GetComponent<NetworkMoveEnemy>();
         if (component) 
@@ -81,7 +81,7 @@ public class Proj_Move : MonoBehaviour
         } 
         else if (other.gameObject.tag == "Player") 
         {
-            Debug.Log("PLAYER DAMAGED");
+            //Debug.Log("PLAYER DAMAGED");
             if (!hit) 
             {
                 health.playerTakeDamage(1);
