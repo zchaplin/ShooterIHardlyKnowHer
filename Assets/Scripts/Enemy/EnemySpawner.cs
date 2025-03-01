@@ -25,7 +25,7 @@ public class EnemySpawner : NetworkBehaviour
 
     private void HandleClientConnected(ulong clientId)
     {
-        if (IsServer && NetworkManager.Singleton.ConnectedClients.Count == 2)
+        if (IsServer && NetworkManager.Singleton.ConnectedClients.Count >=1)// == 2)
         {                        
             StartCoroutine(StartWave());
         }
@@ -70,7 +70,21 @@ public class EnemySpawner : NetworkBehaviour
         else if (waveNum == 8) {
             enemiesInWave[0] = true;
             enemiesInWave[1] = true;
+        }
+        else if (waveNum == 10) {
+            enemiesInWave[4] = true; // flying
+            enemiesInWave[0] = true;
+            enemiesInWave[1] = false;
+            enemiesInWave[2] = false;
+            enemiesInWave[3] = false;
             availableWeapons[4] = true;
+        }
+        else if (waveNum == 13) {
+            enemiesInWave[1] = true;
+            enemiesInWave[2] = true;
+        }
+        else if (waveNum == 15) {            
+            enemiesInWave[3] = true;
         }
         // Spawn a wave of enemies
         for (int i = 0; i < enemiesNum; i++)
@@ -109,7 +123,7 @@ public class EnemySpawner : NetworkBehaviour
     void SpawnObject(GameObject objectPrefab)
     {
         float randomX = UnityEngine.Random.Range(minX, maxX);
-        Vector3 spawnPosition = new Vector3(transform.position.x+randomX, transform.position.y, transform.position.z);
+        Vector3 spawnPosition = new Vector3(transform.position.x+randomX, objectPrefab.transform.position.y, transform.position.z);
         // Instantiate the objectPrefab at the current position
         GameObject objectToSpawn = Instantiate(objectPrefab, spawnPosition, Quaternion.identity);
 
@@ -131,13 +145,6 @@ public class EnemySpawner : NetworkBehaviour
         
         // Ensure the NetworkObject is spawned on both server and client
         networkObject.Spawn();
-
-        // Use NetworkObject's ownership system to assign ownership to the client that spawned the object if needed
-        // if (IsOwner) 
-        // {
-        //     // Assign ownership to the client that should own the object
-        //     networkObject.ChangeOwnership(NetworkManager.Singleton.LocalClientId);
-        // }
     }
 
     private int GetRandomTrueIndex(bool[] array)
