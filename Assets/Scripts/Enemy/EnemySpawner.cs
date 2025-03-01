@@ -7,7 +7,6 @@ using System.Linq;
 
 public class EnemySpawner : NetworkBehaviour
 {
-    // public GameObject objectPrefab;
     public GameObject[] enemyPrefab;
     public int waveNum = 0;
     private bool inWave = false;
@@ -25,7 +24,7 @@ public class EnemySpawner : NetworkBehaviour
 
     private void HandleClientConnected(ulong clientId)
     {
-        if (IsServer && NetworkManager.Singleton.ConnectedClients.Count >=1)// == 2)
+        if (IsServer && NetworkManager.Singleton.ConnectedClients.Count == 2)
         {                        
             StartCoroutine(StartWave());
         }
