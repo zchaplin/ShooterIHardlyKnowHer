@@ -951,11 +951,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: 1314cb46-c6e0-4551-88f5-dbf05514f472
+  cloudProjectId: c03a08fc-90f9-4d9c-a0af-3b242b690627
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: ShooterIHardlyKnowHer
-  organizationId: shoother-studio
+  projectName: CoopRailShooter
+  organizationId: juggernaut04
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

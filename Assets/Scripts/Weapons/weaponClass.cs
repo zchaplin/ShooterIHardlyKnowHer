@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Weapon : MonoBehaviour
 {
@@ -13,38 +14,52 @@ public class Weapon : MonoBehaviour
 
     // OVERRIDE THIS VARIABLE TO THE PROJECTILE BEING SHOT IN WEAPON SCRIPTS
     public GameObject baseBullet;
+    public int initialBullets;
+    [SerializeField] private int bullets;
+    [SerializeField] private bool isLimitedBullet = true;
 
     private float nextTimeToFire = 0f;
     protected Quaternion bulletRotation;
+    [SerializeField] private TMP_Text rechargeText;
 
     // Reference to player camera (for crosshair)
     public Camera playerCamera;
 
     public virtual void Start()
     {
+        bullets = initialBullets;
         // Ensure the player camera is assigned
         if (playerCamera == null)
         {
             Debug.LogError("Player camera is not assigned in the Weapon script.");
             return;
         }
+        rechargeText = GameObject.Find("Canvas/WeaponStats/Manager/Recharge").GetComponent<TMP_Text>();
     }
 
     // Update is called once per frame
     public virtual void Update()
     {
         // Check if it's time to fire
-        if (Input.GetMouseButton(0) && Time.time >= nextTimeToFire) // 0 = Left Mouse Button
+        if (Input.GetMouseButton(0) && Time.time >= nextTimeToFire && !ShowWeaponStats.isPaused) // 0 = Left Mouse Button
         {
-            nextTimeToFire = Time.time + 1f / fireRate;
-            Shoot();
+            if (isLimitedBullet && bullets > 0) {
+                nextTimeToFire = Time.time + 1f / fireRate;
+                bullets -= 1;
+                Shoot();
+            } else if (!isLimitedBullet) {
+                nextTimeToFire = Time.time + 1f / fireRate;
+                Shoot();
+            }
         }
+        rechargeText.text = "Time until next shot: " + Mathf.Max(0f, (nextTimeToFire - Time.time)).ToString("F2") + "\nBullets: " + bullets;
     }
 
     public virtual void Shoot()
-    {
+    { 
         // Calculate the direction from the weapon to the crosshair
         Vector3 shootDirection = GetShootDirection();
+
 
         // Spawn bullet with the calculated direction
         GameObject bullet = Instantiate(baseBullet, gameObject.transform.position, Quaternion.identity);
@@ -73,7 +88,7 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    private Vector3 GetShootDirection()
+    protected Vector3 GetShootDirection()
     {
         // Create a ray from the camera through the center of the screen (crosshair)
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0)); // Center of the screen
@@ -91,7 +106,7 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    private Vector3 CalculateVelocityToHitTarget(Vector3 origin, Vector3 target, Rigidbody rb)
+    protected Vector3 CalculateVelocityToHitTarget(Vector3 origin, Vector3 target, Rigidbody rb)
     {
         // Calculate the direction to the target
         Vector3 direction = target - origin;
@@ -110,5 +125,16 @@ public class Weapon : MonoBehaviour
         velocity.y = verticalVelocity;
 
         return velocity;
+    }
+
+    public virtual void RefillBullets() {
+        bullets = initialBullets;
+        //Debug.Log("refill: " + bullets + " name: " + gameObject.name);
+    }
+    public virtual bool hasBullets() {
+        if (bullets >= initialBullets) {
+            return true;
+        }
+        return false;
     }
 }

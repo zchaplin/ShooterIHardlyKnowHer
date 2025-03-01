@@ -212,3 +212,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45ad03633de3b504a98a1076161afa5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WeaponIndex:
+    m_InternalValue: 3
+  highlightMaterial: {fileID: 2100000, guid: 2a04bac6c3487134bbb134cbfc9a2d4b, type: 2}

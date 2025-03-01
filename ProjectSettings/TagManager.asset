@@ -20,6 +20,9 @@ TagManager:
   - UI
   - Weapon
   - 
+  - SpawnerHost
+  - SpawnerGuest
+  - 
   - 
   - Ground
   - p1 cam

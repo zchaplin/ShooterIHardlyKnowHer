@@ -20,7 +20,7 @@ public class LighthingChain : Weapon
     }
 
     public override void Shoot()
-    {
+    {        
         // Calculate the direction from the weapon to the crosshair
         Vector3 shootDirection = GetShootDirection();
 
@@ -38,12 +38,12 @@ public class LighthingChain : Weapon
 
             if (Physics.Raycast(ray, out hit))
             {
-                if (hit.collider.CompareTag("Enemy")) { // w/o it hitting walls will aslo hit enemeis
-                // If aiming at something, calculate velocity to hit the target (with gravity)
-                Vector3 targetPosition = hit.point;
-                FindClosetEnemies(hit.point);
-                Vector3 velocity = CalculateVelocityToHitTarget(bullet.transform.position, targetPosition, bulletRigidbody);
-                bulletRigidbody.velocity = velocity;
+                if (hit.collider.CompareTag("Enemy")||hit.collider.CompareTag("Player")) { // w/o it hitting walls will aslo hit enemeis
+                    // If aiming at something, calculate velocity to hit the target (with gravity)
+                    Vector3 targetPosition = hit.point;
+                    FindClosetEnemies(hit.point);
+                    Vector3 velocity = CalculateVelocityToHitTarget(bullet.transform.position, targetPosition, bulletRigidbody);
+                    bulletRigidbody.velocity = velocity;
                 }
             }
             else
@@ -86,8 +86,9 @@ public class LighthingChain : Weapon
 
         // Filter only enemies, then sort by distance
         GameObject[] closestEnemies = colliders
-            .Where(c => c.CompareTag("Enemy")) // Filter by tag
-            .Select(c => c.gameObject) // Convert to GameObject
+            .Select(c => c.gameObject)
+            .Where(c => c.CompareTag("Enemy")) 
+            .Concat(GameObject.FindGameObjectsWithTag("Player")) 
             .OrderBy(enemy => Vector3.Distance(hitPoint, enemy.transform.position)) // Sort by distance
             .Take(maxEnemies-1)
             .Where(enemy => IsEnemyInFieldOfView(enemy))
@@ -125,9 +126,12 @@ public class LighthingChain : Weapon
         lineRenderer.SetPosition(0, gameObject.transform.position);
         for (int i = 0; i < closestEnemies.Length; i++)
         {
-            MoveForward enemy = closestEnemies[i].GetComponent<MoveForward>();
-            enemy.Deactivate();
-            lineRenderer.SetPosition(i + 1, closestEnemies[i].transform.position);
+            if (closestEnemies[i] != null)
+            {
+                NetworkMoveEnemy enemy = closestEnemies[i].GetComponent<NetworkMoveEnemy>();
+                enemy.Deactivate();
+                lineRenderer.SetPosition(i + 1, closestEnemies[i].transform.position);
+            }
         }
 
         yield return new WaitForSeconds(1f);

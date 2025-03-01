@@ -138,3 +138,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45ad03633de3b504a98a1076161afa5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WeaponIndex:
+    m_InternalValue: 5
+  highlightMaterial: {fileID: 2100000, guid: cffeb4008b1ccd0479b8a2bdd595d07d, type: 2}

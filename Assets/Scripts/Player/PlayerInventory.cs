@@ -8,27 +8,93 @@ public class PlayerInventory : NetworkBehaviour
     private Shop shop;
     [SerializeField] private Transform playerCamera;  // Assign the player's camera in inspector
     [SerializeField] private LayerMask weaponLayer;  // Set this to the layer your dummy weapons are on
-    private int currentWeaponIndex = 0;
+    
+    // Network variables for weapon management
+    private NetworkVariable<int> currentWeaponIndex = new NetworkVariable<int>(0, 
+        NetworkVariableReadPermission.Everyone, 
+        NetworkVariableWritePermission.Owner);
+    
     private List<int> ownedWeapons = new List<int>();
     private WeaponBin weaponBin;
+    private bool isInitialized = false;
 
     public override void OnNetworkSpawn()
     {
-        if (!IsOwner) return;
-
-        shop = FindObjectOfType<Shop>();
-        weaponBin = FindObjectOfType<WeaponBin>();
-        if (shop) {
-            shop.addWeapons(weapons);
+        base.OnNetworkSpawn();
+        
+        Debug.Log($"PlayerInventory spawned. IsOwner: {IsOwner}, IsServer: {IsServer}, ClientId: {OwnerClientId}");
+        
+        // Find required components
+        if (shop == null) shop = FindObjectOfType<Shop>();
+        if (weaponBin == null) weaponBin = FindObjectOfType<WeaponBin>();
+        
+        if (IsOwner)
+        {
+            if (shop != null)
+            {
+                shop.addWeapons(weapons);
+                // Start with default weapon
+                ownedWeapons.Add(0);
+                currentWeaponIndex.Value = 0;
+                
+                Debug.Log("Player inventory initialized for owner");
+            }
+            else
+            {
+                Debug.LogError("Shop script not found!");
+            }
         }
         
-        // Start with default weapon
-        ownedWeapons.Add(0);
+        // Subscribe to network variable changes
+        currentWeaponIndex.OnValueChanged += OnWeaponIndexChanged;
+        
+        isInitialized = true;
+    }
+    
+    private void OnWeaponIndexChanged(int oldValue, int newValue)
+    {
+       //Debug.Log($"Network weapon change: {oldValue} -> {newValue}");
+        
+        // Make sure we have a weapons transform
+        if (weapons == null || weapons.childCount == 0)
+        {
+            Debug.LogError("No weapons available after weapon change!");
+            return;
+        }
+        
+        // Update owned weapons list if not already in it
+        if (!ownedWeapons.Contains(newValue))
+        {
+            ownedWeapons.Add(newValue);
+        }
+        
+        // Update the weapon visibility directly
+        for (int i = 0; i < weapons.childCount; i++)
+        {
+            if (i < weapons.childCount && weapons.GetChild(i) != null)
+            {
+                weapons.GetChild(i).gameObject.SetActive(i == newValue);
+            }
+        }
+        // reload weapon
+        // Transform weaponTransform = weapons.GetChild(newValue);
+        // Weapon weaponScript = weaponTransform.gameObject.GetComponent<Weapon>();
+        // weaponScript.RefillBullets();
+
+        
+        // If we're the owner, also update the shop UI
+        if (IsOwner && shop != null)
+        {
+            // shop.activateWeapons(newValue);
+            //.Log($"Weapon {newValue} activated via Shop for owner");
+        }
     }
 
     void Update()
     {
-        // if (!IsOwner) return;
+        if (!IsOwner || !isInitialized) return;
+
+        CheckWeaponHighlight();
 
         // Pickup weapon when looking at it and pressing E
         if (Input.GetKeyDown(KeyCode.E))
@@ -50,61 +116,128 @@ public class PlayerInventory : NetworkBehaviour
                 SwitchWeapon(i);
             }
         }
+    }
 
-        // Debug raycast to see what we're looking at
-        Debug.DrawRay(playerCamera.position, playerCamera.forward, Color.red);
+    private void CheckWeaponHighlight()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, 10f, weaponLayer))
+        {
+            DummyWeapon dummyWeapon = hit.collider.GetComponentInParent<DummyWeapon>();
+            if (dummyWeapon != null)
+            {
+                dummyWeapon.Highlight();
+            }
+        }
+        else
+        {
+            RemoveAllHighlights();
+        }
+    }
+
+    private void RemoveAllHighlights()
+    {
+        // Find all dummy weapons in the scene and remove their highlights
+        DummyWeapon[] allWeapons = FindObjectsOfType<DummyWeapon>();
+        foreach (DummyWeapon weapon in allWeapons)
+        {
+            if (weapon != null)
+            {
+                weapon.RemoveHighlight();
+            }
+        }
     }
 
     private void TryPickupWeapon()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, 10f,weaponLayer))
+        if (weaponBin == null)
         {
-            Debug.Log("Hit something with raycast");
-            DummyWeapon dummyWeapon = hit.collider.GetComponentInParent<DummyWeapon>();            if (dummyWeapon != null)
+            weaponBin = FindObjectOfType<WeaponBin>();
+            if (weaponBin == null)
             {
-                Debug.Log($"Found dummy weapon with index {dummyWeapon.WeaponIndex}");
-                PickupWeapon(dummyWeapon.WeaponIndex);
-                Destroy(dummyWeapon.gameObject);  // Remove the dummy weapon
+                Debug.LogError("Cannot find WeaponBin in scene!");
+                return;
+            }
+        }
+        
+        RaycastHit hit;
+        if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, 10f, weaponLayer))
+        {
+            //Debug.Log("Hit something with raycast");
+            
+            DummyWeapon dummyWeapon = hit.collider.GetComponentInParent<DummyWeapon>();
+            if (dummyWeapon != null)
+            {
+                int weaponIndex = dummyWeapon.WeaponIndex.Value;
+                //Debug.Log($"Found dummy weapon with index {weaponIndex}");
+                
+                NetworkObject networkObj = dummyWeapon.GetComponent<NetworkObject>();
+                if (networkObj != null)
+                {
+                    ulong networkId = networkObj.NetworkObjectId;
+                    
+                    // Update our local weapon index first
+                    currentWeaponIndex.Value = weaponIndex;
+                    Transform weaponTransform = weapons.GetChild(weaponIndex);
+                    Weapon weaponScript = weaponTransform.gameObject.GetComponent<Weapon>();
+                    weaponScript.RefillBullets();
+
+                    // Then tell the server to remove the dummy weapon
+                    weaponBin.PickupWeaponServerRpc(networkId);
+                    
+                    //Debug.Log($"Requested pickup of weapon {weaponIndex} with networkID {networkId}");
+                }
+                else
+                {
+                    Debug.LogError("DummyWeapon has no NetworkObject component!");
+                }
             }
         }
     }
 
     private void TryDropWeapon()
     {
-        if (currentWeaponIndex == 0) return;  // Can't drop default weapon
-
-        if (weaponBin != null)
+        if (currentWeaponIndex.Value == 0) return;  // Can't drop default weapon
+        
+        if (weaponBin == null)
         {
-            // Spawn the dummy weapon in the bin
-            weaponBin.SpawnDummyWeapon(currentWeaponIndex);
-            
-            // Remove from inventory
-            ownedWeapons.Remove(currentWeaponIndex);
-            // shop.DeactivateWeapon(currentWeaponIndex);
-            
-            // Switch back to default weapon
-            currentWeaponIndex = 0;
-            shop.activateWeapons(0);
+            weaponBin = FindObjectOfType<WeaponBin>();
+            if (weaponBin == null)
+            {
+                Debug.LogError("Cannot find WeaponBin in scene!");
+                return;
+            }
         }
-    }
 
-    private void PickupWeapon(int weaponIndex)
-    {
-        if (!ownedWeapons.Contains(weaponIndex))
-        {
-            ownedWeapons.Add(weaponIndex);
-        }
-        currentWeaponIndex = weaponIndex;
-        shop.activateWeapons(weaponIndex);
+        // Request server to spawn the dummy weapon in the bin
+        weaponBin.ReturnWeaponServerRpc(currentWeaponIndex.Value, transform.position);
+
+        // Remove from inventory
+        ownedWeapons.Remove(currentWeaponIndex.Value);
+
+        // Switch back to default weapon
+        currentWeaponIndex.Value = 0;
     }
 
     private void SwitchWeapon(int index)
     {
         if (ownedWeapons.Contains(index))
         {
-            currentWeaponIndex = index;
-            shop.activateWeapons(index);
+            currentWeaponIndex.Value = index;
+            // Transform weaponTransform = weapons.GetChild(index);
+            // Weapon weaponScript = weaponTransform.gameObject.GetComponent<Weapon>();
+            // weaponScript.RefillBullets();
+
         }
+    }
+
+    public override void OnDestroy()
+    {
+        // Clean up subscription
+        if (IsSpawned)
+        {
+            currentWeaponIndex.OnValueChanged -= OnWeaponIndexChanged;
+        }
+        base.OnDestroy();
     }
 }
