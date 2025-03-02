@@ -7,10 +7,14 @@ public class NetworkedSpring : NetworkBehaviour
     public float damping = 1f; // Damping factor
     public float restLength = 2f; // Rest length of the spring
 
-    private Rigidbody rb;
+    public GameObject StartChainPre; // Start chain prefab
+    public GameObject EndChainPre; // End chain prefab
 
-    //private NetworkVariable<FixedString64Bytes> networkName = new NetworkVariable<FixedString64Bytes>(); // Synchronized name
+    private Rigidbody rb;
     private string otherPlayerName = "p1(Clone)";
+    private bool hasChain = false;
+    private GameObject chainStart;
+    private GameObject chainEnd;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -25,7 +29,18 @@ public class NetworkedSpring : NetworkBehaviour
 
         if (otherObject != null && otherObject != gameObject)
         {
+            if (!hasChain)
+            {
+                CreateChain(otherObject);
+                hasChain = true; // Ensure the chain is only created once
+            }
+            else{
+                Debug.Log(otherObject.transform);
+                chainStart.GetComponent<CableProceduralSimple>().endPointTransform = otherObject.transform;
+            }
+
             Debug.Log("Testing");
+
             // Calculate the spring force
             Vector3 displacement = otherObject.transform.position - transform.position;
             float distance = displacement.magnitude;
@@ -39,17 +54,26 @@ public class NetworkedSpring : NetworkBehaviour
             rb.AddForce(springForce + dampingForce);
             otherObject.GetComponent<Rigidbody>().AddForce(-(springForce + dampingForce));
         }
-
-        // Update network variables with local values
     }
 
-    void Update()
+    void CreateChain(GameObject otherObject)
     {
-        // if (!IsOwner)
-        // {
-        //     // Apply network values to local object
-        //     transform.position = networkPosition.Value;
-        //     rb.velocity = networkVelocity.Value;
-        // }
+        if (StartChainPre == null || EndChainPre == null)
+        {
+            Debug.LogError("StartChainPre or EndChainPre is not assigned!");
+            return;
+        }
+
+        // Instantiate the start chain and set it as a child of the current object
+        chainStart = Instantiate(StartChainPre, transform.position, Quaternion.identity);
+        chainStart.transform.SetParent(transform); // Set parent to the current object
+        chainStart.name = "ChainStart";
+
+        // Instantiate the end chain and set it as a child of the other object
+        // chainEnd = Instantiate(EndChainPre, otherObject.transform.position, Quaternion.identity);
+        // chainEnd.transform.SetParent(otherObject.transform); // Set parent to the other object
+        // chainEnd.name = "ChainEnd";
+        chainStart.GetComponent<CableProceduralSimple>().endPointTransform = otherObject.transform;
+
     }
 }
