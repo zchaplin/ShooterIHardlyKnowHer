@@ -63,17 +63,17 @@ public class PlayerInventory : NetworkBehaviour
         RaycastHit hit;
         if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, 10f, weaponLayer))
         {
-            Debug.Log($"Raycast hit: {hit.collider.name}"); // Log the name of the object hit
+            //Debug.Log($"Raycast hit: {hit.collider.name}"); // Log the name of the object hit
             DummyWeapon dummyWeapon = hit.collider.GetComponentInParent<DummyWeapon>();
             if (dummyWeapon != null)
             {
-                Debug.Log("Highlighting weapon"); // Log when a weapon is highlighted
+                //Debug.Log("Highlighting weapon"); // Log when a weapon is highlighted
                 dummyWeapon.Highlight();
             }
         }
         else
         {
-            Debug.Log("Raycast did not hit anything"); // Log when nothing is hit
+            //Debug.Log("Raycast did not hit anything"); // Log when nothing is hit
             RemoveAllHighlights();
         }
     }
@@ -93,11 +93,11 @@ public class PlayerInventory : NetworkBehaviour
         RaycastHit hit;
         if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, 10f, weaponLayer))
         {
-            Debug.Log("Hit something with raycast");
+            //Debug.Log("Hit something with raycast");
             DummyWeapon dummyWeapon = hit.collider.GetComponentInParent<DummyWeapon>();
             if (dummyWeapon != null)
             {
-                Debug.Log($"Found dummy weapon with index {dummyWeapon.WeaponIndex.Value}");
+                //Debug.Log($"Found dummy weapon with index {dummyWeapon.WeaponIndex.Value}");
                 PickupWeapon(dummyWeapon.WeaponIndex.Value);
                 weaponBin.PickupWeapon(dummyWeapon.gameObject);  // Remove the dummy weapon from the bin
             }
