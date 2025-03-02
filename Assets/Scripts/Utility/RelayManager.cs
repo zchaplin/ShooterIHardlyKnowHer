@@ -62,6 +62,7 @@ public class RelayManager : MonoBehaviour
         if (hostObject != null)
         {
             hostObject.transform.position = new Vector3(0, 1, -5);
+            hostObject.name = "Player1";
         }
     }
 
@@ -93,6 +94,7 @@ public class RelayManager : MonoBehaviour
         if (playerObject != null)
         {
             playerObject.transform.position = new Vector3(0, 1, 5);
+            playerObject.name = "Player2";
         }
     }
 
