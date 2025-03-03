@@ -26,7 +26,6 @@ public class NetworkMoveEnemy : NetworkBehaviour
         weaponBin = FindObjectOfType<WeaponBin>();
         enemySpawner = FindObjectOfType<EnemySpawner>();
         networkManager = NetworkManager.Singleton;
-
     }
 
 
@@ -46,7 +45,7 @@ public class NetworkMoveEnemy : NetworkBehaviour
 
      void FixedUpdate()
     {
-            checkAlive();
+        checkAlive();
         
     }
 
@@ -63,7 +62,35 @@ public class NetworkMoveEnemy : NetworkBehaviour
         active = false;
     }
 
-    public void TakeDamage(int x){
+    public void TakeDamage(int x)
+    {
+        // Check if this is a regular enemy (not a shield enemy itself)
+        ShieldEnemy ownShieldComponent = GetComponent<ShieldEnemy>();
+        if (ownShieldComponent == null)
+        {
+            // Look for nearby shield enemies
+            ShieldEnemy nearestShieldEnemy = null;
+            
+            // Check for shield enemies in the vicinity
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, 10f);
+            foreach (var hitCollider in hitColliders)
+            {
+                ShieldEnemy shieldEnemy = hitCollider.GetComponent<ShieldEnemy>();
+                if (shieldEnemy != null && shieldEnemy.IsEnemyShielded(GetComponent<NetworkObject>().NetworkObjectId))
+                {
+                    nearestShieldEnemy = shieldEnemy;
+                    break;
+                }
+            }
+            
+            // If we're being shielded, reduce the damage
+            if (nearestShieldEnemy != null)
+            {
+                x = nearestShieldEnemy.ReduceDamage(x);
+            }
+        }
+        
+        // Apply damage
         health -= x;
         checkAlive();
     }
@@ -72,6 +99,9 @@ public class NetworkMoveEnemy : NetworkBehaviour
         if (health <= 0) {
             EnemyDrop();
             MusicManager.AudioManager.goopMusic();
+
+            NetworkObject networkObject = GetComponent<NetworkObject>();
+            networkObject.Despawn(true);
             Destroy(gameObject);
         }
         if (Math.Abs(transform.position.z) <= 5) {
@@ -83,7 +113,6 @@ public class NetworkMoveEnemy : NetworkBehaviour
             playerHealth.playerTakeDamage(1);
         }
     }
-
 
     public void EnemyDrop() {
         // Chance of getting something

@@ -100,7 +100,7 @@ public class WeaponBin : NetworkBehaviour
                 Destroy(dummyWeapon);
             }
         }
-        catch (System.Exception e)
+        catch (System.Exception)
         {
             //Debug.LogError($"Error spawning weapon: {e.Message}\n{e.StackTrace}");
         }
@@ -165,7 +165,7 @@ public class WeaponBin : NetworkBehaviour
                 //Debug.LogError($"Could not find weapon with NetworkObjectId: {weaponNetworkId} in SpawnedObjects dictionary");
             }
         }
-        catch (System.Exception e)
+        catch (System.Exception)
         {
             //Debug.LogError($"Error during pickup: {e.Message}\n{e.StackTrace}");
         }

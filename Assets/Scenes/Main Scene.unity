@@ -11113,6 +11113,7 @@ MonoBehaviour:
   - {fileID: 1396604062351405731, guid: fd299e2111e99f341951faeaab866ab8, type: 3}
   - {fileID: 4957522533844236652, guid: 3aedb63653d993f4c89bf9655ddec5b8, type: 3}
   - {fileID: 2262247272392185019, guid: bf667752f8b691a4497987617fc305cc, type: 3}
+  - {fileID: 2262247272392185019, guid: 06e264effbc78f549a2e30582d68e8d3, type: 3}
   waveNum: 0
   enemiesInWave: 
   maxWave: 3
@@ -14313,6 +14314,7 @@ MonoBehaviour:
   - {fileID: 1396604062351405731, guid: fd299e2111e99f341951faeaab866ab8, type: 3}
   - {fileID: 4957522533844236652, guid: 3aedb63653d993f4c89bf9655ddec5b8, type: 3}
   - {fileID: 2262247272392185019, guid: bf667752f8b691a4497987617fc305cc, type: 3}
+  - {fileID: 2262247272392185019, guid: 06e264effbc78f549a2e30582d68e8d3, type: 3}
   waveNum: 0
   enemiesInWave: 
   maxWave: 3

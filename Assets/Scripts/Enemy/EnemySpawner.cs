@@ -42,18 +42,12 @@ public class EnemySpawner : NetworkBehaviour
         }
     }
 
-     void Update()
-    {
-     
-    }
-
-
-
     public IEnumerator SpawnWave(int enemiesNum)
     {
         //Debug.Log("wave #: " + waveNum + " enemies in wave: " + enemiesNum);
         if (waveNum == 1) {
             enemiesInWave[0] = true;
+            enemiesInWave[5] = true;
             availableWeapons[1] = true;
         }
         else if (waveNum == 3) {
