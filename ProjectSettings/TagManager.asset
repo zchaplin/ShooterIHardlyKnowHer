@@ -9,6 +9,7 @@ TagManager:
   - Enemy
   - DummyWeapon
   - WeaponBin
+  - Ground
   layers:
   - Default
   - TransparentFX

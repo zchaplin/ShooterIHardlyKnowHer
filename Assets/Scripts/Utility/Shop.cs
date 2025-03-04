@@ -36,7 +36,7 @@ public class Shop : MonoBehaviour
         panels.Add(panel3.GetComponent<Image>());
         panels.Add(panel4.GetComponent<Image>());
 
-        Debug.Log("weapons stats: "+showWeaponStats);
+        //Debug.Log("weapons stats: "+showWeaponStats);
     }
 
     // Add this new method to setup button listeners
@@ -56,11 +56,11 @@ public class Shop : MonoBehaviour
     // New method to handle weapon purchase
     private void PurchaseWeapon(int weaponNum)
     {
-        Debug.Log($"Attempting to purchase weapon {weaponNum}");
+        //Debug.Log($"Attempting to purchase weapon {weaponNum}");
         
         if (weapons1Bought[weaponNum] == 0 && ScoreTracker.score >= weaponsPrice[weaponNum])
         {
-            Debug.Log($"Purchasing weapon {weaponNum} for {weaponsPrice[weaponNum]} points");
+           // Debug.Log($"Purchasing weapon {weaponNum} for {weaponsPrice[weaponNum]} points");
             ScoreTracker.score -= weaponsPrice[weaponNum];
             weapons1Bought[weaponNum] = 1;
 
@@ -70,7 +70,7 @@ public class Shop : MonoBehaviour
                 GameObject bin = GameObject.FindGameObjectWithTag("WeaponBin");
                 if (bin)
                 {
-                    Debug.Log($"Found bin, spawning weapon {weaponNum}");
+                    //Debug.Log($"Found bin, spawning weapon {weaponNum}");
                     WeaponBin binScript = bin.GetComponent<WeaponBin>();
                     if (binScript != null)
                     {
@@ -78,12 +78,12 @@ public class Shop : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogError("WeaponBin script not found on bin object");
+                        //Debug.LogError("WeaponBin script not found on bin object");
                     }
                 }
                 else
                 {
-                    Debug.LogError("Could not find object with WeaponBin tag");
+                    //Debug.LogError("Could not find object with WeaponBin tag");
                 }
             }
         }
@@ -93,18 +93,18 @@ public class Shop : MonoBehaviour
             Weapon weaponScript = player1Weapons[weaponNum].GetComponent<Weapon>();
             if (weaponScript != null)
             {
-                Debug.Log($"Refilling bullets for weapon {weaponNum}");
+                //Debug.Log($"Refilling bullets for weapon {weaponNum}");
                 weaponScript.RefillBullets();
                 showWeaponStats.updateText(weaponNum); // Update UI to reflect new ammo count
             }
             else
             {
-                Debug.LogError($"Weapon script not found on weapon {weaponNum}");
+                //Debug.LogError($"Weapon script not found on weapon {weaponNum}");
             }
         }
         else if (weapons1Bought[weaponNum] == 1 && !player1Weapons[weaponNum].activeInHierarchy)
         {
-            Debug.Log($"Weapon {weaponNum} is already bought but not equipped. Cannot buy again.");
+            //Debug.Log($"Weapon {weaponNum} is already bought but not equipped. Cannot buy again.");
         }
     }
 
@@ -121,7 +121,7 @@ public class Shop : MonoBehaviour
         // }
 
         player1Weapons[0].SetActive(true);
-        Debug.Log(player1Weapons[0]);
+        //Debug.Log(player1Weapons[0]);
     }
 
     void Update()
