@@ -11,6 +11,9 @@ public class NetworkMoveEnemy : NetworkBehaviour
     public float speed = 0.5f;
     public int health = 10;
 
+    [Header("Shield")]
+    public GameObject shieldVisual; 
+
     private HealthManager playerHealth;
     private WeaponBin weaponBin;
     private EnemySpawner enemySpawner;
@@ -26,6 +29,11 @@ public class NetworkMoveEnemy : NetworkBehaviour
         weaponBin = FindObjectOfType<WeaponBin>();
         enemySpawner = FindObjectOfType<EnemySpawner>();
         networkManager = NetworkManager.Singleton;
+
+        if (shieldVisual != null)
+        {
+            shieldVisual.SetActive(false);
+        }
     }
 
 
@@ -39,14 +47,9 @@ public class NetworkMoveEnemy : NetworkBehaviour
             } else if (gameObject.layer == LayerMask.NameToLayer("SpawnerGuest")) {
                 transform.position += transform.forward * 2f * Time.deltaTime;
             }
+
+            checkAlive();
         }
-    }
-
-
-     void FixedUpdate()
-    {
-        checkAlive();
-        
     }
 
     public void Activate(float speedIn)
@@ -61,10 +64,34 @@ public class NetworkMoveEnemy : NetworkBehaviour
         speed = 0f;
         active = false;
     }
-
+    
+    // This method will be called by weapons on both client and server
     public void TakeDamage(int x)
     {
-        // Check if this is a regular enemy (not a shield enemy itself)
+        // If we're not the server, request the server to apply damage
+        if (!IsServer)
+        {
+            TakeDamageServerRpc(x);
+            return;
+        }
+        
+        // Server-side damage processing
+        ApplyDamage(x);
+    }
+    
+    // Server RPC to handle damage from clients
+    [ServerRpc(RequireOwnership = false)]
+    public void TakeDamageServerRpc(int damage)
+    {
+        ApplyDamage(damage);
+    }
+
+        private void ApplyDamage(int x)
+    {
+        // Original damage value for logging
+        int originalDamage = x;
+        
+        // Check if this is a shield enemy
         ShieldEnemy ownShieldComponent = GetComponent<ShieldEnemy>();
         if (ownShieldComponent == null)
         {
@@ -76,62 +103,100 @@ public class NetworkMoveEnemy : NetworkBehaviour
             foreach (var hitCollider in hitColliders)
             {
                 ShieldEnemy shieldEnemy = hitCollider.GetComponent<ShieldEnemy>();
-                if (shieldEnemy != null && shieldEnemy.IsEnemyShielded(GetComponent<NetworkObject>().NetworkObjectId))
+                if (shieldEnemy != null && shieldEnemy.IsShielded(GetComponent<NetworkObject>().NetworkObjectId))
                 {
                     nearestShieldEnemy = shieldEnemy;
                     break;
                 }
             }
             
-            // If we're being shielded, reduce the damage
+            // If we're being shielded, process the damage through the shield
             if (nearestShieldEnemy != null)
             {
-                x = nearestShieldEnemy.ReduceDamage(x);
+                ulong myNetId = GetComponent<NetworkObject>().NetworkObjectId;
+                x = nearestShieldEnemy.ProcessDamage(myNetId, x);
+                Debug.Log($"Enemy {myNetId} - Shield reduced damage from {originalDamage} to {x}");
             }
         }
         
-        // Apply damage
+        // Apply damage to health
         health -= x;
-        checkAlive();
+        
+        // Visual feedback for damage (optional)
+        DamageTakenClientRpc(health);
     }
 
-    private void checkAlive(){
+    [ClientRpc]
+    private void DamageTakenClientRpc(int newHealth)
+    {
+        // Update local health value
+        health = newHealth;
+        
+        // Could add visual feedback here like a flash
+    }
+
+    private void checkAlive()
+    {
+        // This method now only runs on the server
+        if (!IsServer)
+            return;
+            
         if (health <= 0) {
             EnemyDrop();
             MusicManager.AudioManager.goopMusic();
-
+            
+            // Tell clients this enemy is dying for any visual effects
+            EnemyDyingClientRpc();
+            
+            // Despawn and destroy (server-only)
             NetworkObject networkObject = GetComponent<NetworkObject>();
             networkObject.Despawn(true);
-            Destroy(gameObject);
         }
         if (Math.Abs(transform.position.z) <= 5) {
             //Debug.Log("Enemy reached the player" + playerHealth);
+            
+            // Tell clients this enemy reached the player
+            EnemyReachedPlayerClientRpc();
+            
+            // Despawn (server-only)
             NetworkObject networkObject = GetComponent<NetworkObject>();
-            networkObject.Despawn(true); 
-            Destroy(gameObject); // Destroy the GameObject
+            networkObject.Despawn(true);
+            
             //take dmg
             playerHealth.playerTakeDamage(1);
         }
     }
+    
+    [ClientRpc]
+    private void EnemyDyingClientRpc()
+    {
+        // Client-side death effects could go here
+        // No need to destroy the object as the server will handle that through despawning
+    }
+    
+    [ClientRpc]
+    private void EnemyReachedPlayerClientRpc()
+    {
+        // Client-side effects for enemy reaching player could go here
+    }
 
     public void EnemyDrop() {
+        // This should only run on the server
+        if (!IsServer)
+            return;
+            
         // Chance of getting something
         int randomNumber = UnityEngine.Random.Range(0, 101);
         // if more than 5 percentage
         if (randomNumber <= 5) {
             // get wave number from waves to see which weapons are unlocked at the moment
             int weaponNum = enemySpawner.getAvailableWeapons();
-            // Request server to spawn the weapon (handle both host and client case)
-            if (networkManager != null && networkManager.IsClient)
+            
+            // Since we're on the server, we can call directly
+            if (weaponBin != null)
             {
-                // Find local player to get client ID
                 ulong localClientId = networkManager.LocalClientId;
-                // Debug.Log($"Local client ID: {localClientId}, requesting purchase from server");
-                if (weaponBin != null)
-                {
-                    // Call server RPC to purchase the weapon
-                    weaponBin.PurchaseWeaponServerRpc(weaponNum, localClientId);
-                }
+                weaponBin.PurchaseWeaponServerRpc(weaponNum, localClientId);
             }
         }
     }

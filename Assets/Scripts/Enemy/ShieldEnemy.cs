@@ -5,196 +5,240 @@ using Unity.Netcode;
 
 public class ShieldEnemy : NetworkBehaviour
 {
+    [Header("Shield Properties")]
     public float shieldRadius = 5f;
-    public int damageReduction = 5;
-    public GameObject shieldVisualPrefab;
-    private GameObject mainShieldVisual;
+    public int damageReduction = 15; // Damage reduced per hit
+    public int shieldHealth = 15;    // Total damage a shield can absorb before breaking
     
-    // Dictionary to keep track of enemy NetworkObjectIds and their shield GameObjects
-    private Dictionary<ulong, GameObject> shieldedEnemies = new Dictionary<ulong, GameObject>();
+    [Header("Visual")]
+    public GameObject shieldVisual; // Assign this in inspector - a child object with a sphere mesh
+    
+    // Track enemies in shield radius and their shield health
+    private Dictionary<ulong, int> shieldedEnemies = new Dictionary<ulong, int>();
+    
+    void OnEnable()
+    {
+        // Ensure shield visual is enabled
+        if (shieldVisual != null)
+        {
+            shieldVisual.SetActive(true);
+        }
+    }
     
     public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
-            // Create the main shield visual around this enemy
-            SpawnMainShield();
-            
             // Start checking for enemies in range
             StartCoroutine(CheckForEnemiesInRange());
         }
     }
     
-    private void SpawnMainShield()
-    {
-        if (shieldVisualPrefab != null)
-        {
-            // Create the shield at our exact position
-            mainShieldVisual = Instantiate(shieldVisualPrefab, transform.position, Quaternion.identity);
-            mainShieldVisual.transform.parent = transform;
-            mainShieldVisual.transform.localPosition = Vector3.zero;
-            mainShieldVisual.transform.localScale = new Vector3(shieldRadius * 2, shieldRadius * 2, shieldRadius * 2);
-            
-            // Spawn on network
-            NetworkObject shieldNetObj = mainShieldVisual.GetComponent<NetworkObject>();
-            if (shieldNetObj != null)
-            {
-                shieldNetObj.Spawn();
-            }
-        }
-    }
-    
     private IEnumerator CheckForEnemiesInRange()
     {
-        while (IsServer && isActiveAndEnabled)
+        while (isActiveAndEnabled)
         {
-            // Store current NetworkObjectIds to check which ones left the radius
-            HashSet<ulong> currentIds = new HashSet<ulong>(shieldedEnemies.Keys);
-            
             // Find all enemies in range with the "Enemy" tag
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, shieldRadius);
+            
+            // Track currently shielded enemies to find those that left
+            HashSet<ulong> currentEnemies = new HashSet<ulong>();
+            
             foreach (var hitCollider in hitColliders)
             {
                 if (hitCollider.CompareTag("Enemy") && hitCollider.gameObject != gameObject)
                 {
-                    NetworkObject enemyNetObj = hitCollider.GetComponent<NetworkObject>();
-                    if (enemyNetObj != null)
+                    NetworkObject enemyObj = hitCollider.GetComponent<NetworkObject>();
+                    if (enemyObj != null)
                     {
-                        ulong enemyNetId = enemyNetObj.NetworkObjectId;
+                        ulong enemyId = enemyObj.NetworkObjectId;
+                        currentEnemies.Add(enemyId);
                         
-                        if (!shieldedEnemies.ContainsKey(enemyNetId))
+                        // Add new enemies to shielded list
+                        if (!shieldedEnemies.ContainsKey(enemyId))
                         {
-                            // New enemy entered the radius
-                            SpawnShieldAroundEnemy(enemyNetObj);
-                        }
-                        else
-                        {
-                            // Enemy was already in radius, update shield position just to be safe
-                            UpdateShieldPosition(enemyNetId);
-                            
-                            // Remove from current set so we don't remove it later
-                            currentIds.Remove(enemyNetId);
+                            shieldedEnemies[enemyId] = shieldHealth; // Set initial shield health
+                            EnableEnemyShield_ClientRpc(enemyId);
+                            Debug.Log($"Added shield to enemy {enemyId} with health {shieldHealth}");
                         }
                     }
                 }
             }
             
-            // Any enemies left in currentIds have left the radius
-            foreach (var enemyNetId in currentIds)
+            // Find enemies that left the shield radius
+            List<ulong> leftEnemies = new List<ulong>();
+            foreach (var enemyId in shieldedEnemies.Keys)
             {
-                RemoveShieldFromEnemy(enemyNetId);
+                if (!currentEnemies.Contains(enemyId))
+                {
+                    leftEnemies.Add(enemyId);
+                }
+            }
+            
+            // Remove shields from enemies that left
+            foreach (var enemyId in leftEnemies)
+            {
+                RemoveShield(enemyId);
             }
             
             yield return new WaitForSeconds(0.5f);
         }
     }
     
-    private void SpawnShieldAroundEnemy(NetworkObject enemyNetObj)
+    private void RemoveShield(ulong enemyId)
     {
-        // Create shield at the exact position of the enemy
-        GameObject enemyShield = Instantiate(shieldVisualPrefab, enemyNetObj.transform.position, Quaternion.identity);
-        enemyShield.name = "EnemyShield";
-        
-        // Scale the shield to be slightly larger than the enemy
-        enemyShield.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-        
-        // Create a NetworkObject for the shield
-        NetworkObject shieldNetObj = enemyShield.GetComponent<NetworkObject>();
-        if (shieldNetObj != null)
+        if (shieldedEnemies.ContainsKey(enemyId))
         {
-            // Spawn it on the network
-            shieldNetObj.Spawn();
-            
-            // Store the shield in our dictionary
-            shieldedEnemies[enemyNetObj.NetworkObjectId] = enemyShield;
-            
-            // Tell clients to parent the shield to the enemy
-            ParentShieldToEnemy_ClientRpc(enemyNetObj.NetworkObjectId, shieldNetObj.NetworkObjectId);
-        }
-    }
-    
-    private void UpdateShieldPosition(ulong enemyNetId)
-    {
-        if (shieldedEnemies.TryGetValue(enemyNetId, out GameObject shield) && 
-            NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(enemyNetId, out NetworkObject enemyObj))
-        {
-            // Update shield position on server
-            shield.transform.position = enemyObj.transform.position;
-        }
-    }
-    
-    private void RemoveShieldFromEnemy(ulong enemyNetId)
-    {
-        if (shieldedEnemies.TryGetValue(enemyNetId, out GameObject shield))
-        {
-            // Despawn the shield
-            NetworkObject shieldNetObj = shield.GetComponent<NetworkObject>();
-            if (shieldNetObj != null)
-            {
-                shieldNetObj.Despawn(true);
-            }
-            
-            // Remove from dictionary
-            shieldedEnemies.Remove(enemyNetId);
+            shieldedEnemies.Remove(enemyId);
+            DisableEnemyShield_ClientRpc(enemyId);
+            Debug.Log($"Removed shield from enemy {enemyId}");
         }
     }
     
     [ClientRpc]
-    private void ParentShieldToEnemy_ClientRpc(ulong enemyNetId, ulong shieldNetId)
+    private void EnableEnemyShield_ClientRpc(ulong enemyNetId)
     {
-        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(enemyNetId, out NetworkObject enemyObj) &&
-            NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(shieldNetId, out NetworkObject shieldObj))
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(enemyNetId, out NetworkObject enemyObj))
         {
-            // Parent the shield to the enemy
-            shieldObj.transform.SetParent(enemyObj.transform);
-            shieldObj.transform.localPosition = Vector3.zero;
+            // Find the "Shield" child object on this enemy
+            Transform shieldTransform = enemyObj.transform.Find("Shield");
+            if (shieldTransform != null)
+            {
+                shieldTransform.gameObject.SetActive(true);
+            }
         }
     }
     
-    // Called from NetworkMoveEnemy to check if enemy is shielded
-    public bool IsEnemyShielded(ulong enemyNetId)
+    [ClientRpc]
+    private void DisableEnemyShield_ClientRpc(ulong enemyNetId)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(enemyNetId, out NetworkObject enemyObj))
+        {
+            // Find the "Shield" child object on this enemy
+            Transform shieldTransform = enemyObj.transform.Find("Shield");
+            if (shieldTransform != null)
+            {
+                shieldTransform.gameObject.SetActive(false);
+            }
+        }
+    }
+    
+    // Called by NetworkMoveEnemy to check if it's shielded
+    public bool IsShielded(ulong enemyNetId)
     {
         return shieldedEnemies.ContainsKey(enemyNetId);
     }
     
-    // Called from NetworkMoveEnemy when an enemy in the shield radius takes damage
-    public int ReduceDamage(int damage)
+    // Called by NetworkMoveEnemy to reduce damage - returns the actual damage to apply
+    public int ProcessDamage(ulong enemyNetId, int damage)
     {
-        // Reduce damage by the damage reduction amount, minimum damage is 1
-        return Mathf.Max(1, damage - damageReduction);
+        if (!shieldedEnemies.ContainsKey(enemyNetId))
+            return damage;
+            
+        int remainingShieldHealth = shieldedEnemies[enemyNetId];
+        int damageToAbsorb = Mathf.Min(damageReduction, damage);
+        
+        // Calculate how much damage the shield can absorb
+        damageToAbsorb = Mathf.Min(damageToAbsorb, remainingShieldHealth);
+        
+        // Reduce shield health
+        remainingShieldHealth -= damageToAbsorb;
+        shieldedEnemies[enemyNetId] = remainingShieldHealth;
+        
+        // Calculate remaining damage to pass through
+        int remainingDamage = damage - damageToAbsorb;
+        
+        // Show shield hit effect
+        ShowShieldHitEffect_ClientRpc(enemyNetId);
+        
+        // If shield is depleted, remove it
+        if (remainingShieldHealth <= 0)
+        {
+            RemoveShield(enemyNetId);
+            Debug.Log($"Shield depleted for enemy {enemyNetId}");
+        }
+        else
+        {
+            Debug.Log($"Shield for enemy {enemyNetId} absorbed {damageToAbsorb} damage, {remainingShieldHealth} shield health remaining");
+        }
+        
+        return remainingDamage;
     }
     
-    public override void OnNetworkDespawn()
+    [ClientRpc]
+    private void ShowShieldHitEffect_ClientRpc(ulong enemyNetId)
     {
-        // Cleanup all created shields when this enemy is despawned
-        if (IsServer)
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(enemyNetId, out NetworkObject enemyObj))
         {
-            foreach (var shield in shieldedEnemies.Values)
+            // Find the "Shield" child object
+            Transform shieldTransform = enemyObj.transform.Find("Shield");
+            if (shieldTransform != null && shieldTransform.gameObject.activeSelf)
             {
-                if (shield != null)
-                {
-                    NetworkObject shieldNetObj = shield.GetComponent<NetworkObject>();
-                    if (shieldNetObj != null)
-                    {
-                        shieldNetObj.Despawn(true);
-                    }
-                }
+                // Flash shield
+                StartCoroutine(FlashShield(shieldTransform.gameObject));
             }
-            
-            shieldedEnemies.Clear();
         }
     }
     
+    private IEnumerator FlashShield(GameObject shield)
+    {
+        if (shield != null)
+        {
+            // Store original material and color
+            Renderer renderer = shield.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                Color originalColor = renderer.material.color;
+                
+                // Set to bright flash color
+                Color flashColor = new Color(1f, 1f, 1f, originalColor.a);
+                renderer.material.color = flashColor;
+                
+                // Wait briefly
+                yield return new WaitForSeconds(0.1f);
+                
+                // Return to original color
+                renderer.material.color = originalColor;
+            }
+        }
+    }
+    
+    // When this enemy is destroyed, tell all clients to disable shields
     public override void OnDestroy()
     {
-        // Additional cleanup in case OnNetworkDespawn wasn't called
-        StopAllCoroutines();
+        if (IsServer)
+        {
+            DisableAllShields_ClientRpc();
+        }
+    }
+    
+    [ClientRpc]
+    private void DisableAllShields_ClientRpc()
+    {
+        // Find all objects with Enemy tag
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (var enemy in enemies)
+        {
+            // Find and disable shield child
+            Transform shieldTransform = enemy.transform.Find("Shield");
+            if (shieldTransform != null)
+            {
+                shieldTransform.gameObject.SetActive(false);
+            }
+        }
     }
     
     // Show shield radius in editor
-    private void OnDrawGizmosSelected()
+    void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, shieldRadius);
+    }
+    
+    // Show shield radius when selected (more visible)
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(0f, 1f, 1f, 0.3f);
+        Gizmos.DrawSphere(transform.position, shieldRadius);
     }
 }
