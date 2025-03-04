@@ -86,12 +86,12 @@ public class NetworkMoveEnemy : NetworkBehaviour
         ApplyDamage(damage);
     }
 
-        private void ApplyDamage(int x)
+    private void ApplyDamage(int damage)
     {
-        // Original damage value for logging
-        int originalDamage = x;
+        // Get this enemy's NetworkObject ID
+        ulong myNetId = GetComponent<NetworkObject>().NetworkObjectId;
         
-        // Check if this is a shield enemy
+        // Don't check for shielding if this is a shield enemy itself
         ShieldEnemy ownShieldComponent = GetComponent<ShieldEnemy>();
         if (ownShieldComponent == null)
         {
@@ -103,27 +103,36 @@ public class NetworkMoveEnemy : NetworkBehaviour
             foreach (var hitCollider in hitColliders)
             {
                 ShieldEnemy shieldEnemy = hitCollider.GetComponent<ShieldEnemy>();
-                if (shieldEnemy != null && shieldEnemy.IsShielded(GetComponent<NetworkObject>().NetworkObjectId))
+                if (shieldEnemy != null && shieldEnemy.IsShielded(myNetId))
                 {
                     nearestShieldEnemy = shieldEnemy;
                     break;
                 }
             }
             
-            // If we're being shielded, process the damage through the shield
+            // If we're being shielded, process damage through the shield
             if (nearestShieldEnemy != null)
             {
-                ulong myNetId = GetComponent<NetworkObject>().NetworkObjectId;
-                x = nearestShieldEnemy.ProcessDamage(myNetId, x);
-                Debug.Log($"Enemy {myNetId} - Shield reduced damage from {originalDamage} to {x}");
+                // Shield will absorb some or all damage and return remaining damage
+                damage = nearestShieldEnemy.ProcessDamage(myNetId, damage);
+                
+                // If damage was completely absorbed (damage = 0), we don't need to apply health reduction
+                if (damage <= 0)
+                {
+                    // Still show feedback that we were hit
+                    DamageTakenClientRpc(health);
+                    return;
+                }
             }
         }
         
         // Apply damage to health
-        health -= x;
+        health -= damage;
         
-        // Visual feedback for damage (optional)
+        // Visual feedback for damage
         DamageTakenClientRpc(health);
+        
+        Debug.Log($"Enemy took {damage} damage. Health now: {health}");
     }
 
     [ClientRpc]

@@ -7,13 +7,12 @@ public class ShieldEnemy : NetworkBehaviour
 {
     [Header("Shield Properties")]
     public float shieldRadius = 5f;
-    public int damageReduction = 15; // Damage reduced per hit
-    public int shieldHealth = 15;    // Total damage a shield can absorb before breaking
+    public int shieldHealth = 15; // Shield absorbs this much damage before breaking
     
     [Header("Visual")]
     public GameObject shieldVisual; // Assign this in inspector - a child object with a sphere mesh
     
-    // Track enemies in shield radius and their shield health
+    // Dictionary to track enemies and their remaining shield health
     private Dictionary<ulong, int> shieldedEnemies = new Dictionary<ulong, int>();
     
     void OnEnable()
@@ -38,12 +37,11 @@ public class ShieldEnemy : NetworkBehaviour
     {
         while (isActiveAndEnabled)
         {
+            // Store current enemies to check which ones left the radius
+            HashSet<ulong> currentEnemies = new HashSet<ulong>(shieldedEnemies.Keys);
+            
             // Find all enemies in range with the "Enemy" tag
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, shieldRadius);
-            
-            // Track currently shielded enemies to find those that left
-            HashSet<ulong> currentEnemies = new HashSet<ulong>();
-            
             foreach (var hitCollider in hitColliders)
             {
                 if (hitCollider.CompareTag("Enemy") && hitCollider.gameObject != gameObject)
@@ -51,47 +49,30 @@ public class ShieldEnemy : NetworkBehaviour
                     NetworkObject enemyObj = hitCollider.GetComponent<NetworkObject>();
                     if (enemyObj != null)
                     {
-                        ulong enemyId = enemyObj.NetworkObjectId;
-                        currentEnemies.Add(enemyId);
+                        ulong enemyNetId = enemyObj.NetworkObjectId;
                         
-                        // Add new enemies to shielded list
-                        if (!shieldedEnemies.ContainsKey(enemyId))
+                        if (!shieldedEnemies.ContainsKey(enemyNetId))
                         {
-                            shieldedEnemies[enemyId] = shieldHealth; // Set initial shield health
-                            EnableEnemyShield_ClientRpc(enemyId);
-                            Debug.Log($"Added shield to enemy {enemyId} with health {shieldHealth}");
+                            // New enemy entered the radius
+                            shieldedEnemies[enemyNetId] = shieldHealth;
+                            EnableEnemyShield_ClientRpc(enemyNetId);
+                        }
+                        else
+                        {
+                            // Enemy was already in radius
+                            currentEnemies.Remove(enemyNetId);
                         }
                     }
                 }
             }
             
-            // Find enemies that left the shield radius
-            List<ulong> leftEnemies = new List<ulong>();
-            foreach (var enemyId in shieldedEnemies.Keys)
+            // Any enemies left in currentEnemies have left the radius
+            foreach (var enemyNetId in currentEnemies)
             {
-                if (!currentEnemies.Contains(enemyId))
-                {
-                    leftEnemies.Add(enemyId);
-                }
-            }
-            
-            // Remove shields from enemies that left
-            foreach (var enemyId in leftEnemies)
-            {
-                RemoveShield(enemyId);
+                RemoveShieldFromEnemy(enemyNetId);
             }
             
             yield return new WaitForSeconds(0.5f);
-        }
-    }
-    
-    private void RemoveShield(ulong enemyId)
-    {
-        if (shieldedEnemies.ContainsKey(enemyId))
-        {
-            shieldedEnemies.Remove(enemyId);
-            DisableEnemyShield_ClientRpc(enemyId);
-            Debug.Log($"Removed shield from enemy {enemyId}");
         }
     }
     
@@ -106,6 +87,15 @@ public class ShieldEnemy : NetworkBehaviour
             {
                 shieldTransform.gameObject.SetActive(true);
             }
+        }
+    }
+    
+    private void RemoveShieldFromEnemy(ulong enemyNetId)
+    {
+        if (shieldedEnemies.ContainsKey(enemyNetId))
+        {
+            shieldedEnemies.Remove(enemyNetId);
+            DisableEnemyShield_ClientRpc(enemyNetId);
         }
     }
     
@@ -129,40 +119,47 @@ public class ShieldEnemy : NetworkBehaviour
         return shieldedEnemies.ContainsKey(enemyNetId);
     }
     
-    // Called by NetworkMoveEnemy to reduce damage - returns the actual damage to apply
+    // Called by NetworkMoveEnemy when a shielded enemy takes damage
     public int ProcessDamage(ulong enemyNetId, int damage)
     {
+        // If enemy isn't shielded, return full damage
         if (!shieldedEnemies.ContainsKey(enemyNetId))
-            return damage;
-            
-        int remainingShieldHealth = shieldedEnemies[enemyNetId];
-        int damageToAbsorb = Mathf.Min(damageReduction, damage);
-        
-        // Calculate how much damage the shield can absorb
-        damageToAbsorb = Mathf.Min(damageToAbsorb, remainingShieldHealth);
-        
-        // Reduce shield health
-        remainingShieldHealth -= damageToAbsorb;
-        shieldedEnemies[enemyNetId] = remainingShieldHealth;
-        
-        // Calculate remaining damage to pass through
-        int remainingDamage = damage - damageToAbsorb;
-        
-        // Show shield hit effect
-        ShowShieldHitEffect_ClientRpc(enemyNetId);
-        
-        // If shield is depleted, remove it
-        if (remainingShieldHealth <= 0)
         {
-            RemoveShield(enemyNetId);
-            Debug.Log($"Shield depleted for enemy {enemyNetId}");
+            return damage;
+        }
+        
+        int remainingShieldHealth = shieldedEnemies[enemyNetId];
+        
+        // If damage is less than remaining shield, absorb it all
+        if (damage <= remainingShieldHealth)
+        {
+            // Update remaining shield health
+            shieldedEnemies[enemyNetId] = remainingShieldHealth - damage;
+            
+            // Show shield hit effect
+            ShowShieldHitEffect_ClientRpc(enemyNetId);
+            
+            Debug.Log($"Shield absorbed all {damage} damage. Remaining shield: {shieldedEnemies[enemyNetId]}");
+            
+            // No damage passes through
+            return 0;
         }
         else
         {
-            Debug.Log($"Shield for enemy {enemyNetId} absorbed {damageToAbsorb} damage, {remainingShieldHealth} shield health remaining");
+            // Shield breaks, calculate remaining damage
+            int remainingDamage = damage - remainingShieldHealth;
+            
+            // Remove shield
+            RemoveShieldFromEnemy(enemyNetId);
+            
+            // Show shield break effect
+            ShieldBrokenEffect_ClientRpc(enemyNetId);
+            
+            Debug.Log($"Shield broke! Absorbed {remainingShieldHealth} damage. {remainingDamage} damage passes through.");
+            
+            // Return remaining damage that passes through
+            return remainingDamage;
         }
-        
-        return remainingDamage;
     }
     
     [ClientRpc]
@@ -170,36 +167,87 @@ public class ShieldEnemy : NetworkBehaviour
     {
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(enemyNetId, out NetworkObject enemyObj))
         {
-            // Find the "Shield" child object
             Transform shieldTransform = enemyObj.transform.Find("Shield");
-            if (shieldTransform != null && shieldTransform.gameObject.activeSelf)
+            if (shieldTransform != null)
             {
-                // Flash shield
+                // Flash the shield
                 StartCoroutine(FlashShield(shieldTransform.gameObject));
+            }
+        }
+    }
+    
+    [ClientRpc]
+    private void ShieldBrokenEffect_ClientRpc(ulong enemyNetId)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(enemyNetId, out NetworkObject enemyObj))
+        {
+            Transform shieldTransform = enemyObj.transform.Find("Shield");
+            if (shieldTransform != null)
+            {
+                // Show break effect before disabling
+                StartCoroutine(ShieldBreakEffect(shieldTransform.gameObject));
             }
         }
     }
     
     private IEnumerator FlashShield(GameObject shield)
     {
-        if (shield != null)
+        Renderer renderer = shield.GetComponent<Renderer>();
+        if (renderer != null)
         {
-            // Store original material and color
-            Renderer renderer = shield.GetComponent<Renderer>();
-            if (renderer != null)
+            Color originalColor = renderer.material.color;
+            
+            // Flash white
+            Color flashColor = new Color(1f, 1f, 1f, originalColor.a);
+            renderer.material.color = flashColor;
+            
+            yield return new WaitForSeconds(0.1f);
+            
+            // Return to original color
+            renderer.material.color = originalColor;
+        }
+    }
+    
+    private IEnumerator ShieldBreakEffect(GameObject shield)
+    {
+        Renderer renderer = shield.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            Color originalColor = renderer.material.color;
+            
+            // Flash red
+            renderer.material.color = new Color(1f, 0f, 0f, originalColor.a);
+            
+            // Quickly shrink
+            Vector3 originalScale = shield.transform.localScale;
+            float duration = 0.3f;
+            float elapsed = 0;
+            
+            while (elapsed < duration)
             {
-                Color originalColor = renderer.material.color;
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                shield.transform.localScale = Vector3.Lerp(originalScale, Vector3.zero, t);
                 
-                // Set to bright flash color
-                Color flashColor = new Color(1f, 1f, 1f, originalColor.a);
-                renderer.material.color = flashColor;
+                // Also fade out
+                Color fadeColor = renderer.material.color;
+                fadeColor.a = Mathf.Lerp(originalColor.a, 0f, t);
+                renderer.material.color = fadeColor;
                 
-                // Wait briefly
-                yield return new WaitForSeconds(0.1f);
-                
-                // Return to original color
-                renderer.material.color = originalColor;
+                yield return null;
             }
+            
+            // Disable the shield
+            shield.SetActive(false);
+            
+            // Reset scale and color for next time
+            shield.transform.localScale = originalScale;
+            renderer.material.color = originalColor;
+        }
+        else
+        {
+            // If no renderer, just disable
+            shield.SetActive(false);
         }
     }
     
