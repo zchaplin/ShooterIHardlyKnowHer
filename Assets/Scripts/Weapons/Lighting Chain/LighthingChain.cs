@@ -126,9 +126,12 @@ public class LighthingChain : Weapon
         lineRenderer.SetPosition(0, gameObject.transform.position);
         for (int i = 0; i < closestEnemies.Length; i++)
         {
-            MoveForward enemy = closestEnemies[i].GetComponent<MoveForward>();
-            enemy.Deactivate();
-            lineRenderer.SetPosition(i + 1, closestEnemies[i].transform.position);
+            if (closestEnemies[i] != null)
+            {
+                NetworkMoveEnemy enemy = closestEnemies[i].GetComponent<NetworkMoveEnemy>();
+                enemy.Deactivate();
+                lineRenderer.SetPosition(i + 1, closestEnemies[i].transform.position);
+            }
         }
 
         yield return new WaitForSeconds(1f);

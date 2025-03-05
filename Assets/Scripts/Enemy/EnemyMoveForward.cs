@@ -20,7 +20,7 @@ public class MoveForward : MonoBehaviour
         GameObject healthManagerObject = GameObject.Find("healthManager");
         playerHealth = healthManagerObject.GetComponent<HealthManager>();
 
-        meshRenderer.enabled = false; // Optionally disable MeshRenderer on start
+        //meshRenderer.enabled = false; // Optionally disable MeshRenderer on start
 
 
         rb = GetComponent<Rigidbody>();

@@ -10,28 +10,56 @@ public class DummyWeapon : NetworkBehaviour
     private Material[] originalMaterials; // Array to store original materials of all child renderers
     [SerializeField] private Material highlightMaterial; // Assign a highlight material in the Inspector
     private MeshRenderer[] meshRenderers; // Array to store all MeshRenderers in children
+    private bool isHighlighted = false;
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        
+        // Initialize materials on all clients
+        InitializeMaterials();
+    }
+    
     void Start()
     {
-        // Get all MeshRenderers in children
-        meshRenderers = GetComponentsInChildren<MeshRenderer>();
-
-        if (meshRenderers != null && meshRenderers.Length > 0)
+        // Make sure materials are initialized even if OnNetworkSpawn wasn't called
+        if (meshRenderers == null || meshRenderers.Length == 0)
         {
-            // Store the original materials of all child renderers
-            originalMaterials = new Material[meshRenderers.Length];
-            for (int i = 0; i < meshRenderers.Length; i++)
+            InitializeMaterials();
+        }
+    }
+    
+    private void InitializeMaterials()
+    {
+        try
+        {
+            // Get all MeshRenderers in children
+            meshRenderers = GetComponentsInChildren<MeshRenderer>();
+
+            if (meshRenderers != null && meshRenderers.Length > 0)
             {
-                originalMaterials[i] = meshRenderers[i].material;
+                // Store the original materials of all child renderers
+                originalMaterials = new Material[meshRenderers.Length];
+                for (int i = 0; i < meshRenderers.Length; i++)
+                {
+                    if (meshRenderers[i] != null && meshRenderers[i].material != null)
+                    {
+                        originalMaterials[i] = meshRenderers[i].material;
+                    }
+                }
             }
-        }
-        else
-        {
-            Debug.LogError("No MeshRenderers found in children of DummyWeapon");
-        }
+            else
+            {
+                Debug.LogWarning("No MeshRenderers found in children of DummyWeapon");
+            }
 
-        // Subscribe to changes in the WeaponIndex
-        WeaponIndex.OnValueChanged += OnWeaponIndexChanged;
+            // Subscribe to changes in the WeaponIndex
+            WeaponIndex.OnValueChanged += OnWeaponIndexChanged;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Error initializing DummyWeapon materials: {e.Message}\n{e.StackTrace}");
+        }
     }
 
     private void OnWeaponIndexChanged(int oldValue, int newValue)
@@ -39,26 +67,52 @@ public class DummyWeapon : NetworkBehaviour
         Debug.Log($"Weapon index changed from {oldValue} to {newValue}");
     }
 
-    // Highlight the weapon when a player looks at it
+    // Highlight the weapon when a player looks at it - client-side only
     public void Highlight()
     {
+        if (isHighlighted) return; // Already highlighted
+        
         if (meshRenderers != null && highlightMaterial != null)
         {
-            foreach (var renderer in meshRenderers)
+            try
             {
-                renderer.material = highlightMaterial;
+                foreach (var renderer in meshRenderers)
+                {
+                    if (renderer != null)
+                    {
+                        renderer.material = highlightMaterial;
+                    }
+                }
+                isHighlighted = true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Error highlighting weapon: {e.Message}");
             }
         }
     }
 
-    // Remove the highlight
+    // Remove the highlight - client-side only
     public void RemoveHighlight()
     {
+        if (!isHighlighted) return; // Not highlighted
+        
         if (meshRenderers != null && originalMaterials != null)
         {
-            for (int i = 0; i < meshRenderers.Length; i++)
+            try
             {
-                meshRenderers[i].material = originalMaterials[i];
+                for (int i = 0; i < meshRenderers.Length; i++)
+                {
+                    if (meshRenderers[i] != null && i < originalMaterials.Length && originalMaterials[i] != null)
+                    {
+                        meshRenderers[i].material = originalMaterials[i];
+                    }
+                }
+                isHighlighted = false;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Error removing highlight: {e.Message}");
             }
         }
     }
@@ -66,7 +120,18 @@ public class DummyWeapon : NetworkBehaviour
     // Cleanup
     public override void OnDestroy()
     {
+        try
+        {
+            if (IsSpawned)
+            {
+                WeaponIndex.OnValueChanged -= OnWeaponIndexChanged;
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Error in OnDestroy: {e.Message}");
+        }
+        
         base.OnDestroy();
-        WeaponIndex.OnValueChanged -= OnWeaponIndexChanged;
     }
 }

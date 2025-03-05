@@ -39,7 +39,7 @@ public class bouncyBullet : MonoBehaviour
     
         // Debug.Log("damage gameobject: " + other.name);
 
-        MoveForward component = collision.gameObject.GetComponent<MoveForward>();
+        NetworkMoveEnemy component = collision.gameObject.GetComponent<NetworkMoveEnemy>();
         if (component) 
         {
             component.TakeDamage(damage);

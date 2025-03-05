@@ -9,9 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu.unity
     guid: f9ff272a3896c0b46af1e413ef5668fe
   - enabled: 1
-    path: Assets/Scenes/Mika.unity
-    guid: 79778d526b726496ea373c9aba20818c
-  - enabled: 1
     path: Assets/Scenes/Main Scene.unity
     guid: 15f94903f0876cf4c98c7567fb4dd5ad
   m_configObjects: {}

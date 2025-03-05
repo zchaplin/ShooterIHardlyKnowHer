@@ -5,43 +5,120 @@ using System.Collections.Generic;
 public class WeaponBin : NetworkBehaviour
 {
     [SerializeField] private GameObject[] dummyWeaponPrefabs;  // Assign dummy prefabs in inspector
-    private List<GameObject> weaponsInBin = new List<GameObject>();
+    private Dictionary<ulong, GameObject> weaponsInBin = new Dictionary<ulong, GameObject>();
 
-    // Spawn weapon in bin when purchased
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        //Debug.Log($"WeaponBin spawned. IsServer: {IsServer}, IsHost: {IsHost}, IsClient: {IsClient}");
+    }
+
+    // New ServerRpc for weapon purchase
+    [ServerRpc(RequireOwnership = false)]
+    public void PurchaseWeaponServerRpc(int weaponIndex, ulong clientId)
+    {
+        //Debug.Log($"Server received purchase request for weapon {weaponIndex} from client {clientId}");
+        
+        if (!IsServer)
+        {
+            //Debug.LogError("PurchaseWeaponServerRpc execution on client - this should never happen!");
+            return;
+        }
+        
+        // Spawn the weapon in the bin for all clients to see
+        SpawnDummyWeapon(weaponIndex);
+        
+        // Notify clients that this weapon was purchased successfully
+        NotifyWeaponPurchasedClientRpc(weaponIndex, clientId);
+    }
+    
+    // ClientRpc to notify all clients about a purchase
+    [ClientRpc]
+    private void NotifyWeaponPurchasedClientRpc(int weaponIndex, ulong clientId)
+    {
+        //Debug.Log($"Client notified that weapon {weaponIndex} was purchased by client {clientId}");
+        
+        // Find all clients' Shop instances
+        Shop[] shops = FindObjectsOfType<Shop>();
+        foreach (Shop shop in shops)
+        {
+            if (shop != null)
+            {
+                shop.MarkWeaponAsPurchased(weaponIndex);
+            }
+        }
+    }
+
+    // Spawn weapon in bin when purchased - only called on server
     public void SpawnDummyWeapon(int weaponIndex)
     {
-        if (weaponIndex >= dummyWeaponPrefabs.Length) return;
+        if (!IsServer)
+        {
+            //Debug.LogWarning("SpawnDummyWeapon called on client - should only be called on server!");
+            return;
+        }
 
-        // Only the server can spawn weapons
-        if (!IsServer) return;
+        if (weaponIndex >= dummyWeaponPrefabs.Length) 
+        {
+            //Debug.LogError($"Invalid weapon index: {weaponIndex}");
+            return;
+        }
 
-        // Spawn weapon at a random position within the bin
-        Vector3 randomOffset = new Vector3(
-            Random.Range(-0.5f, 0.5f),
-            0.5f,  // Slightly above bin floor
-            Random.Range(-0.5f, 0.5f)
-        );
+        try
+        {
+            // Spawn weapon at a random position within the bin
+            Vector3 randomOffset = new Vector3(
+                Random.Range(-0.5f, 0.5f),
+                0.5f,  // Slightly above bin floor
+                Random.Range(-0.5f, 0.5f)
+            );
 
-        Vector3 spawnPos = transform.position + randomOffset;
-        GameObject dummyWeapon = Instantiate(dummyWeaponPrefabs[weaponIndex], spawnPos, Quaternion.identity);
+            Vector3 spawnPos = transform.position + randomOffset;
+            GameObject dummyWeapon = Instantiate(dummyWeaponPrefabs[weaponIndex], spawnPos, Quaternion.identity);
 
-        // Spawn the weapon on the network
-        NetworkObject networkObject = dummyWeapon.GetComponent<NetworkObject>();
-        networkObject.Spawn();
+            // Spawn the weapon on the network
+            NetworkObject networkObject = dummyWeapon.GetComponent<NetworkObject>();
+            if (networkObject != null)
+            {
+                networkObject.Spawn();
+                
+                // Add DummyWeapon component if it doesn't exist
+                DummyWeapon dummyComponent = dummyWeapon.GetComponent<DummyWeapon>();
+                if (dummyComponent == null)
+                    dummyComponent = dummyWeapon.AddComponent<DummyWeapon>();
 
-        // Add DummyWeapon component if it doesn't exist
-        DummyWeapon dummyComponent = dummyWeapon.GetComponent<DummyWeapon>();
-        if (dummyComponent == null)
-            dummyComponent = dummyWeapon.AddComponent<DummyWeapon>();
-
-        dummyComponent.WeaponIndex.Value = weaponIndex;
-        weaponsInBin.Add(dummyWeapon);
+                dummyComponent.WeaponIndex.Value = weaponIndex;
+                
+                // Track the weapon by its network ID
+                weaponsInBin[networkObject.NetworkObjectId] = dummyWeapon;
+                
+                // Debug.Log($"Weapon {weaponIndex} spawned successfully with NetworkObjectId: {networkObject.NetworkObjectId}");
+            }
+            else
+            {
+                //Debug.LogError("NetworkObject component missing on dummy weapon prefab!");
+                Destroy(dummyWeapon);
+            }
+        }
+        catch (System.Exception e)
+        {
+            //Debug.LogError($"Error spawning weapon: {e.Message}\n{e.StackTrace}");
+        }
     }
 
     // Called when weapon is dropped back in bin
     [ServerRpc(RequireOwnership = false)]
     public void ReturnWeaponServerRpc(int weaponIndex, Vector3 dropPosition)
     {
+        //Debug.Log($"Server received request to return weapon {weaponIndex}");
+        
+        if (!IsServer)
+        {
+            //Debug.LogError("ReturnWeaponServerRpc execution on client - this should never happen!");
+            return;
+        }
+        
+        // Server-side spawn
         SpawnDummyWeapon(weaponIndex);
     }
 
@@ -49,33 +126,48 @@ public class WeaponBin : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     public void PickupWeaponServerRpc(ulong weaponNetworkId)
     {
-        // Find the weapon in the bin
-        foreach (var weapon in weaponsInBin)
+        //Debug.Log($"Server received request to pickup weapon with ID: {weaponNetworkId}");
+        
+        if (!IsServer)
         {
-            NetworkObject networkObject = weapon.GetComponent<NetworkObject>();
-            if (networkObject != null && networkObject.NetworkObjectId == weaponNetworkId)
+            //Debug.LogError("PickupWeaponServerRpc execution on client - this should never happen!");
+            return;
+        }
+
+        try {
+            // Check if we can find this object in our spawn manager
+            if (NetworkManager.Singleton != null && 
+                NetworkManager.Singleton.SpawnManager != null && 
+                NetworkManager.Singleton.SpawnManager.SpawnedObjects.ContainsKey(weaponNetworkId))
             {
-                // Remove the weapon from the bin
-                weaponsInBin.Remove(weapon);
-                networkObject.Despawn();
-                break;
+                NetworkObject weaponNetObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[weaponNetworkId];
+                
+                if (weaponNetObj != null)
+                {
+                    // Remove from our tracking dictionary
+                    if (weaponsInBin.ContainsKey(weaponNetworkId))
+                    {
+                        weaponsInBin.Remove(weaponNetworkId);
+                    }
+                    
+                    // Despawn from network (this will remove it for all clients)
+                    weaponNetObj.Despawn();
+                    
+                    //Debug.Log($"Weapon with ID {weaponNetworkId} successfully despawned");
+                }
+                else
+                {
+                    //Debug.LogError($"Found NetworkObjectId: {weaponNetworkId} but object reference is null");
+                }
+            }
+            else
+            {
+                //Debug.LogError($"Could not find weapon with NetworkObjectId: {weaponNetworkId} in SpawnedObjects dictionary");
             }
         }
-    }
-
-    // Client-side method to pick up a weapon
-    public void PickupWeapon(GameObject weapon)
-    {
-        NetworkObject networkObject = weapon.GetComponent<NetworkObject>();
-        if (networkObject != null)
+        catch (System.Exception e)
         {
-            PickupWeaponServerRpc(networkObject.NetworkObjectId);
+            //Debug.LogError($"Error during pickup: {e.Message}\n{e.StackTrace}");
         }
-    }
-
-    // Client-side method to return a weapon
-    public void ReturnWeapon(int weaponIndex, Vector3 dropPosition)
-    {
-        ReturnWeaponServerRpc(weaponIndex, dropPosition);
     }
 }
