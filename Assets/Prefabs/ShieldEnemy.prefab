@@ -219,7 +219,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shieldRadius: 5
-  damageReduction: 15
+  shieldStrength: 10
   shieldVisual: {fileID: 6231998749022384610}
 --- !u!1001 &6504522460908936911
 PrefabInstance:

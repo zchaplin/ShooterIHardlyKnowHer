@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-
 using Unity.Netcode;
 
 public class NetworkMoveEnemy : NetworkBehaviour
@@ -10,6 +9,10 @@ public class NetworkMoveEnemy : NetworkBehaviour
     public bool active = false;
     public float speed = 0.5f;
     public int health = 10;
+    
+    // Player detection settings - can be adjusted per enemy type
+    public float playerDetectionDistance = 5f;
+    public bool useColliderBounds = true; // Use collider bounds to detect player proximity
 
     [Header("Shield")]
     public GameObject shieldVisual; 
@@ -18,9 +21,9 @@ public class NetworkMoveEnemy : NetworkBehaviour
     private WeaponBin weaponBin;
     private EnemySpawner enemySpawner;
     private NetworkManager networkManager;
+    private bool initialRotationSet = false;
+    private Collider myCollider;
 
-
-    // Start is called before the first frame update
     void Start()
     {
         GameObject healthManagerObject = GameObject.Find("healthManager");
@@ -29,35 +32,53 @@ public class NetworkMoveEnemy : NetworkBehaviour
         weaponBin = FindObjectOfType<WeaponBin>();
         enemySpawner = FindObjectOfType<EnemySpawner>();
         networkManager = NetworkManager.Singleton;
+        myCollider = GetComponent<Collider>();
 
         if (shieldVisual != null)
         {
             shieldVisual.SetActive(false);
         }
+        
+        // Set initial rotation based on which layer the enemy is on
+        SetInitialRotation();
+    }
+    
+    private void SetInitialRotation()
+    {
+        if (initialRotationSet)
+            return;
+            
+        if (gameObject.layer == LayerMask.NameToLayer("SpawnerHost"))
+        {
+            transform.rotation = Quaternion.Euler(0, 180, 0); // Facing negative Z
+        }
+        else if (gameObject.layer == LayerMask.NameToLayer("SpawnerGuest"))
+        {
+            transform.rotation = Quaternion.Euler(0, 0, 0); // Facing positive Z
+        }
+        
+        initialRotationSet = true;
     }
 
-
-    // Update is called once per frame
     void Update()
     {
-        if(IsServer) {
-            // Move the enemy forward
-            if (gameObject.layer == LayerMask.NameToLayer("SpawnerHost")) {
-                transform.position += transform.forward * -2f * Time.deltaTime;
-            } else if (gameObject.layer == LayerMask.NameToLayer("SpawnerGuest")) {
-                transform.position += transform.forward * 2f * Time.deltaTime;
-            }
-
-            checkAlive();
+        if (!initialRotationSet) {
+            SetInitialRotation();
+        }
+        
+        if (IsServer) {
+            // Move the enemy forward - with proper rotations, we can use the same movement code for both
+            transform.position += transform.forward * 2f * Time.deltaTime;
+            
+            // Check for death or player proximity
+            CheckStatus();
         }
     }
 
     public void Activate(float speedIn)
     {
-        
         speed = speedIn;
         active = true;
-        
     }
 
     public void Deactivate() {
@@ -66,20 +87,17 @@ public class NetworkMoveEnemy : NetworkBehaviour
     }
     
     // This method will be called by weapons on both client and server
-    public void TakeDamage(int x)
+    public void TakeDamage(int damage)
     {
-        // If we're not the server, request the server to apply damage
         if (!IsServer)
         {
-            TakeDamageServerRpc(x);
+            TakeDamageServerRpc(damage);
             return;
         }
         
-        // Server-side damage processing
-        ApplyDamage(x);
+        ApplyDamage(damage);
     }
     
-    // Server RPC to handle damage from clients
     [ServerRpc(RequireOwnership = false)]
     public void TakeDamageServerRpc(int damage)
     {
@@ -91,14 +109,13 @@ public class NetworkMoveEnemy : NetworkBehaviour
         // Get this enemy's NetworkObject ID
         ulong myNetId = GetComponent<NetworkObject>().NetworkObjectId;
         
-        // Don't check for shielding if this is a shield enemy itself
+        // Process shield protection if applicable
         ShieldEnemy ownShieldComponent = GetComponent<ShieldEnemy>();
         if (ownShieldComponent == null)
         {
             // Look for nearby shield enemies
             ShieldEnemy nearestShieldEnemy = null;
             
-            // Check for shield enemies in the vicinity
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, 10f);
             foreach (var hitCollider in hitColliders)
             {
@@ -110,103 +127,130 @@ public class NetworkMoveEnemy : NetworkBehaviour
                 }
             }
             
-            // If we're being shielded, process damage through the shield
             if (nearestShieldEnemy != null)
             {
-                // Shield will absorb some or all damage and return remaining damage
                 damage = nearestShieldEnemy.ProcessDamage(myNetId, damage);
                 
-                // If damage was completely absorbed (damage = 0), we don't need to apply health reduction
                 if (damage <= 0)
                 {
-                    // Still show feedback that we were hit
                     DamageTakenClientRpc(health);
                     return;
                 }
             }
         }
         
-        // Apply damage to health
+        // Apply damage and update clients
         health -= damage;
-        
-        // Visual feedback for damage
         DamageTakenClientRpc(health);
         
-        Debug.Log($"Enemy took {damage} damage. Health now: {health}");
+        // Check if enemy should die from this damage
+        if (health <= 0)
+        {
+            DestroyEnemy();
+        }
     }
 
     [ClientRpc]
     private void DamageTakenClientRpc(int newHealth)
     {
-        // Update local health value
         health = newHealth;
-        
-        // Could add visual feedback here like a flash
     }
 
-    private void checkAlive()
+    // Unified check for death or player proximity
+    private void CheckStatus()
     {
-        // This method now only runs on the server
         if (!IsServer)
             return;
-            
-        if (health <= 0) {
-            EnemyDrop();
-            MusicManager.AudioManager.goopMusic();
-            
-            // Tell clients this enemy is dying for any visual effects
-            EnemyDyingClientRpc();
-            
-            // Despawn and destroy (server-only)
-            NetworkObject networkObject = GetComponent<NetworkObject>();
-            networkObject.Despawn(true);
+        
+        // Check for death
+        if (health <= 0)
+        {
+            DestroyEnemy();
+            return;
         }
-        if (Math.Abs(transform.position.z) <= 5) {
-            //Debug.Log("Enemy reached the player" + playerHealth);
-            
-            // Tell clients this enemy reached the player
+        
+        // Check for player proximity
+        if (IsNearPlayer())
+        {
+            // Player damage and despawn
+            playerHealth.playerTakeDamage(1);
             EnemyReachedPlayerClientRpc();
             
-            // Despawn (server-only)
-            NetworkObject networkObject = GetComponent<NetworkObject>();
-            networkObject.Despawn(true);
-            
-            //take dmg
-            playerHealth.playerTakeDamage(1);
+            // Despawn
+            GetComponent<NetworkObject>().Despawn(true);
         }
+    }
+    
+    // Better player proximity detection
+    private bool IsNearPlayer()
+    {
+        float zDistanceToPlayer = Math.Abs(transform.position.z);
+        
+        // If we're using collider bounds for more accurate detection
+        if (useColliderBounds && myCollider != null)
+        {
+            // Calculate the closest point of the collider to the Z=0 plane
+            float closestZ;
+            
+            if (transform.forward.z > 0) // Moving toward positive Z
+            {
+                // Get the front-most point of the collider
+                closestZ = myCollider.bounds.max.z;
+            }
+            else // Moving toward negative Z
+            {
+                // Get the front-most point of the collider (which is the minimum Z in this case)
+                closestZ = myCollider.bounds.min.z;
+            }
+            
+            // Calculate absolute distance to player plane (Z=0)
+            zDistanceToPlayer = Math.Abs(closestZ);
+        }
+        
+        return zDistanceToPlayer <= playerDetectionDistance;
+    }
+    
+    // Centralized enemy destruction method
+    private void DestroyEnemy()
+    {
+        EnemyDrop();
+        
+        if (MusicManager.AudioManager != null)
+        {
+            MusicManager.AudioManager.goopMusic();
+        }
+        
+        // Notify clients that this enemy is dying
+        EnemyDyingClientRpc();
+        
+        // Despawn and destroy
+        GetComponent<NetworkObject>().Despawn(true);
     }
     
     [ClientRpc]
     private void EnemyDyingClientRpc()
     {
-        // Client-side death effects could go here
-        // No need to destroy the object as the server will handle that through despawning
+        // Optional death effects
     }
     
     [ClientRpc]
     private void EnemyReachedPlayerClientRpc()
     {
-        // Client-side effects for enemy reaching player could go here
+        // Optional player reached effects
     }
 
-    public void EnemyDrop() {
-        // This should only run on the server
+    public void EnemyDrop()
+    {
         if (!IsServer)
             return;
             
-        // Chance of getting something
+        // 5% chance of dropping a weapon
         int randomNumber = UnityEngine.Random.Range(0, 101);
-        // if more than 5 percentage
-        if (randomNumber <= 5) {
-            // get wave number from waves to see which weapons are unlocked at the moment
+        if (randomNumber <= 5 && weaponBin != null)
+        {
             int weaponNum = enemySpawner.getAvailableWeapons();
-            
-            // Since we're on the server, we can call directly
-            if (weaponBin != null)
-            {
-                ulong localClientId = networkManager.LocalClientId;
-                weaponBin.PurchaseWeaponServerRpc(weaponNum, localClientId);
-            }
+            ulong localClientId = networkManager.LocalClientId;
+            weaponBin.PurchaseWeaponServerRpc(weaponNum, localClientId);
         }
     }
 }
