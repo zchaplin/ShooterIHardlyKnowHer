@@ -205,7 +205,9 @@ MonoBehaviour:
   active: 0
   speed: 0.5
   health: 10
-  shieldVisual: {fileID: 0}
+  playerDetectionDistance: 5
+  useColliderBounds: 1
+  shieldVisual: {fileID: 1479242351861882949}
 --- !u!114 &6842366272516833585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -252,7 +254,9 @@ MonoBehaviour:
   active: 0
   speed: 0.5
   health: 10
-  shieldVisual: {fileID: 0}
+  playerDetectionDistance: 5
+  useColliderBounds: 1
+  shieldVisual: {fileID: 1479242351861882949}
 --- !u!1001 &1783256626524737384
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -321,11 +325,20 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8377787562599878449, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 4086561685
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
+--- !u!1 &1479242351861882949 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 880512416808349485, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
+  m_PrefabInstance: {fileID: 1783256626524737384}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6549455464367996402 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4781469853040734874, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
