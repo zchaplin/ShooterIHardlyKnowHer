@@ -26,6 +26,10 @@ public class Weapon : NetworkBehaviour
     // Reference to player camera (for crosshair)
     public Camera playerCamera;
 
+    public GameObject muzzleFlash;
+    public Transform muzzlePosition;
+    //public Transform muzzleFlashPosition; 
+
     public virtual void Start()
     {
         bullets = initialBullets;
@@ -56,6 +60,8 @@ public class Weapon : NetworkBehaviour
         // Calculate the direction from the weapon to the crosshair
         Vector3 shootDirection = GetShootDirection();
 
+        GameObject Flash = Instantiate(muzzleFlash, muzzlePosition);
+        Destroy(Flash, 0.1f);
 
         // Spawn bullet with the calculated direction
         GameObject bullet = Instantiate(baseBullet, gameObject.transform.position, Quaternion.identity);
