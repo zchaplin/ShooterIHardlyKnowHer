@@ -1,22 +1,48 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class ScoreTracker : MonoBehaviour
+public class ScoreTracker : NetworkBehaviour
 {
-    public static int score;
+    private NetworkVariable<int> score = new NetworkVariable<int>(0, 
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    
     private TMP_Text scoreText;
-    // Start is called before the first frame update
+
     void Start()
     {
-        score = 0;
         scoreText = GetComponent<TMP_Text>();
+        score.OnValueChanged += OnScoreChanged;
+        UpdateScoreUI(score.Value);
     }
 
-    public void addScore(int mod) {
-        score += mod;
-        scoreText.text = score.ToString();
+    private void OnScoreChanged(int oldScore, int newScore)
+    {
+        UpdateScoreUI(newScore);
+    }
+
+    public void addScore(int mod)
+    {
+        if (IsServer)
+        {
+            score.Value += mod;
+        }
+        else
+        {
+            SubmitScoreServerRpc(mod);
+        }
+    }
+
+    [ServerRpc]
+    private void SubmitScoreServerRpc(int mod)
+    {
+        score.Value += mod;
+    }
+
+    private void UpdateScoreUI(int newScore)
+    {
+        scoreText.text = newScore.ToString();
     }
 }
