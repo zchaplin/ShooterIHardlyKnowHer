@@ -193,7 +193,7 @@ public class PlayerInventory : NetworkBehaviour
                     // Then tell the server to remove the dummy weapon
                     weaponBin.PickupWeaponServerRpc(networkId);
     
-                    gunUI.ChangeAvailableGunColor(weaponIndex);
+                    gunUI.ChangeSelectedGunColor(weaponIndex);
                     
                     //Debug.Log($"Requested pickup of weapon {weaponIndex} with networkID {networkId}");
                 }
