@@ -50,7 +50,7 @@ public class GunUI : NetworkBehaviour
             Transform child = transform.GetChild(i);
             Image childImage = child.GetChild(0).GetComponent<Image>();
             TMP_Text childText = child.GetChild(1).GetComponent<TMP_Text>();
-            Debug.Log("childIndex: " + childIndex + " i: " + i + "child anme: " + child.name + "childImage: " + childImage + "childText: " + childText); 
+
 
             if (playerInventory.ownedWeapons.Contains(i)) {
                 childImage.color = notSelectedColor;
@@ -74,9 +74,6 @@ public class GunUI : NetworkBehaviour
             Transform child = transform.GetChild(i);
             Image childImage = child.GetChild(0).GetComponent<Image>();
             TMP_Text childText = child.GetChild(1).GetComponent<TMP_Text>();
-            //Debug.Log("childIndex: " + childIndex + " i: " + i + "child anme: " + child.name + "childImage: " + childImage + "childText: " + childText); 
-            //Debug.Log("playerInventory" + playerInventory);
-            //Debug.Log("playerInventory.ownedWeapons:" + playerInventory.ownedWeapons);
             if (playerInventory.ownedWeapons.Contains(i)) {
                 childImage.color = notSelectedColor;
                 childText.color = notSelectedColor;
