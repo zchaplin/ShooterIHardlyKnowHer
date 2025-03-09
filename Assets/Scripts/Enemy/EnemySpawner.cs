@@ -31,7 +31,7 @@ public class EnemySpawner : NetworkBehaviour
     private void HandleClientConnected(ulong clientId)
     {
        
-        if (IsServer && NetworkManager.Singleton.ConnectedClients.Count == 2)
+        if (IsServer && NetworkManager.Singleton.ConnectedClients.Count == 1)
         {                        
             canvases[0].SetActive(false);
             // canvases[1].SetActive(false);
@@ -54,18 +54,14 @@ public class EnemySpawner : NetworkBehaviour
        
     }
 
-     void Update()
-    {
-     
-    }
-
-
-
     public IEnumerator SpawnWave(int enemiesNum)
     {
         //Debug.Log("wave #: " + waveNum + " enemies in wave: " + enemiesNum);
         if (waveNum == 1) {
             enemiesInWave[0] = true;
+            enemiesInWave[2] = true;
+            // enemiesInWave[4] = true;
+
             availableWeapons[1] = true;
         }
         else if (waveNum == 3) {
@@ -116,11 +112,7 @@ public class EnemySpawner : NetworkBehaviour
         //Debug.Log("Function called! IsServer: " + IsServer);
 
         if (IsServer) {
-            GameObject[] currentEnemies = GameObject.FindGameObjectsWithTag("Enemy");
-            int currentEnemiesNum = currentEnemies.Length;
-            if (currentEnemiesNum <=5) {
-                yield return new WaitForSeconds(15f); 
-            }
+            yield return new WaitForSeconds(15f); 
             inWave = true;
             waveNum++;
             if (minX > -10 && maxX < 10) {
