@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.43956843, g: 0.4879421, b: 0.56817114, a: 1}
+  m_IndirectSpecularColor: {r: 0.4395687, g: 0.48794252, b: 0.56817174, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1938,7 +1938,7 @@ GameObject:
   - component: {fileID: 91242035}
   m_Layer: 5
   m_Name: healthManager
-  m_TagString: Untagged
+  m_TagString: HealthManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

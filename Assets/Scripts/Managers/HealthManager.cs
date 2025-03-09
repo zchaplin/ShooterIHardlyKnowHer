@@ -7,6 +7,10 @@ public class HealthManager : MonoBehaviour
 {
     public int totalHealth = 5;
     private int remainingHealth;
+
+    // Event system for player damage
+    public delegate void OnPlayerDamaged();
+    public event OnPlayerDamaged PlayerDamaged;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +29,7 @@ public class HealthManager : MonoBehaviour
     public void playerTakeDamage(int dmg) {
         if (remainingHealth > 0) {
             remainingHealth -= dmg;
+            PlayerDamaged?.Invoke();
         }
         if (remainingHealth < 0) {
             remainingHealth = 0;
@@ -34,4 +39,5 @@ public class HealthManager : MonoBehaviour
     public int getRemainingPlayerHealth() {
         return remainingHealth;
     }
+
 }
