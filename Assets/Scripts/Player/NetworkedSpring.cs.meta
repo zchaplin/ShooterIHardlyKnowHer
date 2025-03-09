@@ -3,7 +3,9 @@ guid: 5dcc42db2fbaba04aa3aadf3a21eecd6
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - StartChainPre: {fileID: 919132149155446097, guid: cc2db7d79e527c240a672ad3771a3adc, type: 3}
+  - EndChainPre: {fileID: 919132149155446097, guid: ac31f5e1b82e2a6439fea99d6cafd0d6, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
