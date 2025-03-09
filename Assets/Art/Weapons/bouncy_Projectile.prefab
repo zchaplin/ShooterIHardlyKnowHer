@@ -172,6 +172,7 @@ GameObject:
   - component: {fileID: 96674918417469273}
   - component: {fileID: 5484339401905625058}
   - component: {fileID: 6718647477190837266}
+  - component: {fileID: 5428529348971107376}
   m_Layer: 0
   m_Name: bouncy_Projectile
   m_TagString: Untagged
@@ -310,6 +311,27 @@ MonoBehaviour:
   bulletRB: {fileID: 96674918417469273}
   numOfBounces: 7
   damage: 5
+--- !u!114 &5428529348971107376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4390976419354512532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2544338263
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &5445780849391351001
 GameObject:
   m_ObjectHideFlags: 0
