@@ -29,15 +29,15 @@ public class NetworkedSpring : NetworkBehaviour
 
         if (otherObject != null && otherObject != gameObject)
         {
-            if (!hasChain)
-            {
-                CreateChain(otherObject);
-                hasChain = true; // Ensure the chain is only created once
-            }
-            else{
-                Debug.Log(otherObject.transform);
-                chainStart.GetComponent<CableProceduralSimple>().endPointTransform = otherObject.transform;
-            }
+            // if (!hasChain)
+            // {
+            //     CreateChain(otherObject);
+            //     hasChain = true; // Ensure the chain is only created once
+            // }
+            // else{
+            //     Debug.Log(otherObject.transform);
+            //     chainStart.GetComponent<CableProceduralSimple>().endPointTransform = otherObject.transform;
+            // }
 
             Debug.Log("Testing");
 
@@ -56,24 +56,24 @@ public class NetworkedSpring : NetworkBehaviour
         }
     }
 
-    void CreateChain(GameObject otherObject)
-    {
-        if (StartChainPre == null || EndChainPre == null)
-        {
-            Debug.LogError("StartChainPre or EndChainPre is not assigned!");
-            return;
-        }
+    // void CreateChain(GameObject otherObject)
+    // {
+    //     if (StartChainPre == null || EndChainPre == null)
+    //     {
+    //         Debug.LogError("StartChainPre or EndChainPre is not assigned!");
+    //         return;
+    //     }
 
-        // Instantiate the start chain and set it as a child of the current object
-        chainStart = Instantiate(StartChainPre, transform.position, Quaternion.identity);
-        chainStart.transform.SetParent(transform); // Set parent to the current object
-        chainStart.name = "ChainStart";
+    //     // Instantiate the start chain and set it as a child of the current object
+    //     chainStart = Instantiate(StartChainPre, transform.position, Quaternion.identity);
+    //     chainStart.transform.SetParent(transform); // Set parent to the current object
+    //     chainStart.name = "ChainStart";
 
-        // Instantiate the end chain and set it as a child of the other object
-        // chainEnd = Instantiate(EndChainPre, otherObject.transform.position, Quaternion.identity);
-        // chainEnd.transform.SetParent(otherObject.transform); // Set parent to the other object
-        // chainEnd.name = "ChainEnd";
-        chainStart.GetComponent<CableProceduralSimple>().endPointTransform = otherObject.transform;
+    //     // Instantiate the end chain and set it as a child of the other object
+    //     // chainEnd = Instantiate(EndChainPre, otherObject.transform.position, Quaternion.identity);
+    //     // chainEnd.transform.SetParent(otherObject.transform); // Set parent to the other object
+    //     // chainEnd.name = "ChainEnd";
+    //     chainStart.GetComponent<CableProceduralSimple>().endPointTransform = otherObject.transform;
 
-    }
+    // }
 }
