@@ -4,6 +4,7 @@ using UnityEngine;
 public class MovementManager : NetworkBehaviour
 {
     [SerializeField] private Camera playerCamera; // Player's camera
+    [SerializeField] private Animator playerAnimator; // Player's animator
     [SerializeField] private float speed = 10f; // Movement speed
     [SerializeField] private float acceleration = 20f; // Movement acceleration
     [SerializeField] private float mouseSensitivity = 2f; // Sensitivity for mouse movement
@@ -45,8 +46,24 @@ public class MovementManager : NetworkBehaviour
 
     void Update()
     {
-        if (!IsOwner) return;
+        if(!IsOwner) return;
+        // Handle sideways movement (A/D)
+        bool movingLeft = Input.GetKey(KeyCode.A);
+        bool movingRight = Input.GetKey(KeyCode.D);
+        // Update animator parameters
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool("movingLeft", movingLeft);
+            playerAnimator.SetBool("movingRight", movingRight);
+        }
 
+        PlayerNetwork playerNetwork = GetComponent<PlayerNetwork>();
+        if (playerNetwork != null)
+        {
+            playerNetwork.UpdateAnimationState(movingLeft, movingRight);
+        }
+
+        HandleSidewaysMovement();
         // Handle mouse movement for camera and ensure it won't happen while in shop
         if (Cursor.lockState != CursorLockMode.Confined)
         {

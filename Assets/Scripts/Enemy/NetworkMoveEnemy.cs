@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-
 using Unity.Netcode;
 
 public class NetworkMoveEnemy : NetworkBehaviour
@@ -10,14 +9,21 @@ public class NetworkMoveEnemy : NetworkBehaviour
     public bool active = false;
     public float speed = 0.5f;
     public int health = 10;
+    
+    // Player detection settings - can be adjusted per enemy type
+    public float playerDetectionDistance = 5f;
+    public bool useColliderBounds = true; // Use collider bounds to detect player proximity
+
+    [Header("Shield")]
+    public GameObject shieldVisual; 
 
     private HealthManager playerHealth;
     private WeaponBin weaponBin;
     private EnemySpawner enemySpawner;
     private NetworkManager networkManager;
+    private bool initialRotationSet = false;
+    private Collider myCollider;
 
-
-    // Start is called before the first frame update
     void Start()
     {
         GameObject healthManagerObject = GameObject.Find("healthManager");
@@ -26,84 +32,225 @@ public class NetworkMoveEnemy : NetworkBehaviour
         weaponBin = FindObjectOfType<WeaponBin>();
         enemySpawner = FindObjectOfType<EnemySpawner>();
         networkManager = NetworkManager.Singleton;
+        myCollider = GetComponent<Collider>();
 
+        if (shieldVisual != null)
+        {
+            shieldVisual.SetActive(false);
+        }
+        
+        // Set initial rotation based on which layer the enemy is on
+        SetInitialRotation();
+    }
+    
+    private void SetInitialRotation()
+    {
+        if (initialRotationSet)
+            return;
+            
+        if (gameObject.layer == LayerMask.NameToLayer("SpawnerHost"))
+        {
+            transform.rotation = Quaternion.Euler(0, 180, 0); // Facing negative Z
+        }
+        else if (gameObject.layer == LayerMask.NameToLayer("SpawnerGuest"))
+        {
+            transform.rotation = Quaternion.Euler(0, 0, 0); // Facing positive Z
+        }
+        
+        initialRotationSet = true;
     }
 
-
-    // Update is called once per frame
     void Update()
     {
-        if(IsServer) {
-            // Move the enemy forward
-            if (gameObject.layer == LayerMask.NameToLayer("SpawnerHost")) {
-                transform.position += transform.forward * -2f * Time.deltaTime;
-            } else if (gameObject.layer == LayerMask.NameToLayer("SpawnerGuest")) {
-                transform.position += transform.forward * 2f * Time.deltaTime;
-            }
+        if (!initialRotationSet) {
+            SetInitialRotation();
         }
-    }
-
-
-     void FixedUpdate()
-    {
-            checkAlive();
         
+        if (IsServer) {
+            // Move the enemy forward - with proper rotations, we can use the same movement code for both
+            transform.position += transform.forward * 2f * Time.deltaTime;
+            
+            // Check for death or player proximity
+            CheckStatus();
+        }
     }
 
     public void Activate(float speedIn)
     {
-        
         speed = speedIn;
         active = true;
-        
     }
 
     public void Deactivate() {
         speed = 0f;
         active = false;
     }
-
-    public void TakeDamage(int x){
-        health -= x;
-        checkAlive();
+    
+    // This method will be called by weapons on both client and server
+    public void TakeDamage(int damage)
+    {
+        if (!IsServer)
+        {
+            TakeDamageServerRpc(damage);
+            return;
+        }
+        
+        ApplyDamage(damage);
+    }
+    
+    [ServerRpc(RequireOwnership = false)]
+    public void TakeDamageServerRpc(int damage)
+    {
+        ApplyDamage(damage);
     }
 
-    private void checkAlive(){
-        if (health <= 0) {
-            EnemyDrop();
-            MusicManager.AudioManager.goopMusic();
-            Destroy(gameObject);
-        }
-        if (Math.Abs(transform.position.z) <= 5) {
-            //Debug.Log("Enemy reached the player" + playerHealth);
-            NetworkObject networkObject = GetComponent<NetworkObject>();
-            networkObject.Despawn(true); 
-            Destroy(gameObject); // Destroy the GameObject
-            //take dmg
-            playerHealth.playerTakeDamage(1);
-        }
-    }
-
-
-    public void EnemyDrop() {
-        // Chance of getting something
-        int randomNumber = UnityEngine.Random.Range(0, 101);
-        // if more than 5 percentage
-        if (randomNumber <= 5) {
-            // get wave number from waves to see which weapons are unlocked at the moment
-            int weaponNum = enemySpawner.getAvailableWeapons();
-            // Request server to spawn the weapon (handle both host and client case)
-            if (networkManager != null && networkManager.IsClient)
+    private void ApplyDamage(int damage)
+    {
+        // Get this enemy's NetworkObject ID
+        ulong myNetId = GetComponent<NetworkObject>().NetworkObjectId;
+        
+        // Process shield protection if applicable
+        ShieldEnemy ownShieldComponent = GetComponent<ShieldEnemy>();
+        if (ownShieldComponent == null)
+        {
+            // Look for nearby shield enemies
+            ShieldEnemy nearestShieldEnemy = null;
+            
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, 10f);
+            foreach (var hitCollider in hitColliders)
             {
-                // Find local player to get client ID
-                ulong localClientId = networkManager.LocalClientId;
-                // Debug.Log($"Local client ID: {localClientId}, requesting purchase from server");
-                if (weaponBin != null)
+                ShieldEnemy shieldEnemy = hitCollider.GetComponent<ShieldEnemy>();
+                if (shieldEnemy != null && shieldEnemy.IsShielded(myNetId))
                 {
-                    // Call server RPC to purchase the weapon
-                    weaponBin.PurchaseWeaponServerRpc(weaponNum, localClientId);
+                    nearestShieldEnemy = shieldEnemy;
+                    break;
                 }
             }
+            
+            if (nearestShieldEnemy != null)
+            {
+                damage = nearestShieldEnemy.ProcessDamage(myNetId, damage);
+                
+                if (damage <= 0)
+                {
+                    DamageTakenClientRpc(health);
+                    return;
+                }
+            }
+        }
+        
+        // Apply damage and update clients
+        health -= damage;
+        DamageTakenClientRpc(health);
+        
+        // Check if enemy should die from this damage
+        if (health <= 0)
+        {
+            DestroyEnemy();
+        }
+    }
+
+    [ClientRpc]
+    private void DamageTakenClientRpc(int newHealth)
+    {
+        health = newHealth;
+    }
+
+    // Unified check for death or player proximity
+    private void CheckStatus()
+    {
+        if (!IsServer)
+            return;
+        
+        // Check for death
+        if (health <= 0)
+        {
+            DestroyEnemy();
+            return;
+        }
+        
+        // Check for player proximity
+        if (IsNearPlayer())
+        {
+            // Player damage and despawn
+            playerHealth.playerTakeDamage(1);
+            EnemyReachedPlayerClientRpc();
+            
+            // Despawn
+            GetComponent<NetworkObject>().Despawn(true);
+        }
+    }
+    
+    // Better player proximity detection
+    private bool IsNearPlayer()
+    {
+        float zDistanceToPlayer = Math.Abs(transform.position.z);
+        
+        // If we're using collider bounds for more accurate detection
+        if (useColliderBounds && myCollider != null)
+        {
+            // Calculate the closest point of the collider to the Z=0 plane
+            float closestZ;
+            
+            if (transform.forward.z > 0) // Moving toward positive Z
+            {
+                // Get the front-most point of the collider
+                closestZ = myCollider.bounds.max.z;
+            }
+            else // Moving toward negative Z
+            {
+                // Get the front-most point of the collider (which is the minimum Z in this case)
+                closestZ = myCollider.bounds.min.z;
+            }
+            
+            // Calculate absolute distance to player plane (Z=0)
+            zDistanceToPlayer = Math.Abs(closestZ);
+        }
+        
+        return zDistanceToPlayer <= playerDetectionDistance;
+    }
+    
+    // Centralized enemy destruction method
+    private void DestroyEnemy()
+    {
+        EnemyDrop();
+        
+        if (MusicManager.AudioManager != null)
+        {
+            MusicManager.AudioManager.goopMusic();
+        }
+        
+        // Notify clients that this enemy is dying
+        EnemyDyingClientRpc();
+        
+        // Despawn and destroy
+        GetComponent<NetworkObject>().Despawn(true);
+    }
+    
+    [ClientRpc]
+    private void EnemyDyingClientRpc()
+    {
+        // Optional death effects
+    }
+    
+    [ClientRpc]
+    private void EnemyReachedPlayerClientRpc()
+    {
+        // Optional player reached effects
+    }
+
+    public void EnemyDrop()
+    {
+        if (!IsServer)
+            return;
+            
+        // 5% chance of dropping a weapon
+        int randomNumber = UnityEngine.Random.Range(0, 101);
+        if (randomNumber <= 5 && weaponBin != null)
+        {
+            int weaponNum = enemySpawner.getAvailableWeapons();
+            ulong localClientId = networkManager.LocalClientId;
+            weaponBin.PurchaseWeaponServerRpc(weaponNum, localClientId);
         }
     }
 }

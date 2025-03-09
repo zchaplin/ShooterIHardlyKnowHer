@@ -13,6 +13,14 @@ public class PlayerNetwork : NetworkBehaviour
     };
 
     private CharacterController characterController;
+    private Animator playerAnimator;
+
+    // NetworkVariables for animation states
+    public NetworkVariable<bool> netMovingLeft = new NetworkVariable<bool>(false, 
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    
+    public NetworkVariable<bool> netMovingRight = new NetworkVariable<bool>(false, 
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     private void Awake()
     {
@@ -22,6 +30,7 @@ public class PlayerNetwork : NetworkBehaviour
             // Start with CharacterController disabled
             characterController.enabled = false;
         }
+        playerAnimator = GetComponentInChildren<Animator>();
     }
 
     public override void OnNetworkSpawn()
@@ -51,7 +60,47 @@ public class PlayerNetwork : NetworkBehaviour
             characterController.enabled = true;
         }
 
+        // Register callbacks for animation NetworkVariables
+        netMovingLeft.OnValueChanged += OnMovingLeftChanged;
+        netMovingRight.OnValueChanged += OnMovingRightChanged;
+
         base.OnNetworkSpawn();
+    }
+
+        // Animation network callbacks
+    private void OnMovingLeftChanged(bool previousValue, bool newValue)
+    {
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool("movingLeft", newValue);
+            Debug.Log($"Player {OwnerClientId} animation: movingLeft = {newValue}");
+        }
+    }
+    
+    private void OnMovingRightChanged(bool previousValue, bool newValue)
+    {
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool("movingRight", newValue);
+            Debug.Log($"Player {OwnerClientId} animation: movingRight = {newValue}");
+        }
+    }
+
+    // Call this method from your movement script to update animation states
+    public void UpdateAnimationState(bool movingLeft, bool movingRight)
+    {
+        if (!IsOwner) return;
+        
+        // Only send network updates when values actually change
+        if (netMovingLeft.Value != movingLeft)
+        {
+            netMovingLeft.Value = movingLeft;
+        }
+        
+        if (netMovingRight.Value != movingRight)
+        {
+            netMovingRight.Value = movingRight;
+        }
     }
 }
 

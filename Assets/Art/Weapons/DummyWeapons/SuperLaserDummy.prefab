@@ -76,6 +76,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4265235067661651789, guid: 89bb49198dcbc594d9572bdde432a161, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 6665af6bd213588439654bcb53c8cbd6, type: 2}
     - target: {fileID: 4364344567821871601, guid: 89bb49198dcbc594d9572bdde432a161, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -191,7 +195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3285548777
+  GlobalObjectIdHash: 3519692569
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
