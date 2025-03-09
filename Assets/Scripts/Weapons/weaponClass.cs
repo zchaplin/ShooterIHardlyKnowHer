@@ -22,6 +22,8 @@ public class Weapon : MonoBehaviour
     // Reference to player camera (for crosshair)
     public Camera playerCamera;
 
+    public GameObject muzzleFlash;
+    public Transform muzzlePosition;
     public virtual void Start()
     {
         bullets = initialBullets;
@@ -80,7 +82,7 @@ public class Weapon : MonoBehaviour
         // Get the shooting direction
         Vector3 shootDirection = GetShootDirection();
         Vector3? targetPoint = null;
-        
+
         // Create a ray to find the target point
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
@@ -90,6 +92,12 @@ public class Weapon : MonoBehaviour
         {
             targetPoint = hit.point;
         }
+
+        if(muzzleFlash != null){
+            GameObject Flash = Instantiate(muzzleFlash, muzzlePosition);
+            Destroy(Flash, 0.1f);
+        }
+        
         
         // Calculate proper rotation for the bullet
         Quaternion bulletRotation = Quaternion.LookRotation(shootDirection);
