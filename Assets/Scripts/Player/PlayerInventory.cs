@@ -8,24 +8,29 @@ public class PlayerInventory : NetworkBehaviour
     private Shop shop;
     [SerializeField] private Transform playerCamera;  // Assign the player's camera in inspector
     [SerializeField] private LayerMask weaponLayer;  // Set this to the layer your dummy weapons are on
+    [SerializeField] private GameObject pickupText;  // Assign the pickup text in inspector
+
     
     // Network variables for weapon management
     private NetworkVariable<int> currentWeaponIndex = new NetworkVariable<int>(0, 
         NetworkVariableReadPermission.Everyone, 
         NetworkVariableWritePermission.Owner);
     
-    private List<int> ownedWeapons = new List<int>();
+    public List<int> ownedWeapons = new List<int>();
     private WeaponBin weaponBin;
     private bool isInitialized = false;
+    private GunUI gunUI;
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
         
         Debug.Log($"PlayerInventory spawned. IsOwner: {IsOwner}, IsServer: {IsServer}, ClientId: {OwnerClientId}");
-        
+        pickupText = GameObject.Find("Canvas/WeaponStats/PickUpText");
+        pickupText.SetActive(false);
         // Find required components
         if (shop == null) shop = FindObjectOfType<Shop>();
+        gunUI = FindObjectOfType<GunUI>();
         if (weaponBin == null) weaponBin = FindObjectOfType<WeaponBin>();
         
         if (IsOwner)
@@ -126,12 +131,14 @@ public class PlayerInventory : NetworkBehaviour
             DummyWeapon dummyWeapon = hit.collider.GetComponentInParent<DummyWeapon>();
             if (dummyWeapon != null)
             {
+                pickupText.SetActive(true);
                 dummyWeapon.Highlight();
             }
         }
         else
         {
             RemoveAllHighlights();
+            pickupText.SetActive(false);
         }
     }
 
@@ -166,6 +173,7 @@ public class PlayerInventory : NetworkBehaviour
             //Debug.Log("Hit something with raycast");
             
             DummyWeapon dummyWeapon = hit.collider.GetComponentInParent<DummyWeapon>();
+            pickupText.SetActive(false);
             if (dummyWeapon != null)
             {
                 int weaponIndex = dummyWeapon.WeaponIndex.Value;
@@ -184,6 +192,8 @@ public class PlayerInventory : NetworkBehaviour
 
                     // Then tell the server to remove the dummy weapon
                     weaponBin.PickupWeaponServerRpc(networkId);
+    
+                    gunUI.ChangeAvailableGunColor(weaponIndex);
                     
                     //Debug.Log($"Requested pickup of weapon {weaponIndex} with networkID {networkId}");
                 }
@@ -224,6 +234,7 @@ public class PlayerInventory : NetworkBehaviour
         if (ownedWeapons.Contains(index))
         {
             currentWeaponIndex.Value = index;
+            gunUI.ChangeSelectedGunColor(index);
             // Transform weaponTransform = weapons.GetChild(index);
             // Weapon weaponScript = weaponTransform.gameObject.GetComponent<Weapon>();
             // weaponScript.RefillBullets();

@@ -17,16 +17,25 @@ public class EnemySpawner : NetworkBehaviour
     public float minX = -5f; // Minimum X position
     public float maxX = 5f;  // Maximum X position
     public float numEnemies = 10f;
+
+    public GameObject[] canvases;
+
     void Start()
     {
         NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
+        //  Debug.Log("canvases: " + canvases[0]);
+        // canvases[0].SetActive(false);
+        // canvases[1].SetActive(true);
     }
 
     private void HandleClientConnected(ulong clientId)
     {
+       
         if (IsServer && NetworkManager.Singleton.ConnectedClients.Count == 2)
         {                        
-            StartCoroutine(StartWave());
+            canvases[0].SetActive(false);
+            // canvases[1].SetActive(false);
+           StartCoroutine(StartWave());
         }
     }
 
@@ -39,7 +48,10 @@ public class EnemySpawner : NetworkBehaviour
             enemiesInWave = new bool[enemyPrefab.Length];
             availableWeapons = new bool[numWeapons]; //we currently have 
 
+
         }
+        
+       
     }
 
      void Update()
@@ -104,6 +116,9 @@ public class EnemySpawner : NetworkBehaviour
         //Debug.Log("Function called! IsServer: " + IsServer);
 
         if (IsServer) {
+            GameObject[] currentEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+            // Get the number of GameObjects with the specified tag
+            int numberOfObjects = objectsWithTag.Length;
             yield return new WaitForSeconds(15f); 
             inWave = true;
             waveNum++;

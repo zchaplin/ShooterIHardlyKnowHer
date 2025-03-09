@@ -7,7 +7,7 @@ using Unity.Netcode;
 public class Shop : MonoBehaviour
 {
 
-    private List<GameObject> player1Weapons;
+    public List<GameObject> player1Weapons;
     private List<int> weaponsPrice;
     private List<int> weapons1Bought;
     private Dictionary<Button, RawImage[]> buttonImagesMap;
