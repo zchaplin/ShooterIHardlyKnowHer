@@ -117,9 +117,10 @@ public class EnemySpawner : NetworkBehaviour
 
         if (IsServer) {
             GameObject[] currentEnemies = GameObject.FindGameObjectsWithTag("Enemy");
-            // Get the number of GameObjects with the specified tag
-            int numberOfObjects = objectsWithTag.Length;
-            yield return new WaitForSeconds(15f); 
+            int currentEnemiesNum = currentEnemies.Length;
+            if (currentEnemiesNum <=5) {
+                yield return new WaitForSeconds(15f); 
+            }
             inWave = true;
             waveNum++;
             if (minX > -10 && maxX < 10) {
