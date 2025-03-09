@@ -31,7 +31,7 @@ public class Weapon : MonoBehaviour
             Debug.LogError("Player camera is not assigned in the Weapon script.");
             return;
         }
-        rechargeText = GameObject.Find("Canvas/WeaponStats/Manager/Recharge").GetComponent<TMP_Text>();
+        rechargeText = GameObject.Find("Canvas/WeaponStats/Manager/ammo/Recharge").GetComponent<TMP_Text>();
     }
 
     // Update is called once per frame
@@ -49,7 +49,11 @@ public class Weapon : MonoBehaviour
                 Shoot();
             }
         }
-        rechargeText.text = "Time until next shot: " + Mathf.Max(0f, (nextTimeToFire - Time.time)).ToString("F2") + "\nBullets: " + bullets;
+        if (gameObject.name == "peaShooter") {
+            rechargeText.text = "inf";
+        } else {
+            rechargeText.text = "" + bullets;
+        }
     }
 
     // Add back the GetShootDirection method for boomerang and other weapons

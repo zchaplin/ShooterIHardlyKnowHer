@@ -17,16 +17,25 @@ public class EnemySpawner : NetworkBehaviour
     public float minX = -5f; // Minimum X position
     public float maxX = 5f;  // Maximum X position
     public float numEnemies = 10f;
+
+    public GameObject[] canvases;
+
     void Start()
     {
         NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
+        //  Debug.Log("canvases: " + canvases[0]);
+        // canvases[0].SetActive(false);
+        // canvases[1].SetActive(true);
     }
 
     private void HandleClientConnected(ulong clientId)
     {
+       
         if (IsServer && NetworkManager.Singleton.ConnectedClients.Count == 2)
         {                        
-            StartCoroutine(StartWave());
+            canvases[0].SetActive(false);
+            // canvases[1].SetActive(false);
+           StartCoroutine(StartWave());
         }
     }
 
@@ -39,17 +48,24 @@ public class EnemySpawner : NetworkBehaviour
             enemiesInWave = new bool[enemyPrefab.Length];
             availableWeapons = new bool[numWeapons]; //we currently have 
 
+
         }
+        
+       
     }
+
+     void Update()
+    {
+     
+    }
+
+
 
     public IEnumerator SpawnWave(int enemiesNum)
     {
         //Debug.Log("wave #: " + waveNum + " enemies in wave: " + enemiesNum);
         if (waveNum == 1) {
             enemiesInWave[0] = true;
-            enemiesInWave[2] = true;
-            // enemiesInWave[4] = true;
-
             availableWeapons[1] = true;
         }
         else if (waveNum == 3) {
@@ -100,7 +116,11 @@ public class EnemySpawner : NetworkBehaviour
         //Debug.Log("Function called! IsServer: " + IsServer);
 
         if (IsServer) {
-            yield return new WaitForSeconds(5f); // inital delay
+            GameObject[] currentEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+            int currentEnemiesNum = currentEnemies.Length;
+            if (currentEnemiesNum <=5) {
+                yield return new WaitForSeconds(15f); 
+            }
             inWave = true;
             waveNum++;
             if (minX > -10 && maxX < 10) {

@@ -40,10 +40,9 @@ public class ShowWeaponStats : MonoBehaviour
             }
         }
         // Will also display the host/join code when pressing tab, for now just putting the code here
-
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            hostCanvas.SetActive(!hostCanvas.activeSelf);
-        }
+        // if (Input.GetKeyDown(KeyCode.Alpha1)) {
+        //     hostCanvas.SetActive(!hostCanvas.activeSelf);
+        // }
 
         if (Input.GetKeyDown(KeyCode.Escape)) {
             PauseCanvas.SetActive(!PauseCanvas.activeSelf);
