@@ -122,10 +122,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pushForce: 5
   interval: 1
-  rotationAmount: 50
-  rotationDuration: 0.6
   animator: {fileID: 8689869761777763878}
   sneakWalkParam: sneakWalk
+  turnLeftParam: turnLeft
+  turnRightParam: turnRight
+  turnAnimationDuration: 0.5
 --- !u!114 &8091307679367588431
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,15 +281,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4781469853040734874, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.3261691
+      value: 1.286362
       objectReference: {fileID: 0}
     - target: {fileID: 4781469853040734874, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.3261691
+      value: 1.3731155
       objectReference: {fileID: 0}
     - target: {fileID: 4781469853040734874, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.3261691
+      value: 1.3731155
       objectReference: {fileID: 0}
     - target: {fileID: 4781469853040734874, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
       propertyPath: m_LocalPosition.x
@@ -296,11 +297,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4781469853040734874, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.097
+      value: 0.392
       objectReference: {fileID: 0}
     - target: {fileID: 4781469853040734874, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.061
+      value: -0.036
       objectReference: {fileID: 0}
     - target: {fileID: 4781469853040734874, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
       propertyPath: m_LocalRotation.w

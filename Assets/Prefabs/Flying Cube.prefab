@@ -153,6 +153,8 @@ MonoBehaviour:
   active: 0
   speed: 0.5
   health: 5
+  playerDetectionDistance: 5
+  useColliderBounds: 1
   shieldVisual: {fileID: 5325071613255197650}
 --- !u!1001 &1015541012434124661
 PrefabInstance:
@@ -314,6 +316,10 @@ PrefabInstance:
     - target: {fileID: 4781469853040734874, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8377787562599878449, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2102289351
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
