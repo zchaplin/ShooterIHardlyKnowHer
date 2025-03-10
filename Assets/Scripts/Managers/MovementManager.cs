@@ -10,6 +10,9 @@ public class MovementManager : NetworkBehaviour
     [SerializeField] private float mouseSensitivity = 2f; // Sensitivity for mouse movement
     [SerializeField] private float jumpForce = 5f; // Force applied when jumping
 
+    // Add a flag to identify the character type
+    [SerializeField] private bool isClownCharacter = false;
+
     private Rigidbody rb; // Rigidbody component for physics-based movement
     private Collider playerCollider; // Player's collider
     private Vector3 currentVelocityP1 = Vector3.zero;
@@ -18,25 +21,47 @@ public class MovementManager : NetworkBehaviour
     private bool isGrounded = false; // Check if the player is grounded
     private PlayerNetwork.JumpState currentJumpState = PlayerNetwork.JumpState.None; // Track current jump state
     private float verticalVelocity = 0f; // Track vertical velocity for jump state transitions
+    private bool isPlayer2 = false; // Flag to identify if this is Player 2
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        playerCollider = GetComponent<Collider>(); // Get the player's collider
+        playerCollider = GetComponent<Collider>();
+        
+        // Determine if this is Player 2 based on client ID
+        isPlayer2 = OwnerClientId != NetworkManager.ServerClientId;
+        isClownCharacter = isPlayer2; // Player 2 is the clown
 
         if (rb == null)
         {
-            Debug.LogError("Player1 does not have a Rigidbody component.");
+            Debug.LogError("Player does not have a Rigidbody component.");
             return;
         }
 
-        // Lock the cursor to the center of the screen and make it invisible
+        // Configure the Rigidbody
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+        // Lock cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        // Ignore collisions with objects tagged as "Enemy"
+        
+        // Auto-detect if this is the clown character by checking animator parameters
+        if (playerAnimator != null)
+        {
+            // Check if clown parameters exist
+            foreach (AnimatorControllerParameter param in playerAnimator.parameters)
+            {
+                if (param.name == "clownMovingLeft" || param.name == "clownMovingRight" || param.name == "clownJumping")
+                {
+                    isClownCharacter = true;
+                    Debug.Log("Detected clown character based on animator parameters");
+                    break;
+                }
+            }
+        }
     }
-
 
     public override void OnNetworkSpawn()
     {
@@ -44,47 +69,89 @@ public class MovementManager : NetworkBehaviour
         {
             playerCamera.gameObject.SetActive(true);
         }
+        
+        // Determine if this is Player 2 based on client ID
+        isPlayer2 = OwnerClientId != NetworkManager.ServerClientId;
+        isClownCharacter = isPlayer2; // Player 2 is the clown
     }
 
     void Update()
     {
         if(!IsOwner) return;
-        // Handle sideways movement (A/D)
+        
         bool movingLeft = Input.GetKey(KeyCode.A);
         bool movingRight = Input.GetKey(KeyCode.D);
 
         verticalVelocity = rb.velocity.y;
-
+        
         UpdateJumpState(movingLeft, movingRight);
-
+        
+        // Update animator parameters based on character type
         if (playerAnimator != null)
         {
-            playerAnimator.SetBool("movingLeft", movingLeft);
-            playerAnimator.SetBool("movingRight", movingRight);
-            playerAnimator.SetBool("jumpUp", currentJumpState == PlayerNetwork.JumpState.JumpUp);
-            playerAnimator.SetBool("jumpDown", currentJumpState == PlayerNetwork.JumpState.JumpDown);
-            playerAnimator.SetBool("leftStrafeJump", currentJumpState == PlayerNetwork.JumpState.LeftStrafeJump);
-            playerAnimator.SetBool("rightStrafeJump", currentJumpState == PlayerNetwork.JumpState.RightStrafeJump);
+            if (isClownCharacter)
+            {
+                // Use clown parameter names
+                SafeSetBool("clownMovingLeft", movingLeft);
+                SafeSetBool("clownMovingRight", movingRight);
+                
+                // Handle jump animations for clown
+                bool isJumping = currentJumpState != PlayerNetwork.JumpState.None;
+                bool isLeftJumping = isJumping && movingLeft;
+                bool isRightJumping = isJumping && movingRight;
+                bool isNormalJumping = isJumping && !movingLeft && !movingRight;
+                
+                SafeSetBool("clownJumping", isNormalJumping);
+                SafeSetBool("clownMovingLeftJump", isLeftJumping);
+                SafeSetBool("clownMovingRightJump", isRightJumping);
+            }
+            else
+            {
+                // Use original parameter names
+                SafeSetBool("movingLeft", movingLeft);
+                SafeSetBool("movingRight", movingRight);
+                SafeSetBool("jumpUp", currentJumpState == PlayerNetwork.JumpState.JumpUp);
+                SafeSetBool("jumpDown", currentJumpState == PlayerNetwork.JumpState.JumpDown);
+                SafeSetBool("leftStrafeJump", currentJumpState == PlayerNetwork.JumpState.LeftStrafeJump);
+                SafeSetBool("rightStrafeJump", currentJumpState == PlayerNetwork.JumpState.RightStrafeJump);
+            }
         }
 
+        // Sync animation states over the network
         PlayerNetwork playerNetwork = GetComponent<PlayerNetwork>();
         if (playerNetwork != null)
         {
-            playerNetwork.UpdateAnimationState(movingLeft, movingRight, currentJumpState);
+            playerNetwork.UpdateAnimationState(movingLeft, movingRight, currentJumpState, isClownCharacter);
         }
-
+        
         HandleSidewaysMovement();
-        // Handle mouse movement for camera and ensure it won't happen while in shop
+        
         if (Cursor.lockState != CursorLockMode.Confined)
         {
             RotatePlayerWithMouse();
         }
 
-        // Check for jump input
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             Jump();
         }
+    }
+    
+    // Helper method to safely set bool parameters
+    private void SafeSetBool(string paramName, bool value)
+    {
+        if (playerAnimator == null) return;
+        
+        // Check if the parameter exists by iterating through parameters
+        foreach (AnimatorControllerParameter param in playerAnimator.parameters)
+        {
+            if (param.name == paramName && param.type == AnimatorControllerParameterType.Bool)
+            {
+                playerAnimator.SetBool(paramName, value);
+                return;
+            }
+        }
+        // Parameter not found - silently ignore
     }
 
     void FixedUpdate()
@@ -137,7 +204,7 @@ public class MovementManager : NetworkBehaviour
         }
         else if (OwnerClientId == 1) // Player 2
         {
-            // Player 2 should rotate between 90° and 270° to match Player 1’s perspective
+            // Player 2 should rotate between 90° and 270° to match Player 1's perspective
             if (horizontalLookRotation < 90f) horizontalLookRotation = 90f;
             if (horizontalLookRotation > 270f) horizontalLookRotation = 270f;
         }
@@ -177,17 +244,17 @@ public class MovementManager : NetworkBehaviour
         }
         
         // Update animator directly
-        UpdateJumpAnimator();       
+        UpdateJumpAnimator();
     }
 
     void UpdateJumpState(bool movingLeft, bool movingRight)
     {
         if (!isGrounded)
         {
-            // If we're in the air
-            if (verticalVelocity < -0.5f) // Falling threshold - transition from rising to falling
+            if (isClownCharacter)
             {
-                // We're falling, update to the appropriate state
+                // For clown character, we just need to know if jumping or not
+                // and whether moving left/right during jump
                 if (movingLeft)
                 {
                     currentJumpState = PlayerNetwork.JumpState.LeftStrafeJump;
@@ -196,30 +263,51 @@ public class MovementManager : NetworkBehaviour
                 {
                     currentJumpState = PlayerNetwork.JumpState.RightStrafeJump;
                 }
-                else if (currentJumpState == PlayerNetwork.JumpState.JumpUp)
+                else if (currentJumpState == PlayerNetwork.JumpState.None)
                 {
-                    // If we were in JumpUp, transition to JumpDown
-                    currentJumpState = PlayerNetwork.JumpState.JumpDown;
+                    currentJumpState = PlayerNetwork.JumpState.JumpUp; // Any non-None state will work for clown
                 }
-                else
-                {
-                    currentJumpState = PlayerNetwork.JumpState.JumpDown;
-                }
+                // Else keep current state
             }
-            else if (verticalVelocity > 0.1f) // Rising threshold
+            else
             {
-                // We're rising, update to the appropriate state
-                if (movingLeft)
+                // For original character with multiple jump animations
+                if (verticalVelocity < -0.5f) // Falling threshold - transition from rising to falling
                 {
-                    currentJumpState = PlayerNetwork.JumpState.LeftStrafeJump;
+                    // We're falling, update to the appropriate state
+                    if (movingLeft)
+                    {
+                        currentJumpState = PlayerNetwork.JumpState.LeftStrafeJump;
+                    }
+                    else if (movingRight)
+                    {
+                        currentJumpState = PlayerNetwork.JumpState.RightStrafeJump;
+                    }
+                    else if (currentJumpState == PlayerNetwork.JumpState.JumpUp)
+                    {
+                        // If we were in JumpUp, transition to JumpDown
+                        currentJumpState = PlayerNetwork.JumpState.JumpDown;
+                    }
+                    else
+                    {
+                        currentJumpState = PlayerNetwork.JumpState.JumpDown;
+                    }
                 }
-                else if (movingRight)
+                else if (verticalVelocity > 0.1f) // Rising threshold
                 {
-                    currentJumpState = PlayerNetwork.JumpState.RightStrafeJump;
-                }
-                else
-                {
-                    currentJumpState = PlayerNetwork.JumpState.JumpUp;
+                    // We're rising, update to the appropriate state
+                    if (movingLeft)
+                    {
+                        currentJumpState = PlayerNetwork.JumpState.LeftStrafeJump;
+                    }
+                    else if (movingRight)
+                    {
+                        currentJumpState = PlayerNetwork.JumpState.RightStrafeJump;
+                    }
+                    else
+                    {
+                        currentJumpState = PlayerNetwork.JumpState.JumpUp;
+                    }
                 }
             }
         }
@@ -234,10 +322,28 @@ public class MovementManager : NetworkBehaviour
     {
         if (playerAnimator != null)
         {
-            playerAnimator.SetBool("jumpUp", currentJumpState == PlayerNetwork.JumpState.JumpUp);
-            playerAnimator.SetBool("jumpDown", currentJumpState == PlayerNetwork.JumpState.JumpDown);
-            playerAnimator.SetBool("leftStrafeJump", currentJumpState == PlayerNetwork.JumpState.LeftStrafeJump);
-            playerAnimator.SetBool("rightStrafeJump", currentJumpState == PlayerNetwork.JumpState.RightStrafeJump);
+            if (isClownCharacter)
+            {
+                // For clown character
+                bool isJumping = currentJumpState != PlayerNetwork.JumpState.None;
+                bool movingLeft = Input.GetKey(KeyCode.A);
+                bool movingRight = Input.GetKey(KeyCode.D);
+                bool isLeftJumping = isJumping && movingLeft;
+                bool isRightJumping = isJumping && movingRight;
+                bool isNormalJumping = isJumping && !movingLeft && !movingRight;
+                
+                SafeSetBool("clownJumping", isNormalJumping);
+                SafeSetBool("clownMovingLeftJump", isLeftJumping);
+                SafeSetBool("clownMovingRightJump", isRightJumping);
+            }
+            else
+            {
+                // For original character
+                SafeSetBool("jumpUp", currentJumpState == PlayerNetwork.JumpState.JumpUp);
+                SafeSetBool("jumpDown", currentJumpState == PlayerNetwork.JumpState.JumpDown);
+                SafeSetBool("leftStrafeJump", currentJumpState == PlayerNetwork.JumpState.LeftStrafeJump);
+                SafeSetBool("rightStrafeJump", currentJumpState == PlayerNetwork.JumpState.RightStrafeJump);
+            }
         }
     }
 
@@ -260,10 +366,13 @@ public class MovementManager : NetworkBehaviour
                 PlayerNetwork playerNetwork = GetComponent<PlayerNetwork>();
                 if (playerNetwork != null && IsOwner)
                 {
+                    bool movingLeft = Input.GetKey(KeyCode.A);
+                    bool movingRight = Input.GetKey(KeyCode.D);
                     playerNetwork.UpdateAnimationState(
-                        playerAnimator.GetBool("movingLeft"), 
-                        playerAnimator.GetBool("movingRight"), 
-                        PlayerNetwork.JumpState.None
+                        movingLeft, 
+                        movingRight, 
+                        PlayerNetwork.JumpState.None,
+                        isClownCharacter
                     );
                 }
             }
