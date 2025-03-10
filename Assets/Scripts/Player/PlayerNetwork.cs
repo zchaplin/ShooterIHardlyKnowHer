@@ -12,7 +12,7 @@ public class PlayerNetwork : NetworkBehaviour
         new Vector3(1, 1, 3)   // Spawn point for player 2
     };
 
-    private CharacterController characterController;
+    private Rigidbody rb;
     private Animator playerAnimator;
 
     // NetworkVariables for animation states
@@ -22,13 +22,23 @@ public class PlayerNetwork : NetworkBehaviour
     public NetworkVariable<bool> netMovingRight = new NetworkVariable<bool>(false, 
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+    // NetworkVariables for jumping animations
+    public NetworkVariable<bool> netJumpUp = new NetworkVariable<bool>(false,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<bool> netJumpDown = new NetworkVariable<bool>(false,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<bool> netLeftStrafeJump = new NetworkVariable<bool>(false,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<bool> netRightStrafeJump = new NetworkVariable<bool>(false,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
     private void Awake()
     {
-        characterController = GetComponent<CharacterController>();
-        if (characterController != null)
+        rb = GetComponent<Rigidbody>();
+        if (rb != null)
         {
-            // Start with CharacterController disabled
-            characterController.enabled = false;
+            // Disable physics simulation initially to prevent issues
+            rb.isKinematic = true;
         }
         playerAnimator = GetComponentInChildren<Animator>();
     }
@@ -54,15 +64,19 @@ public class PlayerNetwork : NetworkBehaviour
             }
         }
 
-        // Owner enables CharacterController when spawned
-        if (IsOwner && characterController != null)
+        // Owner enables physics when spawned
+        if (IsOwner && rb != null)
         {
-            characterController.enabled = true;
+            rb.isKinematic = false;
         }
 
         // Register callbacks for animation NetworkVariables
         netMovingLeft.OnValueChanged += OnMovingLeftChanged;
         netMovingRight.OnValueChanged += OnMovingRightChanged;
+        netJumpUp.OnValueChanged += OnJumpUpChanged;
+        netJumpDown.OnValueChanged += OnJumpDownChanged;
+        netLeftStrafeJump.OnValueChanged += OnLeftStrafeJumpChanged;
+        netRightStrafeJump.OnValueChanged += OnRightStrafeJumpChanged;
 
         base.OnNetworkSpawn();
     }
@@ -73,7 +87,6 @@ public class PlayerNetwork : NetworkBehaviour
         if (playerAnimator != null)
         {
             playerAnimator.SetBool("movingLeft", newValue);
-            Debug.Log($"Player {OwnerClientId} animation: movingLeft = {newValue}");
         }
     }
     
@@ -82,12 +95,43 @@ public class PlayerNetwork : NetworkBehaviour
         if (playerAnimator != null)
         {
             playerAnimator.SetBool("movingRight", newValue);
-            Debug.Log($"Player {OwnerClientId} animation: movingRight = {newValue}");
+        }
+    }
+
+    private void OnJumpUpChanged(bool previousValue, bool newValue)
+    {
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool("jumpUp", newValue);
+        }
+    }
+    
+    private void OnJumpDownChanged(bool previousValue, bool newValue)
+    {
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool("jumpDown", newValue);
+        }
+    }
+    
+    private void OnLeftStrafeJumpChanged(bool previousValue, bool newValue)
+    {
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool("leftStrafeJump", newValue);
+        }
+    }
+    
+    private void OnRightStrafeJumpChanged(bool previousValue, bool newValue)
+    {
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool("rightStrafeJump", newValue);
         }
     }
 
     // Call this method from your movement script to update animation states
-    public void UpdateAnimationState(bool movingLeft, bool movingRight)
+    public void UpdateAnimationState(bool movingLeft, bool movingRight, JumpState jumpState)
     {
         if (!IsOwner) return;
         
@@ -101,6 +145,41 @@ public class PlayerNetwork : NetworkBehaviour
         {
             netMovingRight.Value = movingRight;
         }
+
+        // Update jump animation states
+        bool isJumpUp = jumpState == JumpState.JumpUp;
+        bool isJumpDown = jumpState == JumpState.JumpDown;
+        bool isLeftStrafeJump = jumpState == JumpState.LeftStrafeJump;
+        bool isRightStrafeJump = jumpState == JumpState.RightStrafeJump;
+        
+        if (netJumpUp.Value != isJumpUp)
+        {
+            netJumpUp.Value = isJumpUp;
+        }
+        
+        if (netJumpDown.Value != isJumpDown)
+        {
+            netJumpDown.Value = isJumpDown;
+        }
+        
+        if (netLeftStrafeJump.Value != isLeftStrafeJump)
+        {
+            netLeftStrafeJump.Value = isLeftStrafeJump;
+        }
+        
+        if (netRightStrafeJump.Value != isRightStrafeJump)
+        {
+            netRightStrafeJump.Value = isRightStrafeJump;
+        }
+    }
+    
+    public enum JumpState
+    {
+        None,
+        JumpUp,
+        JumpDown,
+        LeftStrafeJump,
+        RightStrafeJump
     }
 }
 

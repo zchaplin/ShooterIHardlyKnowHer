@@ -39,7 +39,7 @@ public class NetworkedSpring : NetworkBehaviour
             //     chainStart.GetComponent<CableProceduralSimple>().endPointTransform = otherObject.transform;
             // }
 
-            Debug.Log("Testing");
+            // Debug.Log("Testing");
 
             // Calculate the spring force
             Vector3 displacement = otherObject.transform.position - transform.position;

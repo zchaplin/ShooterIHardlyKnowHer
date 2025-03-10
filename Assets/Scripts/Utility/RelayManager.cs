@@ -61,7 +61,7 @@ public class RelayManager : MonoBehaviour
         NetworkObject hostObject = NetworkManager.Singleton.LocalClient.PlayerObject;
         if (hostObject != null)
         {
-            hostObject.transform.position = new Vector3(0, 1, -5);
+            hostObject.transform.position = new Vector3(1, 1, -3);
             hostObject.name = "Player1";
         }
     }
@@ -93,7 +93,7 @@ public class RelayManager : MonoBehaviour
         NetworkObject playerObject = NetworkManager.Singleton.LocalClient.PlayerObject;
         if (playerObject != null)
         {
-            playerObject.transform.position = new Vector3(0, 1, 5);
+            playerObject.transform.position = new Vector3(1, 1, 3);
             playerObject.name = "Player2";
         }
     }

@@ -16,6 +16,8 @@ public class MovementManager : NetworkBehaviour
     private float verticalLookRotation = 0f; // Tracks up/down camera rotation
     private float horizontalLookRotation = 0f; // Tracks left/right camera rotation
     private bool isGrounded = false; // Check if the player is grounded
+    private PlayerNetwork.JumpState currentJumpState = PlayerNetwork.JumpState.None; // Track current jump state
+    private float verticalVelocity = 0f; // Track vertical velocity for jump state transitions
 
     void Start()
     {
@@ -50,17 +52,25 @@ public class MovementManager : NetworkBehaviour
         // Handle sideways movement (A/D)
         bool movingLeft = Input.GetKey(KeyCode.A);
         bool movingRight = Input.GetKey(KeyCode.D);
-        // Update animator parameters
+
+        verticalVelocity = rb.velocity.y;
+
+        UpdateJumpState(movingLeft, movingRight);
+
         if (playerAnimator != null)
         {
             playerAnimator.SetBool("movingLeft", movingLeft);
             playerAnimator.SetBool("movingRight", movingRight);
+            playerAnimator.SetBool("jumpUp", currentJumpState == PlayerNetwork.JumpState.JumpUp);
+            playerAnimator.SetBool("jumpDown", currentJumpState == PlayerNetwork.JumpState.JumpDown);
+            playerAnimator.SetBool("leftStrafeJump", currentJumpState == PlayerNetwork.JumpState.LeftStrafeJump);
+            playerAnimator.SetBool("rightStrafeJump", currentJumpState == PlayerNetwork.JumpState.RightStrafeJump);
         }
 
         PlayerNetwork playerNetwork = GetComponent<PlayerNetwork>();
         if (playerNetwork != null)
         {
-            playerNetwork.UpdateAnimationState(movingLeft, movingRight);
+            playerNetwork.UpdateAnimationState(movingLeft, movingRight, currentJumpState);
         }
 
         HandleSidewaysMovement();
@@ -146,16 +156,117 @@ public class MovementManager : NetworkBehaviour
         // Apply jump force
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         isGrounded = false;
+
+        // Set initial jump state based on horizontal movement
+        bool movingLeft = Input.GetKey(KeyCode.A);
+        bool movingRight = Input.GetKey(KeyCode.D);
+        
+        if (movingLeft)
+        {
+            currentJumpState = PlayerNetwork.JumpState.LeftStrafeJump;
+        }
+        else if (movingRight)
+        {
+            currentJumpState = PlayerNetwork.JumpState.RightStrafeJump;
+        }
+        else
+        {
+            // Always start with JumpUp for vertical jumps
+            // JumpDown will happen automatically when velocity becomes negative
+            currentJumpState = PlayerNetwork.JumpState.JumpUp;
+        }
+        
+        // Update animator directly
+        UpdateJumpAnimator();       
+    }
+
+    void UpdateJumpState(bool movingLeft, bool movingRight)
+    {
+        if (!isGrounded)
+        {
+            // If we're in the air
+            if (verticalVelocity < -0.5f) // Falling threshold - transition from rising to falling
+            {
+                // We're falling, update to the appropriate state
+                if (movingLeft)
+                {
+                    currentJumpState = PlayerNetwork.JumpState.LeftStrafeJump;
+                }
+                else if (movingRight)
+                {
+                    currentJumpState = PlayerNetwork.JumpState.RightStrafeJump;
+                }
+                else if (currentJumpState == PlayerNetwork.JumpState.JumpUp)
+                {
+                    // If we were in JumpUp, transition to JumpDown
+                    currentJumpState = PlayerNetwork.JumpState.JumpDown;
+                }
+                else
+                {
+                    currentJumpState = PlayerNetwork.JumpState.JumpDown;
+                }
+            }
+            else if (verticalVelocity > 0.1f) // Rising threshold
+            {
+                // We're rising, update to the appropriate state
+                if (movingLeft)
+                {
+                    currentJumpState = PlayerNetwork.JumpState.LeftStrafeJump;
+                }
+                else if (movingRight)
+                {
+                    currentJumpState = PlayerNetwork.JumpState.RightStrafeJump;
+                }
+                else
+                {
+                    currentJumpState = PlayerNetwork.JumpState.JumpUp;
+                }
+            }
+        }
+        else
+        {
+            // We're grounded, reset jump state
+            currentJumpState = PlayerNetwork.JumpState.None;
+        }
+    }
+    
+    void UpdateJumpAnimator()
+    {
+        if (playerAnimator != null)
+        {
+            playerAnimator.SetBool("jumpUp", currentJumpState == PlayerNetwork.JumpState.JumpUp);
+            playerAnimator.SetBool("jumpDown", currentJumpState == PlayerNetwork.JumpState.JumpDown);
+            playerAnimator.SetBool("leftStrafeJump", currentJumpState == PlayerNetwork.JumpState.LeftStrafeJump);
+            playerAnimator.SetBool("rightStrafeJump", currentJumpState == PlayerNetwork.JumpState.RightStrafeJump);
+        }
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        //Debug.Log(collision.gameObject.name);
         // Check if the player is grounded
         if (collision.gameObject.CompareTag("Ground"))
         {
-            //Debug.Log("Grounded");
             isGrounded = true;
+            
+            // Only update jump state if we were in any jump state
+            if (currentJumpState != PlayerNetwork.JumpState.None)
+            {
+                currentJumpState = PlayerNetwork.JumpState.None;
+                
+                // Update animator directly
+                UpdateJumpAnimator();
+                
+                // Update network state
+                PlayerNetwork playerNetwork = GetComponent<PlayerNetwork>();
+                if (playerNetwork != null && IsOwner)
+                {
+                    playerNetwork.UpdateAnimationState(
+                        playerAnimator.GetBool("movingLeft"), 
+                        playerAnimator.GetBool("movingRight"), 
+                        PlayerNetwork.JumpState.None
+                    );
+                }
+            }
         }
     }
 }

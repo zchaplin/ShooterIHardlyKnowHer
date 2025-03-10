@@ -374,6 +374,7 @@ GameObject:
   - component: {fileID: 7839895910816689950}
   - component: {fileID: 8506399523823231052}
   - component: {fileID: 7851318638961055507}
+  - component: {fileID: 5873202530655925866}
   - component: {fileID: 6107928483338227633}
   - component: {fileID: 2458831180728407551}
   - component: {fileID: 3066880144147088103}
@@ -469,7 +470,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2722499459
+  GlobalObjectIdHash: 3823312306
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -478,6 +479,18 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &5873202530655925866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4400328585649254945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6107928483338227633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -527,6 +540,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3ea3a66023867e42825c333f8aafdc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  netMovingLeft:
+    m_InternalValue: 0
+  netMovingRight:
+    m_InternalValue: 0
+  netJumpUp:
+    m_InternalValue: 0
+  netJumpDown:
+    m_InternalValue: 0
+  netLeftStrafeJump:
+    m_InternalValue: 0
+  netRightStrafeJump:
+    m_InternalValue: 0
 --- !u!114 &6558258999868792483
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -727,7 +752,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 959406016
+  GlobalObjectIdHash: 3823312306
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -835,7 +860,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3873793892
+  GlobalObjectIdHash: 3823312306
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -949,7 +974,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2562316829
+  GlobalObjectIdHash: 3823312306
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1069,7 +1094,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 314035642
+  GlobalObjectIdHash: 3823312306
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1167,7 +1192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2875463750
+  GlobalObjectIdHash: 3823312306
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -1291,6 +1316,8 @@ MonoBehaviour:
   isLimitedBullet: 1
   rechargeText: {fileID: 0}
   playerCamera: {fileID: 1629880104306304855}
+  muzzleFlash: {fileID: 0}
+  muzzlePosition: {fileID: 0}
   maxEnemies: 3
   lineMaterial: {fileID: 2100000, guid: aa9f25951a207ca4c9659ce9a2d03d59, type: 2}
   lineColor: {r: 0, g: 0, b: 1, a: 1}
@@ -1307,7 +1334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3791717851
+  GlobalObjectIdHash: 3823312306
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
