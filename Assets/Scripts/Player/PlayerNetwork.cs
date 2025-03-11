@@ -13,9 +13,9 @@ public class PlayerNetwork : NetworkBehaviour
     };
 
     private Rigidbody rb;
-    private Animator playerAnimator;
+    private PlayerModelSwitcher modelSwitcher;
 
-    // NetworkVariables for animation states
+    // NetworkVariables for animation states - shared between both models
     public NetworkVariable<bool> netMovingLeft = new NetworkVariable<bool>(false, 
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     
@@ -31,6 +31,20 @@ public class PlayerNetwork : NetworkBehaviour
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     public NetworkVariable<bool> netRightStrafeJump = new NetworkVariable<bool>(false,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    
+    public NetworkVariable<bool> netJumping = new NetworkVariable<bool>(false,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    public NetworkVariable<bool> netClownMovingLeft = new NetworkVariable<bool>(false, 
+    NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+    public NetworkVariable<bool> netClownMovingRight = new NetworkVariable<bool>(false, 
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+    public NetworkVariable<bool> netClownMovingLeftJump = new NetworkVariable<bool>(false, 
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
+    public NetworkVariable<bool> netClownMovingRightJump = new NetworkVariable<bool>(false, 
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     private void Awake()
     {
@@ -40,7 +54,8 @@ public class PlayerNetwork : NetworkBehaviour
             // Disable physics simulation initially to prevent issues
             rb.isKinematic = true;
         }
-        playerAnimator = GetComponentInChildren<Animator>();
+        
+        modelSwitcher = GetComponent<PlayerModelSwitcher>();
     }
 
     public override void OnNetworkSpawn()
@@ -71,105 +86,173 @@ public class PlayerNetwork : NetworkBehaviour
         }
 
         // Register callbacks for animation NetworkVariables
-        netMovingLeft.OnValueChanged += OnMovingLeftChanged;
-        netMovingRight.OnValueChanged += OnMovingRightChanged;
-        netJumpUp.OnValueChanged += OnJumpUpChanged;
-        netJumpDown.OnValueChanged += OnJumpDownChanged;
-        netLeftStrafeJump.OnValueChanged += OnLeftStrafeJumpChanged;
-        netRightStrafeJump.OnValueChanged += OnRightStrafeJumpChanged;
+        netMovingLeft.OnValueChanged += OnNetworkValueChanged;
+        netMovingRight.OnValueChanged += OnNetworkValueChanged;
+        netJumpUp.OnValueChanged += OnNetworkValueChanged;
+        netJumpDown.OnValueChanged += OnNetworkValueChanged;
+        netLeftStrafeJump.OnValueChanged += OnNetworkValueChanged;
+        netRightStrafeJump.OnValueChanged += OnNetworkValueChanged;
+        netJumping.OnValueChanged += OnNetworkValueChanged;
+
+        // Register callbacks for clown-specific animation NetworkVariables
+        netClownMovingLeft.OnValueChanged += OnNetworkValueChanged;
+        netClownMovingRight.OnValueChanged += OnNetworkValueChanged;
+        netClownMovingLeftJump.OnValueChanged += OnNetworkValueChanged;
+        netClownMovingRightJump.OnValueChanged += OnNetworkValueChanged;
 
         base.OnNetworkSpawn();
     }
 
-        // Animation network callbacks
-    private void OnMovingLeftChanged(bool previousValue, bool newValue)
+    // Single callback to handle all animation network variable changes
+    private void OnNetworkValueChanged(bool previousValue, bool newValue)
     {
-        if (playerAnimator != null)
-        {
-            playerAnimator.SetBool("movingLeft", newValue);
-        }
+        UpdateLocalAnimationState();
     }
     
-    private void OnMovingRightChanged(bool previousValue, bool newValue)
+    // Update local animation state based on network variables
+    private void UpdateLocalAnimationState()
     {
-        if (playerAnimator != null)
+        // Try to get the model switcher if it's not already assigned
+        if (modelSwitcher == null)
         {
-            playerAnimator.SetBool("movingRight", newValue);
+            modelSwitcher = GetComponent<PlayerModelSwitcher>();
+            if (modelSwitcher == null)
+            {
+                return;
+            }
+        }
+        
+        try
+        {
+            bool movingLeft = netMovingLeft.Value;
+            bool movingRight = netMovingRight.Value;
+            
+            // Determine the jump state
+            JumpState jumpState = JumpState.None;
+            
+            if (netJumping.Value)
+            {
+                jumpState = JumpState.Generic; // Used by Clown
+            }
+            else if (netLeftStrafeJump.Value)
+            {
+                jumpState = JumpState.LeftStrafeJump;
+            }
+            else if (netRightStrafeJump.Value)
+            {
+                jumpState = JumpState.RightStrafeJump;
+            }
+            else if (netJumpUp.Value)
+            {
+                jumpState = JumpState.JumpUp;
+            }
+            else if (netJumpDown.Value)
+            {
+                jumpState = JumpState.JumpDown;
+            }
+            
+            // Update the model switcher with the current animation state
+            modelSwitcher.UpdateAnimationState(movingLeft, movingRight, jumpState);
+
+            // Update clown-specific animation states
+            if (modelSwitcher.IsClownModel)
+            {
+                modelSwitcher.UpdateAnimationState(netClownMovingLeft.Value, netClownMovingRight.Value, jumpState);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Error updating animation state: {e.Message}", this);
         }
     }
 
-    private void OnJumpUpChanged(bool previousValue, bool newValue)
-    {
-        if (playerAnimator != null)
-        {
-            playerAnimator.SetBool("jumpUp", newValue);
-        }
-    }
-    
-    private void OnJumpDownChanged(bool previousValue, bool newValue)
-    {
-        if (playerAnimator != null)
-        {
-            playerAnimator.SetBool("jumpDown", newValue);
-        }
-    }
-    
-    private void OnLeftStrafeJumpChanged(bool previousValue, bool newValue)
-    {
-        if (playerAnimator != null)
-        {
-            playerAnimator.SetBool("leftStrafeJump", newValue);
-        }
-    }
-    
-    private void OnRightStrafeJumpChanged(bool previousValue, bool newValue)
-    {
-        if (playerAnimator != null)
-        {
-            playerAnimator.SetBool("rightStrafeJump", newValue);
-        }
-    }
-
-    // Call this method from your movement script to update animation states
     public void UpdateAnimationState(bool movingLeft, bool movingRight, JumpState jumpState)
     {
         if (!IsOwner) return;
         
-        // Only send network updates when values actually change
-        if (netMovingLeft.Value != movingLeft)
+        try
         {
-            netMovingLeft.Value = movingLeft;
-        }
-        
-        if (netMovingRight.Value != movingRight)
-        {
-            netMovingRight.Value = movingRight;
-        }
+            // Log animation state changes for debugging
+            bool isClownModel = modelSwitcher != null && modelSwitcher.IsClownModel;
+            string modelType = isClownModel ? "Clown" : "Wizard";
+            
+            // Only send network updates when values actually change
+            if (netMovingLeft.Value != movingLeft)
+            {
+                netMovingLeft.Value = movingLeft;
+            }
+            
+            if (netMovingRight.Value != movingRight)
+            {
+                netMovingRight.Value = movingRight;
+            }
 
-        // Update jump animation states
-        bool isJumpUp = jumpState == JumpState.JumpUp;
-        bool isJumpDown = jumpState == JumpState.JumpDown;
-        bool isLeftStrafeJump = jumpState == JumpState.LeftStrafeJump;
-        bool isRightStrafeJump = jumpState == JumpState.RightStrafeJump;
-        
-        if (netJumpUp.Value != isJumpUp)
-        {
-            netJumpUp.Value = isJumpUp;
+            // Update jump animation states
+            bool isJumpUp = jumpState == JumpState.JumpUp;
+            bool isJumpDown = jumpState == JumpState.JumpDown;
+            bool isLeftStrafeJump = jumpState == JumpState.LeftStrafeJump;
+            bool isRightStrafeJump = jumpState == JumpState.RightStrafeJump;
+            bool isGenericJump = jumpState == JumpState.Generic;
+            bool isJumping = jumpState != JumpState.None;
+            
+            // For Clown model, prioritize generic jumping
+            if (isClownModel && isJumping && !isGenericJump)
+            {
+                isGenericJump = true;
+            }
+            
+            if (netJumpUp.Value != isJumpUp)
+            {
+                netJumpUp.Value = isJumpUp;          
+            }
+            
+            if (netJumpDown.Value != isJumpDown)
+            {
+                netJumpDown.Value = isJumpDown;
+            }
+            
+            if (netLeftStrafeJump.Value != isLeftStrafeJump)
+            {
+                netLeftStrafeJump.Value = isLeftStrafeJump;
+            }
+            
+            if (netRightStrafeJump.Value != isRightStrafeJump)
+            {
+                netRightStrafeJump.Value = isRightStrafeJump;
+            }
+            
+            if (netJumping.Value != isJumping)
+            {
+                netJumping.Value = isJumping;
+            }
+
+            // Update clown-specific animation states
+            if (isClownModel)
+            {
+                if (netClownMovingLeft.Value != movingLeft)
+                {
+                    netClownMovingLeft.Value = movingLeft;
+                }
+                
+                if (netClownMovingRight.Value != movingRight)
+                {
+                    netClownMovingRight.Value = movingRight;
+                }
+                
+                if (netClownMovingLeftJump.Value != (isJumping && movingLeft))
+                {
+                    netClownMovingLeftJump.Value = isJumping && movingLeft;
+                }
+                
+                if (netClownMovingRightJump.Value != (isJumping && movingRight))
+                {
+                    netClownMovingRightJump.Value = isJumping && movingRight;
+                }
+            }
         }
-        
-        if (netJumpDown.Value != isJumpDown)
+        catch (System.Exception e)
         {
-            netJumpDown.Value = isJumpDown;
-        }
-        
-        if (netLeftStrafeJump.Value != isLeftStrafeJump)
-        {
-            netLeftStrafeJump.Value = isLeftStrafeJump;
-        }
-        
-        if (netRightStrafeJump.Value != isRightStrafeJump)
-        {
-            netRightStrafeJump.Value = isRightStrafeJump;
+            Debug.LogError($"Error updating network animation state: {e.Message}");
         }
     }
     
@@ -179,8 +262,27 @@ public class PlayerNetwork : NetworkBehaviour
         JumpUp,
         JumpDown,
         LeftStrafeJump,
-        RightStrafeJump
+        RightStrafeJump,
+        Generic // For Clown's single jump animation
+    }
+        
+    public override void OnNetworkDespawn()
+    {
+        // Unregister callbacks to prevent memory leaks
+        netMovingLeft.OnValueChanged -= OnNetworkValueChanged;
+        netMovingRight.OnValueChanged -= OnNetworkValueChanged;
+        netJumpUp.OnValueChanged -= OnNetworkValueChanged;
+        netJumpDown.OnValueChanged -= OnNetworkValueChanged;
+        netLeftStrafeJump.OnValueChanged -= OnNetworkValueChanged;
+        netRightStrafeJump.OnValueChanged -= OnNetworkValueChanged;
+        netJumping.OnValueChanged -= OnNetworkValueChanged;
+
+        // Unregister callbacks for clown-specific animation NetworkVariables
+        netClownMovingLeft.OnValueChanged -= OnNetworkValueChanged;
+        netClownMovingRight.OnValueChanged -= OnNetworkValueChanged;
+        netClownMovingLeftJump.OnValueChanged -= OnNetworkValueChanged;
+        netClownMovingRightJump.OnValueChanged -= OnNetworkValueChanged;
+        
+        base.OnNetworkDespawn();
     }
 }
-
-

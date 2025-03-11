@@ -7,13 +7,11 @@ public class PushBackAndForth : NetworkBehaviour
 {
     public float pushForce = 5f; // Force to apply for the push
     public float interval = 1f;   // Time interval between pushes
+    public float rotationAmount = 15f; // Amount to rotate when changing direction
 
     [Header("Animation")]
     public Animator animator;
     public string sneakWalkParam = "sneakWalk";
-    public string turnLeftParam = "turnLeft";
-    public string turnRightParam = "turnRight";
-    public float turnAnimationDuration = 0.5f; // Duration to play turn animation
 
     private Rigidbody rb;
     private bool pushingRight = true;
@@ -33,85 +31,32 @@ public class PushBackAndForth : NetworkBehaviour
         {
             animator.SetBool(sneakWalkParam, true);
         }
-        
+              
         if (IsServer)
         {
-            StartCoroutine(PushWithAnimation());
+            StartCoroutine(PushRoutine());
         }
     }
     
-    IEnumerator PushWithAnimation()
+    IEnumerator PushRoutine()
     {
         while (true)
         {
             yield return new WaitForSeconds(interval);
 
-            // Start turning animation            
             if (pushingRight)
-            {
-                // Going to push left, so turn left
-                PlayTurnAnimation(false);
-                
-                // Apply force after a small delay
-                yield return new WaitForSeconds(turnAnimationDuration * 0.5f);
+            {              
+                // Apply force
                 rb.AddForce(Vector3.left * pushForce, ForceMode.Impulse);
             }
             else
-            {
-                // Going to push right, so turn right
-                PlayTurnAnimation(true);
-                
-                // Apply force after a small delay
-                yield return new WaitForSeconds(turnAnimationDuration * 0.5f);
+            {            
+                // Apply force
                 rb.AddForce(Vector3.right * pushForce, ForceMode.Impulse);
-            }
-
-            // Wait for the rest of the turn animation
-            yield return new WaitForSeconds(turnAnimationDuration * 0.5f);
-            
-            // Reset turn animations and continue sneaking
-            if (animator != null)
-            {
-                animator.SetBool(turnLeftParam, false);
-                animator.SetBool(turnRightParam, false);
             }
             
             // Toggle direction for next push
             pushingRight = !pushingRight;
         }
     }
-    
-    private void PlayTurnAnimation(bool turnRight)
-    {
-        if (animator == null) return;
-        
-        // Stop the other turn animation if it's playing
-        animator.SetBool(turnRight ? turnLeftParam : turnRightParam, false);
-        
-        // Start the new turn animation
-        animator.SetBool(turnRight ? turnRightParam : turnLeftParam, true);
-        
-        // Sync animation across network
-        if (IsServer)
-        {
-            SyncAnimationClientRpc(turnRight);
-        }
-    }
-    
-    [ClientRpc]
-    private void SyncAnimationClientRpc(bool turnRight)
-    {
-        if (IsServer) return; // Server already did this locally
-        
-        if (animator != null)
-        {
-            // Reset both turn animations
-            animator.SetBool(turnLeftParam, false);
-            animator.SetBool(turnRightParam, false);
-            
-            // Play the correct one
-            animator.SetBool(turnRight ? turnRightParam : turnLeftParam, true);
-        }
-    }
 }
-

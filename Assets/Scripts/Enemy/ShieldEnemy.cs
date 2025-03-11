@@ -102,7 +102,7 @@ public class ShieldEnemy : NetworkBehaviour
         // If enemy is shielded and damage is less than shield strength, absorb all damage
         if (IsShielded(enemyNetId) && damage <= shieldStrength)
         {
-            Debug.Log($"Shield absorbed {damage} damage");
+            // Debug.Log($"Shield absorbed {damage} damage");
             return 0;
         }
         // If damage exceeds shield strength, shield breaks and remaining damage goes through
@@ -116,7 +116,7 @@ public class ShieldEnemy : NetworkBehaviour
             // Update shield visuals
             UpdateShieldVisualsClientRpc(shieldedEnemies.ToArray());
             
-            Debug.Log($"Shield broke! {remainingDamage} damage passes through");
+            // Debug.Log($"Shield broke! {remainingDamage} damage passes through");
             return remainingDamage;
         }
         else

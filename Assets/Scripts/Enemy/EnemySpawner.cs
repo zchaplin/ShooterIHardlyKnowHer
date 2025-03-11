@@ -59,9 +59,6 @@ public class EnemySpawner : NetworkBehaviour
         //Debug.Log("wave #: " + waveNum + " enemies in wave: " + enemiesNum);
         if (waveNum == 1) {
             enemiesInWave[0] = true;
-            enemiesInWave[2] = true;
-            // enemiesInWave[4] = true;
-
             availableWeapons[1] = true;
         }
         else if (waveNum == 3) {
@@ -84,6 +81,7 @@ public class EnemySpawner : NetworkBehaviour
             enemiesInWave[1] = false;
             enemiesInWave[2] = false;
             enemiesInWave[3] = false;
+            enemiesInWave[5] = true;
             availableWeapons[4] = true;
         }
         else if (waveNum == 13) {

@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 5585113480161939385}
   - component: {fileID: 1956069485781530258}
   - component: {fileID: 4060135578987712249}
+  - component: {fileID: -6506677008027717365}
   - component: {fileID: 2035286668616480450}
   - component: {fileID: 7612364636886965637}
-  - component: {fileID: -6506677008027717365}
   - component: {fileID: 5216213980765738514}
   - component: {fileID: 6842366272516833585}
   - component: {fileID: -3062608252083404600}
@@ -140,35 +140,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 1
---- !u!114 &2035286668616480450
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4957522533844236652}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b35ac9670705ba4d95202db27425377, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pushForce: 5
-  interval: 1
---- !u!114 &7612364636886965637
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4957522533844236652}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9939c2ec0d13d894184050a04fe22565, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  active: 0
-  speed: 0.5
-  health: 10
 --- !u!114 &-6506677008027717365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,6 +161,38 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &2035286668616480450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4957522533844236652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b35ac9670705ba4d95202db27425377, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pushForce: 5
+  interval: 1
+  rotationAmount: 15
+  animator: {fileID: 0}
+  sneakWalkParam: sneakWalk
+--- !u!114 &7612364636886965637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4957522533844236652}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9939c2ec0d13d894184050a04fe22565, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  active: 0
+  speed: 0.5
+  health: 10
 --- !u!114 &5216213980765738514
 MonoBehaviour:
   m_ObjectHideFlags: 0
