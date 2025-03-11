@@ -96,8 +96,8 @@ Transform:
   - {fileID: 8904315126187721573}
   - {fileID: 93461269253504115}
   - {fileID: 2695204323791905152}
-  - {fileID: 4304837177024304585}
   - {fileID: 4952473086262155037}
+  - {fileID: 4304837177024304585}
   m_Father: {fileID: 7180642123259438290}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6656248355496981046
@@ -585,6 +585,14 @@ MonoBehaviour:
   netRightStrafeJump:
     m_InternalValue: 0
   netJumping:
+    m_InternalValue: 0
+  netClownMovingLeft:
+    m_InternalValue: 0
+  netClownMovingRight:
+    m_InternalValue: 0
+  netClownMovingLeftJump:
+    m_InternalValue: 0
+  netClownMovingRightJump:
     m_InternalValue: 0
 --- !u!114 &6558258999868792483
 MonoBehaviour:

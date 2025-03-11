@@ -31,7 +31,7 @@ public class EnemySpawner : NetworkBehaviour
     private void HandleClientConnected(ulong clientId)
     {
        
-        if (IsServer && NetworkManager.Singleton.ConnectedClients.Count == 1)
+        if (IsServer && NetworkManager.Singleton.ConnectedClients.Count == 2)
         {                        
             canvases[0].SetActive(false);
             // canvases[1].SetActive(false);
@@ -77,7 +77,7 @@ public class EnemySpawner : NetworkBehaviour
         }
         else if (waveNum == 10) {
             enemiesInWave[4] = true; // flying
-            enemiesInWave[0] = true;
+            enemiesInWave[0] = false;
             enemiesInWave[1] = false;
             enemiesInWave[2] = false;
             enemiesInWave[3] = false;
@@ -85,10 +85,13 @@ public class EnemySpawner : NetworkBehaviour
             availableWeapons[4] = true;
         }
         else if (waveNum == 13) {
+            enemiesInWave[0] = true;
+        }
+        else if (waveNum == 15) {            
             enemiesInWave[1] = true;
             enemiesInWave[2] = true;
         }
-        else if (waveNum == 15) {            
+        else if (waveNum == 18) {            
             enemiesInWave[3] = true;
         }
         // Spawn a wave of enemies

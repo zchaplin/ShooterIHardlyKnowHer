@@ -22,7 +22,7 @@ public class HealthManager : MonoBehaviour
     {
         if (remainingHealth <= 0) {
             //lose game
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene(2); 
         }
     }
 

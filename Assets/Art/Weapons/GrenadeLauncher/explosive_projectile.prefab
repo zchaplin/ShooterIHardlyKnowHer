@@ -105,7 +105,7 @@ MonoBehaviour:
   destroyOnHit: 1
   lifespan: 5
   piercing_limit: 0
-  damage: 10
+  damage: 20
   explosion: {fileID: 3287102586050016481, guid: 574b188d66661f943ad8cd0925ff94c9, type: 3}
 --- !u!65 &3289107284288825657
 BoxCollider:
