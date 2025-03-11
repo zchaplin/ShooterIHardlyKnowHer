@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.Netcode;
 
 public class Weapon : MonoBehaviour
 {
@@ -93,11 +94,7 @@ public class Weapon : MonoBehaviour
             targetPoint = hit.point;
         }
 
-        if(muzzleFlash != null){
-            GameObject Flash = Instantiate(muzzleFlash, muzzlePosition);
-            Destroy(Flash, 0.1f);
-        }
-        
+        muzzleVFX();
         
         // Calculate proper rotation for the bullet
         Quaternion bulletRotation = Quaternion.LookRotation(shootDirection);
@@ -126,6 +123,12 @@ public class Weapon : MonoBehaviour
         }
     }
 
+    public virtual void muzzleVFX(){
+        if(muzzleFlash != null){
+            GameObject Flash = Instantiate(muzzleFlash, muzzlePosition);
+            Destroy(Flash, 0.1f);
+        }
+    }
     protected Vector3 CalculateVelocityToHitTarget(Vector3 origin, Vector3 target, Rigidbody rb)
     {
         // Calculate the direction to the target

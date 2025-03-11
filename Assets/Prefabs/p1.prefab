@@ -786,6 +786,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5167170482835468862, guid: 6ef1a4e4ce968c34f8265d74879bbcf3, type: 3}
+      propertyPath: muzzleFlash
+      value: 
+      objectReference: {fileID: 6310971959338730015, guid: 541597ce4f1452a45bcb0439ed6463fd, type: 3}
+    - target: {fileID: 5167170482835468862, guid: 6ef1a4e4ce968c34f8265d74879bbcf3, type: 3}
       propertyPath: playerCamera
       value: 
       objectReference: {fileID: 1629880104306304855}
@@ -1397,7 +1401,7 @@ MonoBehaviour:
   isLimitedBullet: 1
   rechargeText: {fileID: 0}
   playerCamera: {fileID: 1629880104306304855}
-  muzzleFlash: {fileID: 6310971959338730015, guid: 541597ce4f1452a45bcb0439ed6463fd, type: 3}
+  muzzleFlash: {fileID: 8630981382690700426, guid: ba1315578641cd14fab6827f1a16654b, type: 3}
   muzzlePosition: {fileID: 1208423220655749629}
   maxEnemies: 3
   lineMaterial: {fileID: 2100000, guid: aa9f25951a207ca4c9659ce9a2d03d59, type: 2}

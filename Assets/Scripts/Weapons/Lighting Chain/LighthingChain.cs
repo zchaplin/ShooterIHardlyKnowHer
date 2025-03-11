@@ -23,6 +23,8 @@ public class LighthingChain : Weapon
     {        
         // Calculate the direction from the weapon to the crosshair
         Vector3 shootDirection = GetShootDirection();
+        
+        base.muzzleVFX();
 
         // Spawn bullet with the calculated direction
         GameObject bullet = Instantiate(baseBullet, gameObject.transform.position, Quaternion.identity);

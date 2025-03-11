@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &265691841819997517
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3735841221239991581}
+  m_Layer: 0
+  m_Name: muzzlePosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3735841221239991581
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 265691841819997517}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
+  m_LocalPosition: {x: 0, y: 0, z: 0.7}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.19999999}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4452937703715094880}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2390368627136293394
 GameObject:
   m_ObjectHideFlags: 0
@@ -461,6 +492,7 @@ Transform:
   - {fileID: 555959761112188026}
   - {fileID: 6159065797364815679}
   - {fileID: 952843925896254918}
+  - {fileID: 3735841221239991581}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &4163762067990436835
@@ -546,7 +578,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 0
+  GlobalObjectIdHash: 1927727383
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -568,12 +600,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fireRate: 0.2
+  bulletSpeed: 75
   baseBullet: {fileID: 4390976419354512532, guid: e0d7dc65261bb404da15b854b8953b04, type: 3}
   initialBullets: 5
+  bullets: 0
+  isLimitedBullet: 1
   rechargeText: {fileID: 0}
   playerCamera: {fileID: 0}
-  muzzleFlash: {fileID: 0}
-  muzzlePosition: {fileID: 0}
+  muzzleFlash: {fileID: 8630981382690700426, guid: ba1315578641cd14fab6827f1a16654b, type: 3}
+  muzzlePosition: {fileID: 3735841221239991581}
 --- !u!1 &8198607857744795839
 GameObject:
   m_ObjectHideFlags: 0

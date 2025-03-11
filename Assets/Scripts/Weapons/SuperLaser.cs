@@ -6,7 +6,7 @@ public class SuperLaser : Weapon
 {
     // Variables to define weapon behavior
     //[SerializeField] public GameObject bullet;
-
+    
     public override void Start() {
         base.Start();
     }
@@ -19,8 +19,8 @@ public class SuperLaser : Weapon
     public override void Shoot()
     {
         bulletRotation = gameObject.transform.rotation;
-       
 
+        base.muzzleVFX();
         //spawn bullet
         Instantiate(baseBullet, gameObject.transform.position + Vector3.forward*2, bulletRotation, transform);
     }

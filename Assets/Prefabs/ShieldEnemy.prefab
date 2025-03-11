@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3906549025
+  GlobalObjectIdHash: 2594847443
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -205,6 +205,8 @@ MonoBehaviour:
   active: 0
   speed: 0.5
   health: 10
+  playerDetectionDistance: 5
+  useColliderBounds: 1
   shieldVisual: {fileID: 6231998749022384610}
 --- !u!114 &1311366283115487987
 MonoBehaviour:
@@ -292,6 +294,10 @@ PrefabInstance:
     - target: {fileID: 4781469853040734874, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8377787562599878449, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3151108526
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
