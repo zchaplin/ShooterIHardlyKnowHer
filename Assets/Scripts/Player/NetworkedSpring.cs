@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class NetworkedSpring : NetworkBehaviour
 {
-    public float springConstant = 10f; // Spring stiffness
-    public float damping = 1f; // Damping factor
+    public float springConstant = 100f; // Spring stiffness
+    public float damping = 4f; // Damping factor
     public float restLength = 2f; // Rest length of the spring
 
     public GameObject StartChainPre; // Start chain prefab

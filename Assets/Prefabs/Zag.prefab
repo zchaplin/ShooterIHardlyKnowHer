@@ -122,11 +122,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pushForce: 5
   interval: 1
+  rotationAmount: 15
   animator: {fileID: 8689869761777763878}
   sneakWalkParam: sneakWalk
-  turnLeftParam: turnLeft
-  turnRightParam: turnRight
-  turnAnimationDuration: 0.5
 --- !u!114 &8091307679367588431
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,6 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8535c1b53b2d68f45867e00d829107e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vfxPrefab: {fileID: 1007127540951276732, guid: 3ace37360f306cb4aac03640550fa9ef, type: 3}
   active: 0
   speed: 0.5
   health: 10

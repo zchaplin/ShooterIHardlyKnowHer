@@ -6,6 +6,7 @@ using Unity.Netcode;
 
 public class NetworkMoveEnemy : NetworkBehaviour
 {
+    public GameObject vfxPrefab;
     public bool active = false;
     public float speed = 0.5f;
     public int health = 10;
@@ -213,6 +214,8 @@ public class NetworkMoveEnemy : NetworkBehaviour
     // Centralized enemy destruction method
     private void DestroyEnemy()
     {
+        Debug.Log("Boom");
+        Instantiate(vfxPrefab, transform.position, Quaternion.identity);
         EnemyDrop();
         
         if (MusicManager.AudioManager != null)

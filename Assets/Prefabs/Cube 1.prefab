@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8535c1b53b2d68f45867e00d829107e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  vfxPrefab: {fileID: 7187393024123294025, guid: 5f2bc166e68df974bb952c4ec5c43454, type: 3}
   active: 0
   speed: 0.5
   health: 5
