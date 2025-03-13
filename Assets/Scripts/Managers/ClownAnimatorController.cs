@@ -36,6 +36,7 @@ public class ClownAnimatorController : MonoBehaviour
 
         // Set initial state
         animator.SetInteger("clownState", (int)ClownState.Idle);
+        animator.SetBool("clownJumping", false);
         lastAnimationState = ClownState.Idle;
     }
 
@@ -46,6 +47,7 @@ public class ClownAnimatorController : MonoBehaviour
         // Get movement inputs
         bool keyA = Input.GetKey(KeyCode.A);
         bool keyD = Input.GetKey(KeyCode.D);
+        bool spacePressed = Input.GetKeyDown(KeyCode.Space);
 
         // Check grounded state
         if (transform.parent != null)
@@ -62,12 +64,24 @@ public class ClownAnimatorController : MonoBehaviour
         }
 
         bool isJumping = !isGrounded;
-
+        
+        // Set clownJumping bool when space is pressed
+        if (spacePressed && isGrounded)
+        {
+            animator.SetBool("clownJumping", true);
+        }
+        
         // Handle Jump Animation (Trigger)
         if (isJumping && wasGrounded) // Jump just started
         {
             animator.SetTrigger("clownJumpTrigger");
             animator.ResetTrigger("clownJumpTrigger"); // Reset the trigger
+        }
+        
+        // Reset clownJumping bool when landing
+        if (isGrounded && !wasGrounded)
+        {
+            animator.SetBool("clownJumping", false);
         }
 
         // Determine new movement animation state
