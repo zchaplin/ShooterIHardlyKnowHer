@@ -12,6 +12,27 @@ public class MovementManager : NetworkBehaviour
     // Animation components
     [SerializeField] private Animator wizardAnimator; // Reference to wizard's animator
 
+    // Network variables to sync animation states
+    private NetworkVariable<bool> networkMovingRight = new NetworkVariable<bool>(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
+    
+    private NetworkVariable<bool> networkMovingLeft = new NetworkVariable<bool>(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
+    
+    private NetworkVariable<bool> networkJumpUp = new NetworkVariable<bool>(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
+    
+    private NetworkVariable<bool> networkJumpDown = new NetworkVariable<bool>(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
+
     private Rigidbody rb; // Rigidbody component for physics-based movement
     private Collider playerCollider; // Player's collider
     private Vector3 currentVelocityP1 = Vector3.zero;
@@ -40,13 +61,74 @@ public class MovementManager : NetworkBehaviour
         // Lock the cursor to the center of the screen and make it invisible
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        
+        // Register network variable callbacks
+        networkMovingRight.OnValueChanged += OnMovingRightChanged;
+        networkMovingLeft.OnValueChanged += OnMovingLeftChanged;
+        networkJumpUp.OnValueChanged += OnJumpUpChanged;
+        networkJumpDown.OnValueChanged += OnJumpDownChanged;
     }
 
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+        
         if (IsLocalPlayer)
         {
             playerCamera.gameObject.SetActive(true);
+        }
+        
+        // Apply initial states if we're not the owner
+        if (!IsOwner)
+        {
+            OnMovingRightChanged(false, networkMovingRight.Value);
+            OnMovingLeftChanged(false, networkMovingLeft.Value);
+            OnJumpUpChanged(false, networkJumpUp.Value);
+            OnJumpDownChanged(false, networkJumpDown.Value);
+        }
+    }
+    
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+        
+        // Unregister callbacks
+        networkMovingRight.OnValueChanged -= OnMovingRightChanged;
+        networkMovingLeft.OnValueChanged -= OnMovingLeftChanged;
+        networkJumpUp.OnValueChanged -= OnJumpUpChanged;
+        networkJumpDown.OnValueChanged -= OnJumpDownChanged;
+    }
+    
+    // Network callbacks
+    private void OnMovingRightChanged(bool previousValue, bool newValue)
+    {
+        if (!IsOwner && !modelSwitcher.IsClownModel)
+        {
+            wizardAnimator.SetBool("movingRight", newValue);
+        }
+    }
+    
+    private void OnMovingLeftChanged(bool previousValue, bool newValue)
+    {
+        if (!IsOwner && !modelSwitcher.IsClownModel)
+        {
+            wizardAnimator.SetBool("movingLeft", newValue);
+        }
+    }
+    
+    private void OnJumpUpChanged(bool previousValue, bool newValue)
+    {
+        if (!IsOwner && !modelSwitcher.IsClownModel)
+        {
+            wizardAnimator.SetBool("jumpUp", newValue);
+        }
+    }
+    
+    private void OnJumpDownChanged(bool previousValue, bool newValue)
+    {
+        if (!IsOwner && !modelSwitcher.IsClownModel)
+        {
+            wizardAnimator.SetBool("jumpDown", newValue);
         }
     }
 
@@ -180,6 +262,12 @@ public class MovementManager : NetworkBehaviour
         wizardAnimator.SetBool("movingLeft", false);
         wizardAnimator.SetBool("jumpUp", false);
         wizardAnimator.SetBool("jumpDown", false);
+        
+        // Reset network variables
+        networkMovingRight.Value = false;
+        networkMovingLeft.Value = false;
+        networkJumpUp.Value = false;
+        networkJumpDown.Value = false;
 
         // Handle Wizard animations with simplified parameters
         if (isJumping)
@@ -188,32 +276,38 @@ public class MovementManager : NetworkBehaviour
             if (isJumpingUp)
             {
                 wizardAnimator.SetBool("jumpUp", true);
+                networkJumpUp.Value = true;
             }
             else // jumping down
             {
                 wizardAnimator.SetBool("jumpDown", true);
+                networkJumpDown.Value = true;
             }
             
             // Also set movement flags if moving horizontally while jumping
             if (isMovingRight)
             {
                 wizardAnimator.SetBool("movingRight", true);
+                networkMovingRight.Value = true;
                 Debug.Log("Wizard jumping while moving right");
             }
             else if (isMovingLeft)
             {
                 wizardAnimator.SetBool("movingLeft", true);
+                networkMovingLeft.Value = true;
                 Debug.Log("Wizard jumping while moving left");
             }
         }
         else if (isMovingRight)
         {
             wizardAnimator.SetBool("movingRight", true);
+            networkMovingRight.Value = true;
             Debug.Log("Wizard moving right");
         }
         else if (isMovingLeft)
         {
             wizardAnimator.SetBool("movingLeft", true);
+            networkMovingLeft.Value = true;
             Debug.Log("Wizard moving left");
         }
         // Idle is default when no animation is set

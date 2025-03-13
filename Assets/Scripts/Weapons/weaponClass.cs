@@ -25,6 +25,15 @@ public class Weapon : MonoBehaviour
 
     public GameObject muzzleFlash;
     public Transform muzzlePosition;
+
+    // Zoom functionality
+    [Header("Zoom Settings")]
+    public float defaultFOV = 60f;     // Default camera FOV
+    public float zoomFOV = 40f;        // FOV when zoomed in
+    public float zoomSpeed = 10f;      // How fast to transition between zoom states
+    private bool isZooming = false;    // Track if player is currently zooming
+    private float targetFOV;           // The target FOV we're transitioning to
+
     public virtual void Start()
     {
         bullets = initialBullets;
@@ -35,11 +44,18 @@ public class Weapon : MonoBehaviour
             return;
         }
         rechargeText = GameObject.Find("Canvas/WeaponStats/Manager/ammo/Recharge").GetComponent<TMP_Text>();
+        
+        // Initialize FOV variables
+        defaultFOV = playerCamera.fieldOfView;
+        targetFOV = defaultFOV;
     }
 
     // Update is called once per frame
     public virtual void Update()
     {
+        // Handle zoom with right mouse button
+        HandleZoom();
+        
         // Check if it's time to fire
         if (Input.GetMouseButton(0) && Time.time >= nextTimeToFire && !ShowWeaponStats.isPaused) // 0 = Left Mouse Button
         {
@@ -57,6 +73,25 @@ public class Weapon : MonoBehaviour
         } else {
             rechargeText.text = "" + bullets;
         }
+    }
+
+    // Handle the zoom functionality
+    private void HandleZoom()
+    {
+        // Check if right mouse button is being held
+        if (Input.GetMouseButton(1) && !ShowWeaponStats.isPaused) // 1 = Right Mouse Button
+        {
+            isZooming = true;
+            targetFOV = zoomFOV;
+        }
+        else
+        {
+            isZooming = false;
+            targetFOV = defaultFOV;
+        }
+
+        // Smoothly interpolate between current FOV and target FOV
+        playerCamera.fieldOfView = Mathf.Lerp(playerCamera.fieldOfView, targetFOV, Time.deltaTime * zoomSpeed);
     }
 
     // Add back the GetShootDirection method for boomerang and other weapons
@@ -162,5 +197,11 @@ public class Weapon : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    // Public accessor for zoom state - useful for other scripts that might need to know if player is zooming
+    public bool IsZooming()
+    {
+        return isZooming;
     }
 }
