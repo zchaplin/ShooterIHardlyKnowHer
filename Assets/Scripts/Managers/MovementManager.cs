@@ -9,6 +9,9 @@ public class MovementManager : NetworkBehaviour
     [SerializeField] private float mouseSensitivity = 2f; // Sensitivity for mouse movement
     [SerializeField] private float jumpForce = 5f; // Force applied when jumping
 
+    // Animation components
+    [SerializeField] private Animator wizardAnimator; // Reference to wizard's animator
+
     private Rigidbody rb; // Rigidbody component for physics-based movement
     private Collider playerCollider; // Player's collider
     private Vector3 currentVelocityP1 = Vector3.zero;
@@ -18,6 +21,9 @@ public class MovementManager : NetworkBehaviour
     private float verticalVelocity = 0f; // Track vertical velocity for jump state
     
     private PlayerModelSwitcher modelSwitcher; // Reference to the model switcher
+    private bool wasJumping = false; // Track if we were jumping last frame
+    private bool isMovingRight = false; // Track if we're moving right
+    private bool isMovingLeft = false; // Track if we're moving left
 
     void Start()
     {
@@ -63,6 +69,9 @@ public class MovementManager : NetworkBehaviour
         {
             Jump();
         }
+
+        // Update animations based on current movement state
+        UpdateAnimations();
     }
 
     void FixedUpdate()
@@ -77,8 +86,16 @@ public class MovementManager : NetworkBehaviour
     {
         // Get input for sideways movement (A/D keys)
         float moveX = Input.GetAxis("Horizontal");
-
-        // Reverse movement for Player 2 
+        
+        // Simply track raw input for animations - this works for wizard
+        isMovingRight = moveX > 0.1f;
+        isMovingLeft = moveX < -0.1f;
+        
+        // For debug
+        if (isMovingRight) Debug.Log("Raw Input: Moving RIGHT");
+        if (isMovingLeft) Debug.Log("Raw Input: Moving LEFT");
+        
+        // Reverse movement for Player 2 physics
         if (!IsServer)
         {
             moveX *= -1;
@@ -143,5 +160,67 @@ public class MovementManager : NetworkBehaviour
         {
             isGrounded = true;
         }
+    }
+
+    void UpdateAnimations()
+    {
+        bool isJumping = !isGrounded;
+        bool isJumpingUp = isJumping && verticalVelocity > 0;
+        bool isJumpingDown = isJumping && verticalVelocity <= 0;
+        
+        // Determine if we just started jumping
+        bool jumpStarted = !wasJumping && isJumping;
+        wasJumping = isJumping;
+
+        // Skip animation updates for clown model - now handled by ClownAnimatorController
+        if (modelSwitcher.IsClownModel) return;
+
+        // Reset all wizard animation flags
+        wizardAnimator.SetBool("movingRight", false);
+        wizardAnimator.SetBool("movingLeft", false);
+        wizardAnimator.SetBool("jumpUp", false);
+        wizardAnimator.SetBool("jumpDown", false);
+
+        // Handle Wizard animations with simplified parameters
+        if (isJumping)
+        {
+            // Set the appropriate jump animation based on vertical velocity
+            if (isJumpingUp)
+            {
+                wizardAnimator.SetBool("jumpUp", true);
+            }
+            else // jumping down
+            {
+                wizardAnimator.SetBool("jumpDown", true);
+            }
+            
+            // Also set movement flags if moving horizontally while jumping
+            if (isMovingRight)
+            {
+                wizardAnimator.SetBool("movingRight", true);
+                Debug.Log("Wizard jumping while moving right");
+            }
+            else if (isMovingLeft)
+            {
+                wizardAnimator.SetBool("movingLeft", true);
+                Debug.Log("Wizard jumping while moving left");
+            }
+        }
+        else if (isMovingRight)
+        {
+            wizardAnimator.SetBool("movingRight", true);
+            Debug.Log("Wizard moving right");
+        }
+        else if (isMovingLeft)
+        {
+            wizardAnimator.SetBool("movingLeft", true);
+            Debug.Log("Wizard moving left");
+        }
+        // Idle is default when no animation is set
+    }
+
+    public bool IsGrounded
+    {
+        get { return isGrounded; }
     }
 }
