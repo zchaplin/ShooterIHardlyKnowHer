@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: GameText_es
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: es
+  m_SharedData: {fileID: 11400000, guid: fd526164768085c409a4dd251d07a33d, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 53642788864
+    m_Localized: Comenzar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21025661911040
+    m_Localized: SCORE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 30683952840704
+    m_Localized: 'SALUD:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21433507643392
+    m_Localized: "Introducir c\xF3digo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21421595820032
+    m_Localized: Unirse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21387584208896
+    m_Localized: "Anfitri\xF3n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21367120199680
+    m_Localized: Volumen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21346513584128
+    m_Localized: "\xA1Dispara a los enemigos!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21332240367616
+    m_Localized: Instrucciones
+    m_Metadata:
+      m_Items: []
+  - m_Id: 21064710881280
+    m_Localized: Controles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 16775259095040
+    m_Localized: 'Movimiento
+
+      Disparar
+
+      Acercar
+
+      Recoger arma
+
+      Soltar
+      arma
+
+      Saltar'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 41259059904512
+    m_Localized: Salir
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []
