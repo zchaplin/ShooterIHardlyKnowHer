@@ -99,7 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1618741625
+  GlobalObjectIdHash: 3764974615
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -245,7 +245,7 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: cdeb0269c5ea8124a99af83a22237362, type: 2}
     - target: {fileID: 5866666021909216657, guid: 14e85d6ba5cb364449a6750e92098197, type: 3}
       propertyPath: m_ApplyRootMotion
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -332,7 +332,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8377787562599878449, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 1618741625
+      value: 2904231037
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

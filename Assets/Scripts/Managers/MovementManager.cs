@@ -174,8 +174,8 @@ public class MovementManager : NetworkBehaviour
         isMovingLeft = moveX < -0.1f;
         
         // For debug
-        if (isMovingRight) Debug.Log("Raw Input: Moving RIGHT");
-        if (isMovingLeft) Debug.Log("Raw Input: Moving LEFT");
+        // if (isMovingRight) Debug.Log("Raw Input: Moving RIGHT");
+        // if (isMovingLeft) Debug.Log("Raw Input: Moving LEFT");
         
         // Reverse movement for Player 2 physics
         if (!IsServer)
@@ -289,26 +289,26 @@ public class MovementManager : NetworkBehaviour
             {
                 wizardAnimator.SetBool("movingRight", true);
                 networkMovingRight.Value = true;
-                Debug.Log("Wizard jumping while moving right");
+                // Debug.Log("Wizard jumping while moving right");
             }
             else if (isMovingLeft)
             {
                 wizardAnimator.SetBool("movingLeft", true);
                 networkMovingLeft.Value = true;
-                Debug.Log("Wizard jumping while moving left");
+                // Debug.Log("Wizard jumping while moving left");
             }
         }
         else if (isMovingRight)
         {
             wizardAnimator.SetBool("movingRight", true);
             networkMovingRight.Value = true;
-            Debug.Log("Wizard moving right");
+            // Debug.Log("Wizard moving right");
         }
         else if (isMovingLeft)
         {
             wizardAnimator.SetBool("movingLeft", true);
             networkMovingLeft.Value = true;
-            Debug.Log("Wizard moving left");
+            // Debug.Log("Wizard moving left");
         }
         // Idle is default when no animation is set
     }

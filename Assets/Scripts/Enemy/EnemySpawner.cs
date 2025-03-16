@@ -81,7 +81,7 @@ public class EnemySpawner : NetworkBehaviour
             enemiesInWave[1] = false;
             enemiesInWave[2] = false;
             enemiesInWave[3] = false;
-            enemiesInWave[5] = true;
+            // enemiesInWave[5] = true;  // Removed shield enemy due to functional issues
             availableWeapons[4] = true;
         }
         else if (waveNum == 13) {

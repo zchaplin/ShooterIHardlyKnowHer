@@ -147,7 +147,7 @@ Transform:
   m_GameObject: {fileID: 2635761614529097251}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.58, z: 0.139}
+  m_LocalPosition: {x: 0, y: 0.58, z: 0.358}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1517,6 +1517,9 @@ MonoBehaviour:
   playerCamera: {fileID: 1629880104306304855}
   muzzleFlash: {fileID: 8630981382690700426, guid: ba1315578641cd14fab6827f1a16654b, type: 3}
   muzzlePosition: {fileID: 1208423220655749629}
+  defaultFOV: 60
+  zoomFOV: 40
+  zoomSpeed: 10
   maxEnemies: 3
   lineMaterial: {fileID: 2100000, guid: aa9f25951a207ca4c9659ce9a2d03d59, type: 2}
   lineColor: {r: 0, g: 0, b: 1, a: 1}
