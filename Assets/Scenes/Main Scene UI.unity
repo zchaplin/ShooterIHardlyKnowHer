@@ -18047,6 +18047,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 730217262}
+  - component: {fileID: 730217264}
   - component: {fileID: 730217261}
   - component: {fileID: 730217263}
   m_Layer: 0
@@ -18108,6 +18109,27 @@ MonoBehaviour:
   references:
     version: 2
     RefIds: []
+--- !u!114 &730217264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 730217260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 550707728
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &730476352
 GameObject:
   m_ObjectHideFlags: 0
@@ -29963,7 +29985,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1180106293}
-  - component: {fileID: 1180106294}
   m_Layer: 5
   m_Name: LanguageButtons
   m_TagString: Untagged
@@ -29993,18 +30014,6 @@ RectTransform:
   m_AnchoredPosition: {x: 82.40006, y: 48.290985}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1180106294
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1180106292}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 706b381b04b6e5b42b85364b5aeedcfd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1199522218
 PrefabInstance:
   m_ObjectHideFlags: 0
