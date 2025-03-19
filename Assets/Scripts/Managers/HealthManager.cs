@@ -46,6 +46,10 @@ public class HealthManager : NetworkBehaviour
     }
 
     public void playerTakeDamage(int dmg) {
+        if (MusicManager.AudioManager != null)
+        {
+            MusicManager.AudioManager.playerDamage();
+        }
         if (IsServer)
         {
             if (remainingHealth.Value > 0) {
@@ -70,7 +74,6 @@ public class HealthManager : NetworkBehaviour
     [ServerRpc(RequireOwnership = false)]
     private void SubmitHealthServerRpc(int dmg)
     {
-        Debug.Log($"SubmitHealthServerRpc called with dmg: {dmg}. Current health: {remainingHealth.Value}");
 
          if (remainingHealth.Value > 0) {
                 remainingHealth.Value -= dmg;
@@ -80,7 +83,6 @@ public class HealthManager : NetworkBehaviour
             remainingHealth.Value = 0;
             GameOverAllClients();
         }
-         Debug.Log($"Health after damage: {remainingHealth.Value}");
 
        
     }
@@ -97,11 +99,11 @@ public class HealthManager : NetworkBehaviour
     }
 
     private void GameOverAllClients()
-{
-    if (IsServer) // Only the server can load the scene for all clients
     {
-        Debug.Log("Game Over! Syncing scene for all clients...");
-        NetworkManager.SceneManager.LoadScene("EndScreen", LoadSceneMode.Single);
+        if (IsServer) // Only the server can load the scene for all clients
+        {
+            Debug.Log("Game Over! Syncing scene for all clients...");
+            NetworkManager.SceneManager.LoadScene("EndScreen", LoadSceneMode.Single);
+        }
     }
-}
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using Unity.Netcode;
 
+
 public class NetworkMoveEnemy : NetworkBehaviour
 {
     public GameObject vfxPrefab;
@@ -216,7 +217,7 @@ public class NetworkMoveEnemy : NetworkBehaviour
     private void DestroyEnemy()
     {
         Debug.Log("Boom");
-        Instantiate(vfxPrefab, transform.position, Quaternion.identity);
+        // Instantiate(vfxPrefab, transform.position, Quaternion.identity);
         EnemyDrop();
         
         if (MusicManager.AudioManager != null)
@@ -231,16 +232,25 @@ public class NetworkMoveEnemy : NetworkBehaviour
         GetComponent<NetworkObject>().Despawn(true);
     }
     
+    // public AudioSource source;
+    // public AudioClip enemyClip;
+
     [ClientRpc]
     private void EnemyDyingClientRpc()
     {
         // Optional death effects
+        Instantiate(vfxPrefab, transform.position, Quaternion.identity);
+        // play a sound
+        // source.clip = enemyClip;
+        // source.Play();
     }
     
+    // public AudioClip[] damageClip;
     [ClientRpc]
     private void EnemyReachedPlayerClientRpc()
     {
         // Optional player reached effects
+        
     }
 
     public void EnemyDrop()

@@ -16,6 +16,15 @@ public class peaShooter : Weapon
     public override void Shoot()
     {
         base.Shoot();
+        if (gameObject.name == "peaShooter" && MusicManager.AudioManager != null)
+        {
+            MusicManager.AudioManager.basicGun();
+        }
+
+        if (gameObject.name == "Bouncy" && MusicManager.AudioManager != null)
+        {
+            MusicManager.AudioManager.bouncyGun();
+        }
     }
 }
 

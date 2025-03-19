@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1575655725
+  GlobalObjectIdHash: 4272945398
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -157,6 +157,13 @@ MonoBehaviour:
   playerDetectionDistance: 5
   useColliderBounds: 1
   shieldVisual: {fileID: 8841042873187922771}
+  source: {fileID: 2528240974593634740, guid: 52d9bf1455b48134383741dd3ff408c4, type: 3}
+  enemyClip: {fileID: 8300000, guid: 46a68a490200e6147abe5acb76ee237f, type: 3}
+  damageClip:
+  - {fileID: 8300000, guid: fba6a5c16e743084abdc2925e2245c60, type: 3}
+  - {fileID: 8300000, guid: 73a78f4544d72784aa613ce7e54bdfef, type: 3}
+  - {fileID: 8300000, guid: b51451fb6aafe6a45aca4a0edd17c63c, type: 3}
+  - {fileID: 8300000, guid: d9172e6dc1092324a8fb504abeee4766, type: 3}
 --- !u!1001 &8283029372778981397
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -289,7 +296,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8377787562599878449, guid: 66376033e13e048498ab3e5bef47ac97, type: 3}
       propertyPath: GlobalObjectIdHash
-      value: 3251655501
+      value: 4272945398
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

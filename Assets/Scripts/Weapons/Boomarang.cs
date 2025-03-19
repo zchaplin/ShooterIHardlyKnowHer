@@ -38,6 +38,10 @@ public class Boomarang : Weapon
 
     public override void Shoot()
     {
+        if (MusicManager.AudioManager != null)
+        {
+            MusicManager.AudioManager.boomerangSound();
+        }
         isShot = true;
         // Calculate the direction from the weapon to the crosshair
         Vector3 shootDirection = GetShootDirection();

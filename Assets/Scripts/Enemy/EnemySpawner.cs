@@ -63,7 +63,7 @@ public class EnemySpawner : NetworkBehaviour
         }
         else if (waveNum == 3) {
             enemiesInWave[1] = true;
-            availableWeapons[2] = true;
+            availableWeapons[4] = true;
         }
         else if (waveNum == 5) {
             enemiesInWave[1] = false;
@@ -82,7 +82,7 @@ public class EnemySpawner : NetworkBehaviour
             enemiesInWave[2] = false;
             enemiesInWave[3] = false;
             // enemiesInWave[5] = true;  // Removed shield enemy due to functional issues
-            availableWeapons[4] = true;
+            availableWeapons[5] = true;
         }
         else if (waveNum == 13) {
             enemiesInWave[0] = true;
@@ -93,6 +93,7 @@ public class EnemySpawner : NetworkBehaviour
         }
         else if (waveNum == 18) {            
             enemiesInWave[3] = true;
+            availableWeapons[2] = true;
         }
         // Spawn a wave of enemies
         for (int i = 0; i < enemiesNum; i++)
