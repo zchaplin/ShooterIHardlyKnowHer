@@ -11,7 +11,7 @@ public class EnemySpawner : NetworkBehaviour
     public int waveNum = 0;
     private bool inWave = false;
     public bool[] enemiesInWave;
-    public int maxWave = 20;
+    // public int maxWave = 20;
     public bool[] availableWeapons;
     public int numWeapons = 6;
     public float minX = -5f; // Minimum X position
@@ -110,21 +110,20 @@ public class EnemySpawner : NetworkBehaviour
 
     public IEnumerator StartWave()
     {
-        //Debug.Log("Function called! IsServer: " + IsServer);
-
         if (IsServer) {
-            yield return new WaitForSeconds(15f); 
-            inWave = true;
-            waveNum++;
-            if (minX > -10 && maxX < 10) {
-                minX -= 1;
-                maxX += 1;
+            int enemyCount = GameObject.FindGameObjectsWithTag(tag).Length;
+            if (enemyCount <= 5) {
+                yield return new WaitForSeconds(15f); 
+                inWave = true;
+                waveNum++;
+                if (minX > -10 && maxX < 10) {
+                    minX -= 1;
+                    maxX += 1;
+                }
+                
+                StartCoroutine(SpawnWave((int)numEnemies));
+                numEnemies *= 1.2f;
             }
-            
-            //Debug.Log("Wave " + waveNum + " started");
-            StartCoroutine(SpawnWave((int)numEnemies));
-            numEnemies *= 1.2f;
-            
         }
     }
 

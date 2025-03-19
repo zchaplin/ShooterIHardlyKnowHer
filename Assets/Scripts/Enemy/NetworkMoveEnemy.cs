@@ -174,6 +174,7 @@ public class NetworkMoveEnemy : NetworkBehaviour
         if (IsNearPlayer())
         {
             // Player damage and despawn
+            // Debug.Log("player taking damage from enemy script");
             playerHealth.playerTakeDamage(1);
             EnemyReachedPlayerClientRpc();
             
