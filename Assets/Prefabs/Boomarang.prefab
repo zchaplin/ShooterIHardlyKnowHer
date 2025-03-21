@@ -119,11 +119,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e6609ecbd2952b4ab68332378d7b69e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireRate: 0.7
+  fireRate: 0.9
+  bulletSpeed: 75
   baseBullet: {fileID: 4390976419354512532, guid: 67e031de2e88ef343aec08542f2c7756, type: 3}
   initialBullets: 20
+  bullets: 0
+  isLimitedBullet: 1
   rechargeText: {fileID: 0}
   playerCamera: {fileID: 0}
+  muzzleFlash: {fileID: 0}
+  muzzlePosition: {fileID: 0}
+  defaultFOV: 60
+  zoomFOV: 40
+  zoomSpeed: 10
+  maxPoint: 50
 --- !u!1 &3524116398937713226
 GameObject:
   m_ObjectHideFlags: 0

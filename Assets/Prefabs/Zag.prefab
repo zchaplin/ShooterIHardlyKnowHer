@@ -139,7 +139,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vfxPrefab: {fileID: 1007127540951276732, guid: 3ace37360f306cb4aac03640550fa9ef, type: 3}
   active: 0
-  speed: 0.5
+  speed: 0.3
   health: 10
   playerDetectionDistance: 5
   useColliderBounds: 1

@@ -123,7 +123,9 @@ public class EnemySpawner : NetworkBehaviour
                 }
                 
                 StartCoroutine(SpawnWave((int)numEnemies));
-                numEnemies *= 1.2f;
+                if (waveNum%3==0) {
+                    numEnemies += 1f;
+                }
             }
         }
     }
